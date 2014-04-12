@@ -28,6 +28,31 @@
                 width: 300px;
                 height: 200px;
             }
+            .gallery-cover {
+                /* This is the surrounding div */
+                position: relative;
+            }
+            .gallery-cover img {
+                width: 150px;
+                height: 100px;
+            }
+            .gallery-cover div {
+                /* This is the popover div */
+                position: absolute;
+                top: 70px;
+                width: 100%;
+                padding: 5px 0;
+                background-color: rgba(30, 30, 30, 0.64);
+            }
+            .gallery-cover div span {
+                /* This is where the popover text is */
+                position: relative;
+                font-size: 11pt;
+                font-weight: lighter;
+                color: #e5e5e5;
+                text-align: center;
+                margin: 0 5px;
+            }
 
             .image-info {
                 position: absolute;
@@ -42,6 +67,9 @@
             .image-info-sf {
                 top: 200px;
             }
+            .image-info-gc {
+                top: 100px;
+            }
             .info-text {
                 position: relative;
                 top: 10px;
@@ -50,10 +78,7 @@
                 color: #e5e5e5;
             }
 
-            .gallery-cover-image {
-                width:150px;
-                height: 100px;
-            }
+
 
             .outer {
                 display: table;
@@ -70,7 +95,7 @@
             .inner {
                 margin-left: auto;
                 margin-right: auto;
-                width: 900px;
+                width: 1000px;
             }
 {#            .row {#}
 {#                padding: 0;#}
@@ -152,9 +177,11 @@
 
                     <div class="row nopadding">
                         {% for gallery_cover in gallery_covers %}
-                            <div class="col-md-2 nopadding">
-                                <img src="{{ gallery_cover.cover.image.url }}" class="gallery-cover-image" />
-                                <span>{{ gallery_cover.gallery.name }}</span>
+                            <div class="col-md-2 nopadding gallery-cover">
+                                <img src="{{ gallery_cover.cover.image.url }}" />
+                                <div>
+                                    <span>{{ gallery_cover.gallery.name }}</span>
+                                </div>
                             </div>
                         {% endfor %}
 {#                        <div class="col-md-2 nopadding">#}
@@ -206,36 +233,45 @@
         </div>
         <script>
 
-            $(document).ready(function() {
-                $(".image-info").height(0);
-            });
+{#            $(document).ready(function() {#}
+{#                $(".image-info").height(0);#}
+{#            });#}
 
-            $(".primary-feature-group").hover(function() {
-                console.log($(this).children(".image-info").first()
-                    .animate({
-                            height: ["100px", 'easeOutBack'],
-                            top: ["350px", 'easeOutBack']
-                        }, 250));
-            }, function() {
-                console.log($(this).children(".image-info").first()
-                    .animate({
-                            height: ["0", 'easeOutBack'],
-                            top: ["400px", 'easeOutBack']
-                        }, 250));
-            });
-            $(".secondary-feature-group-top").hover(function() {
+
+{#            $(".primary-feature-group").hover(function() {#}
+{#                $(this).children(".image-info").first()#}
+{#                    .animate({#}
+{#                            height: ["50px", 'easeOutBack'],#}
+{#                            top: ["350px", 'easeOutBack']#}
+{#                            height: "50px",#}
+{#                            top: "350px"#}
+{#                        }, 250);#}
+{#            }, function() {#}
+{#                $(this).children(".image-info").first()#}
+{#                    .animate({#}
+{#                            height: ["0", 'easeOutBack'],#}
+{#                            top: ["400px", 'easeOutBack']#}
+{#                            height: "0",#}
+{#                            top: "400px"#}
+{#                        }, 250);#}
+{#            });#}
+{#            $(".secondary-feature-group-top").hover(function() {#}
 {#                    $(".image-info-sf-top").child(".info-text").show(0);#}
-                    $(this).children(".image-info-sf-top")
-                            .animate({
-                                height: ["100px", 'easeOutBack'],
-                                top: ["150px", 'easeOutBack']
-                            }, 250);
-                }, function() {$(this).children(".image-info-sf-top")
-                        .animate({
-                            height: ["0", 'easeOutBack'],
-                            top: ["200px", 'easeOutBack']
-                        }, 250)
-            });
+{#                    $(this).find(".image-info-sf-top")#}
+{#                            .animate({#}
+{#                                height: ["50px", 'easeOutBack'],#}
+{#                                top: ["150px", 'easeOutBack']#}
+{#                                height: "50px",#}
+{#                                top: "150px"#}
+{#                            }, 250);#}
+{#                }, function() {$(this).find(".image-info-sf-top")#}
+{#                        .animate({#}
+{#                            height: ["0", 'easeOutBack'],#}
+{#                            top: ["200px", 'easeOutBack']#}
+{#                            height: "0",#}
+{#                            top: "200px"#}
+{#                        }, 250)#}
+{#            });#}
         </script>
     </body>
 </html>
