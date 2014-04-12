@@ -15,70 +15,97 @@
                 height:100%;
                 background:#DCDDDE;
             }
-{#            .simulated-viewport {#}
-{#                width: 900px;#}
-{#                margin: 0 auto;#}
-{#            }#}
+
+            div.popover-common {
+                position: absolute;
+{#                width: 100%;#}
+                background-color: rgba(30, 30, 30, 0.64);
+            }
+            .popover-common span {
+                position: relative;
+                margin: 0 10px;
+                font-weight: lighter;
+                color: #e5e5e5;
+            }
+
+            /* Primary feature */
             .primary-feature {
+                position: relative;
+                float: left;
                 width: 600px;
                 height: 400px;
+            }
+            .primary-feature a img {
+                width: 600px;
+                height: 400px;
+            }
+            .primary-feature div {
+                /* Popover */
+                width: 600px;
+                height: 50px;
+                top: 350px;
+            }
+            .primary-feature div span {
+                /* Styles specific to Primary Feature popover */
+                font-size: 25pt;
+            }
+
+            /* Secondary Feature */
+            .secondary-feature-group {
                 position: relative;
+                float: left;
+                width: 300px;
+                height: 400px;
             }
             .secondary-feature {
+                position: relative;
+                float: left;
                 width: 300px;
                 height: 200px;
             }
-            .gallery-cover {
-                /* This is the surrounding div */
-                position: relative;
+            .secondary-feature a img {
+                width: 300px;
+                height: 200px;
             }
-            .gallery-cover img {
-                width: 150px;
-                height: 100px;
+            .secondary-feature div {
+                /* Popover */
+                width: 300px;
+                height: 30px;
+                top: 170px; /* 200-30 */
             }
-            .gallery-cover div {
-                /* This is the popover div */
-                position: absolute;
-                top: 70px;
-                width: 100%;
-                padding: 5px 0;
-                background-color: rgba(30, 30, 30, 0.64);
-            }
-            .gallery-cover div span {
-                /* This is where the popover text is */
-                position: relative;
-                font-size: 11pt;
-                font-weight: lighter;
-                color: #e5e5e5;
-                text-align: center;
-                margin: 0 5px;
+            .secondary-feature div span {
+                font-size: 18pt;
             }
 
-            .image-info {
-                position: absolute;
-                height: 50px;
-                width: 100%;
-                background-color: rgba(30, 30, 30, 0.64);
-            }
 
-            .image-info-pf {
-                top: 400px;
+            /* Gallery Cover Photos in carousel-esque thing */
+            .gallery-image {
+                /* Div with Img, Div & div -> span */
+                position: relative;
+                float: left;
+                width: 180px;
+                height: 120px; /* THIS IS NOT RIGHT */
             }
-            .image-info-sf {
-                top: 200px;
+            .gallery-image a img {
+                width: 180px;
+                height: 120px; /* THIS IS NOT RIGHT */
             }
-            .image-info-gc {
+            .gallery-image div {
+                width: 180px;
+                height: 20px;
                 top: 100px;
             }
-            .info-text {
-                position: relative;
-                top: 10px;
-                left: 20px;
-                font-size: 15pt;
-                color: #e5e5e5;
+            .gallery-image div span {
+                font-size: 11pt;
             }
 
-
+            /* carousel-esque thingy */
+            .gallery-carousel {
+                position: relative;
+                width: 100%;
+                height: 120px;
+                overflow: hidden;
+            }
 
             .outer {
                 display: table;
@@ -95,16 +122,9 @@
             .inner {
                 margin-left: auto;
                 margin-right: auto;
-                width: 1000px;
+                width: 900px;
             }
-{#            .row {#}
-{#                padding: 0;#}
-{#                margin: 0;#}
-{#            }#}
-{#            .col-md-* {#}
-{#                padding: 0;#}
-{#                margin: 0;#}
-{#            }#}
+
             .nopadding {
                 padding: 0 !important;
                 margin: 0 !important;
@@ -149,59 +169,72 @@
 {#                        </div>#}
 {#                    </div>#}
                     <div class="row nopadding">
-                        <div class="col-md-8 nopadding">
-                            <div class="primary-feature-group">
-                                <img src="{{ primary_feature.image.image.url }}" class="primary-feature" />
-                                <div class="image-info image-info-pf"><span class="info-text">{{ primary_feature.image.title }}</span></div>
+                        <div class="primary-feature nopadding">
+                            <a href="/gallery/{{ primary_feature.image.gallery.slug }}">
+                                <img src="{{ primary_feature.image.image.url }}" alt="{{ primary_feature.image.gallery.name }}"/>
+                            </a>
+                            <div class="popover-common">
+                                <span>{{ primary_feature.image.title }}</span>
                             </div>
-{#                            <img src="http://baconmockup.com/600/400">#}
                         </div>
-                        <div class="col-md-4 nopadding">
-                            <div class="secondary-feature-group-top">
-                                <img src="{{ secondary_feature_top.image.image.url }}" class="secondary-feature" />
-                                <div class="image-info image-info-sf image-info-sf-top">
-                                    <span class="info-text">{{ secondary_feature_top.image.title }}</span>
+                        <div class="secondary-feature-group nopadding">
+                            <div class="secondary-feature nopadding">
+                                <a href="/gallery/{{ secondary_feature_top.image.gallery.slug }}">
+                                    <img src="{{ secondary_feature_top.image.image.url }}" alt="{{ secondary_feature_top.image.gallery.name }}" />
+                                </a>
+                                <div class="popover-common">
+                                    <span>{{ secondary_feature_top.image.title }}</span>
                                 </div>
                             </div>
-                            <div class="secondary-feature-group-bottom">
-                                <img src="{{ secondary_feature_bottom.image.image.url }}" class="secondary-feature" />
-                                <div class="image-info image-info-sf image-info-sf-bottom">
-                                    <span class="info-text">{{ secondary_feature_bottom.image.title }}</span>
+                            <div class="secondary-feature nopadding">
+                                <a href="/gallery/{{ secondary_feature_bottom.gallery.slug }}">
+                                    <img src="{{ secondary_feature_bottom.image.image.url }}" alt="{{ secondary_feature_bottom.image.gallery.name }}" />
+                                </a>
+                                <div class="popover-common">
+                                    <span>{{ secondary_feature_bottom.image.title }}</span>
                                 </div>
                             </div>
-{#                            <img src="http://placekitten.com/300/200">#}
-{#                            <img src="http://placehold.it/300x200">#}
-{#                            <img src="http://dummyimage.com/300x200/000/fff">#}
                         </div>
                     </div>
 
                     <div class="row nopadding">
+                        <div class="gallery-carousel">
                         {% for gallery_cover in gallery_covers %}
-                            <div class="col-md-2 nopadding gallery-cover">
-                                <img src="{{ gallery_cover.cover.image.url }}" />
-                                <div>
+                            <div class="gallery-image nopadding">
+                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" alt="{{ gallery_cover.gallery.name }}" /></a>
+                                <div class="popover-common">
                                     <span>{{ gallery_cover.gallery.name }}</span>
                                 </div>
                             </div>
                         {% endfor %}
-{#                        <div class="col-md-2 nopadding">#}
-{#                            <img src="http://placekitten.com/150/100">#}
-{#                        </div>#}
-{#                        <div class="col-md-2 nopadding">#}
-{#                            <img src="http://baconmockup.com/150/100">#}
-{#                        </div>#}
-{#                        <div class="col-md-2 nopadding">#}
-{#                            <img src="http://dummyimage.com/150x100/555/ddd">#}
-{#                        </div>#}
-{#                        <div class="col-md-2 nopadding">#}
-{#                            <img src="http://dummyimage.com/150x100/777/eee">#}
-{#                        </div>#}
-{#                        <div class="col-md-2 nopadding">#}
-{#                            <img src="http://dummyimage.com/150x100/999/fff">#}
-{#                        </div>#}
-{#                        <div class="col-md-2 nopadding">#}
-{#                            <img src="http://dummyimage.com/150x100/555/ddd">#}
-{#                        </div>#}
+
+                        <!-- Hey, here's a great idea: Let's do that 3 more times -->
+                        {% for gallery_cover in gallery_covers %} <!-- #Hashtag we're asking for trouble -->
+                            <div class="gallery-image nopadding">
+                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" /></a>
+                                <div class="popover-common">
+                                    <span>{{ gallery_cover.gallery.name }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% for gallery_cover in gallery_covers %} <!-- #Hashtag we're asking for trouble -->
+                            <div class="gallery-image nopadding">
+                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" /></a>
+                                <div class="popover-common">
+                                    <span>{{ gallery_cover.gallery.name }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% for gallery_cover in gallery_covers %} <!-- #Hashtag we're asking for trouble -->
+                            <div class="gallery-image nopadding">
+                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" /></a>
+                                <div class="popover-common">
+                                    <span>{{ gallery_cover.gallery.name }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        </div>
                     </div>
 
                     <div class="row nopadding">
@@ -231,47 +264,80 @@
 
 
         </div>
-        <script>
 
-{#            $(document).ready(function() {#}
-{#                $(".image-info").height(0);#}
-{#            });#}
+    <!-- Popover Modal Boxes -->
+            <div class="modal fade" id="pricingModal" tabindex="-1" role="dialog" aria-labelledby="pricingModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="pricingModalLabel">Pricing</h4>
+                        </div>
+                        <div class="modal-body">
+                            <strong>Bacon ipsum</strong><br />
+                            Bacon ipsum dolor sit amet turkey swine short loin, strip steak beef ribs sirloin venison flank frankfurter brisket pork andouille ribeye pork belly tongue. Capicola pork chop pastrami, corned beef landjaeger shankle drumstick swine. Pork loin t-bone pork belly ribeye biltong. T-bone bacon landjaeger, tongue rump leberkas biltong shoulder jowl swine ribeye salami sirloin pork loin. Leberkas porchetta beef ribs cow pig filet mignon kevin bacon ground round pork belly meatloaf.
+                            <br />
+                            <br />
+                            <strong>Second Helping</strong><br />
+                            Drumstick hamburger cow, pastrami spare ribs shank pancetta chicken beef turkey strip steak ribeye frankfurter. Rump spare ribs sirloin turkey pork chop bacon meatloaf ham hock doner ribeye filet mignon. Pork belly bacon kevin, sirloin tenderloin beef frankfurter shank swine chuck. Chuck turducken pancetta, kielbasa kevin ground round porchetta beef cow spare ribs jerky turkey. Kielbasa salami sausage pork chop chuck tenderloin, meatloaf hamburger flank tail kevin pork corned beef. Doner venison capicola turkey tail pork belly. Short ribs chicken jowl, shankle kielbasa short loin pancetta pork bacon chuck bresaola frankfurter.
+                            <br />
+                            <br />
+                            <strong>Third Helping</strong><br />
+                            Ribeye chicken ball tip kielbasa rump strip steak landjaeger. Landjaeger shank flank tri-tip, meatball jerky spare ribs fatback prosciutto shankle swine. Sausage sirloin flank prosciutto pancetta andouille leberkas meatloaf boudin t-bone short ribs kielbasa strip steak. Turkey hamburger flank doner sausage ground round salami rump.
+                            <br />
+                            <br />
+                            <strong>Fourth Helping</strong><br />
+                            Pancetta tail corned beef bresaola cow meatball. Meatball tail hamburger bacon, ham tongue beef andouille ham hock tenderloin pig leberkas. T-bone ham hock meatball short loin ball tip leberkas cow turkey bacon shankle. Beef ribs ham hock bresaola, chuck meatloaf tail short loin tenderloin meatball jowl rump prosciutto. Rump pastrami meatball venison turkey chuck shoulder salami.
+                            <br />
+                            <br />
+                            <strong>Finish It Off The Right Way</strong><br />
+                            Doner bresaola kevin chicken flank hamburger swine, fatback sausage venison. Shoulder ball tip kevin flank, jerky porchetta ham hock pancetta shankle brisket hamburger. Venison frankfurter kevin, capicola cow chicken ground round jerky. Sausage shankle jerky ham, leberkas doner pork loin pancetta cow fatback.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+             <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="contactModalLabel">Contact</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <span>Matthew Turley Photography</span><br />
+                                <span>3434 East 7800 South #310</span><br />
+                                <span>Salt Lake City, UT 84121</span><br />
+                            </div>
+                            <hr />
+                            <form role="form">
+                                <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Name">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Email">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Phone">
+                                </div>
+                                <div class="form-group">
+                                    <textarea class="form-control" placeholder="Message"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-default">Submit</button>
+                            </form>
 
-{#            $(".primary-feature-group").hover(function() {#}
-{#                $(this).children(".image-info").first()#}
-{#                    .animate({#}
-{#                            height: ["50px", 'easeOutBack'],#}
-{#                            top: ["350px", 'easeOutBack']#}
-{#                            height: "50px",#}
-{#                            top: "350px"#}
-{#                        }, 250);#}
-{#            }, function() {#}
-{#                $(this).children(".image-info").first()#}
-{#                    .animate({#}
-{#                            height: ["0", 'easeOutBack'],#}
-{#                            top: ["400px", 'easeOutBack']#}
-{#                            height: "0",#}
-{#                            top: "400px"#}
-{#                        }, 250);#}
-{#            });#}
-{#            $(".secondary-feature-group-top").hover(function() {#}
-{#                    $(".image-info-sf-top").child(".info-text").show(0);#}
-{#                    $(this).find(".image-info-sf-top")#}
-{#                            .animate({#}
-{#                                height: ["50px", 'easeOutBack'],#}
-{#                                top: ["150px", 'easeOutBack']#}
-{#                                height: "50px",#}
-{#                                top: "150px"#}
-{#                            }, 250);#}
-{#                }, function() {$(this).find(".image-info-sf-top")#}
-{#                        .animate({#}
-{#                            height: ["0", 'easeOutBack'],#}
-{#                            top: ["200px", 'easeOutBack']#}
-{#                            height: "0",#}
-{#                            top: "200px"#}
-{#                        }, 250)#}
-{#            });#}
-        </script>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <!-- End Modal Boxes -->
+
     </body>
 </html>

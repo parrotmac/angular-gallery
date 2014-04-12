@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import permission_required
 from StockPhotos.models import Image, Gallery, GalleryFeature, GalleryCover
 
@@ -14,6 +14,22 @@ def home(request):
                                          'primary_feature': primary_feature,
                                          'secondary_feature_top': secondary_feature_top,
                                          'secondary_feature_bottom': secondary_feature_bottom})
+
+
+def get_gallery_by_id(request, gallery_id):
+    gallery_images = Image.objects.filter(gallery=gallery_id)
+    return render(request, "gallery.html", {'images': gallery_images})
+
+
+def get_gallery_by_slug(request, gallery_slug):
+    # return HttpResponse("You seem to be looking for: %s" % gallery_slug)
+    gallery_images = Image.objects.filter(gallery__slug__contains=gallery_slug)
+    return render(request, "gallery.html", {'images': gallery_images})
+
+
+def image(request, image_id):
+    image_to_display = Image.objects.filter(pk=image_id)[0]
+    return HttpResponse("You're looking for this: <img src=\"%s\" />" % image_to_display.image.url)
 
 
 def user_login(request):

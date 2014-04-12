@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+{% for image in images %}
+    <img style="width: 500px" src="{{ image.image.url }}" />
+{% endfor %}
+</body>
+</html>

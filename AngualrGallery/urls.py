@@ -7,6 +7,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'StockPhotos.views.home', name='home'),
+    url(r'^gallery/(?P<gallery_id>\d{5})', 'StockPhotos.views.get_gallery_by_id', name='gallery_id'),
+    url(r'^gallery/(?P<gallery_slug>\w+)', 'StockPhotos.views.get_gallery_by_slug', name='gallery_slug'),
+    url(r'^image/(?P<image_id>\d+)', 'StockPhotos.views.image', name='image_id'),
 
     # Just for development
     url(r'^admin/', include(admin.site.urls)),

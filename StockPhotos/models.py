@@ -21,6 +21,7 @@ class Customer(models.Model):
 
 class Gallery(models.Model):
     name = models.CharField(max_length=35)
+    slug = models.SlugField(max_length=35)
 
     def __unicode__(self):
         return self.name
