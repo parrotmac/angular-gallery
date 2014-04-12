@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block easy_title %}Matthew Turley Stock Photography{% endblock %}</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+        <style>
+            html, body{
+                margin:0;
+                padding:0;
+                height:100%;
+                background:#DCDDDE;
+            }
+{#            .simulated-viewport {#}
+{#                width: 900px;#}
+{#                margin: 0 auto;#}
+{#            }#}
+            .primary-feature {
+                width: 600px;
+                height: 400px;
+                position: relative;
+            }
+            .secondary-feature {
+                width: 300px;
+                height: 200px;
+            }
+
+            .image-info {
+                position: absolute;
+                height: 50px;
+                width: 100%;
+                background-color: rgba(30, 30, 30, 0.64);
+            }
+
+            .image-info-pf {
+                top: 400px;
+            }
+            .image-info-sf {
+                top: 200px;
+            }
+            .info-text {
+                position: relative;
+                top: 10px;
+                left: 20px;
+                font-size: 15pt;
+                color: #e5e5e5;
+            }
+
+            .gallery-cover-image {
+                width:150px;
+                height: 100px;
+            }
+
+            .outer {
+                display: table;
+                position: absolute;
+                height: 100%;
+                width: 100%;
+            }
+
+            .middle {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            .inner {
+                margin-left: auto;
+                margin-right: auto;
+                width: 900px;
+            }
+{#            .row {#}
+{#                padding: 0;#}
+{#                margin: 0;#}
+{#            }#}
+{#            .col-md-* {#}
+{#                padding: 0;#}
+{#                margin: 0;#}
+{#            }#}
+            .nopadding {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="outer">
+            <div class="middle">
+                <div class="inner">
+{#                    <div class="row">#}
+{#                        <div class="col-md-12">#}
+                            <nav class="navbar navbar-inverse" role="navigation">
+{#                                <img class="navbar-brand" src="http://isaacparker.org/mts/mts-logo.png" />#}
+                                <a class="navbar-brand" href="#">Matthew Turley Stock</a>
+{#                                <ul class="nav navbar-nav">#}
+{#                                    <li><a href="#">Sign In/Sign Up</a></li>#}
+{#                                    <li><a href="#" data-toggle="modal" data-target="#pricingModal">Pricing</a></li>#}
+{#                                    <li><a href="#" data-toggle="modal" data-target="#contactModal">Contact</a></li>#}
+{#                                </ul>#}
+                                <form class="navbar-form navbar-right" role="search" style="margin-right: 0px">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Search">
+                                    </div>
+                                    <button type="submit" class="btn btn-default">Search</button>
+                                </form>
+                                <ul class="nav navbar-nav navbar-right">
+{#                                <ul class="nav navbar-nav">#}
+                                    <li><a href="#">Galleries</a></li>
+                                    <li><a href="#">Recents</a></li>
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Sign In/Sign Up</a></li>
+                                            <li class="divider"></li>
+                                            <li><a href="#" data-toggle="modal" data-target="#pricingModal">Pricing</a></li>
+                                            <li><a href="#" data-toggle="modal" data-target="#contactModal">Contact</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </nav>
+{#                        </div>#}
+{#                    </div>#}
+                    <div class="row nopadding">
+                        <div class="col-md-8 nopadding">
+                            <div class="primary-feature-group">
+                                <img src="{{ primary_feature.image.image.url }}" class="primary-feature" />
+                                <div class="image-info image-info-pf"><span class="info-text">{{ primary_feature.image.title }}</span></div>
+                            </div>
+{#                            <img src="http://baconmockup.com/600/400">#}
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <div class="secondary-feature-group-top">
+                                <img src="{{ secondary_feature_top.image.image.url }}" class="secondary-feature" />
+                                <div class="image-info image-info-sf image-info-sf-top">
+                                    <span class="info-text">{{ secondary_feature_top.image.title }}</span>
+                                </div>
+                            </div>
+                            <div class="secondary-feature-group-bottom">
+                                <img src="{{ secondary_feature_bottom.image.image.url }}" class="secondary-feature" />
+                                <div class="image-info image-info-sf image-info-sf-bottom">
+                                    <span class="info-text">{{ secondary_feature_bottom.image.title }}</span>
+                                </div>
+                            </div>
+{#                            <img src="http://placekitten.com/300/200">#}
+{#                            <img src="http://placehold.it/300x200">#}
+{#                            <img src="http://dummyimage.com/300x200/000/fff">#}
+                        </div>
+                    </div>
+
+                    <div class="row nopadding">
+                        {% for gallery_cover in gallery_covers %}
+                            <div class="col-md-2 nopadding">
+                                <img src="{{ gallery_cover.cover.image.url }}" class="gallery-cover-image" />
+                                <span>{{ gallery_cover.gallery.name }}</span>
+                            </div>
+                        {% endfor %}
+{#                        <div class="col-md-2 nopadding">#}
+{#                            <img src="http://placekitten.com/150/100">#}
+{#                        </div>#}
+{#                        <div class="col-md-2 nopadding">#}
+{#                            <img src="http://baconmockup.com/150/100">#}
+{#                        </div>#}
+{#                        <div class="col-md-2 nopadding">#}
+{#                            <img src="http://dummyimage.com/150x100/555/ddd">#}
+{#                        </div>#}
+{#                        <div class="col-md-2 nopadding">#}
+{#                            <img src="http://dummyimage.com/150x100/777/eee">#}
+{#                        </div>#}
+{#                        <div class="col-md-2 nopadding">#}
+{#                            <img src="http://dummyimage.com/150x100/999/fff">#}
+{#                        </div>#}
+{#                        <div class="col-md-2 nopadding">#}
+{#                            <img src="http://dummyimage.com/150x100/555/ddd">#}
+{#                        </div>#}
+                    </div>
+
+                    <div class="row nopadding">
+                        <div class="col-md-2 nopadding">
+                            <img src="http://dummyimage.com/150x100/555/ddd">
+                        </div>
+                        <div class="col-md-2 nopadding">
+                            <img src="http://dummyimage.com/150x100/777/eee">
+                        </div>
+                        <div class="col-md-2 nopadding">
+                            <img src="http://dummyimage.com/150x100/999/fff">
+                        </div>
+                        <div class="col-md-2 nopadding">
+                            <img src="http://dummyimage.com/150x100/555/ddd">
+                        </div>
+                        <div class="col-md-2 nopadding">
+                            <img src="http://dummyimage.com/150x100/777/eee">
+                        </div>
+                        <div class="col-md-2 nopadding">
+                            <img src="http://dummyimage.com/150x100/999/fff">
+                        </div>
+                    </div>
+
+                    </div>
+
+            </div>
+
+
+        </div>
+        <script>
+
+            $(document).ready(function() {
+                $(".image-info").height(0);
+            });
+
+            $(".primary-feature-group").hover(function() {
+                console.log($(this).children(".image-info").first()
+                    .animate({
+                            height: ["100px", 'easeOutBack'],
+                            top: ["350px", 'easeOutBack']
+                        }, 250));
+            }, function() {
+                console.log($(this).children(".image-info").first()
+                    .animate({
+                            height: ["0", 'easeOutBack'],
+                            top: ["400px", 'easeOutBack']
+                        }, 250));
+            });
+            $(".secondary-feature-group-top").hover(function() {
+{#                    $(".image-info-sf-top").child(".info-text").show(0);#}
+                    $(this).children(".image-info-sf-top")
+                            .animate({
+                                height: ["100px", 'easeOutBack'],
+                                top: ["150px", 'easeOutBack']
+                            }, 250);
+                }, function() {$(this).children(".image-info-sf-top")
+                        .animate({
+                            height: ["0", 'easeOutBack'],
+                            top: ["200px", 'easeOutBack']
+                        }, 250)
+            });
+        </script>
+    </body>
+</html>
