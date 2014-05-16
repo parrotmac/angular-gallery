@@ -8,6 +8,12 @@ FEATURE_TYPE = (
     (2, 'Secondary Feature (Bottom)'),
 )
 
+IMAGE_RELEASE = (
+    (0, 'Yes'),
+    (1, 'No'),
+    (2, 'N/A'),
+)
+
 
 class Customer(models.Model):
     user = models.ForeignKey(User)
@@ -15,19 +21,21 @@ class Customer(models.Model):
     def __unicode__(self):
         return self.user.first_name + " " + self.user.last_name
 
-    class Meta:
-        verbose_name_plural = 'gallery'
-
 
 class Gallery(models.Model):
     name = models.CharField(max_length=35)
     slug = models.SlugField(max_length=35)
+    active = models.BooleanField(default=False)
+    cover_photo = models.ForeignKey('Photo', blank=True, null=True, related_name='gallery_cover_photo')
 
     def __unicode__(self):
         return self.name
 
     def get_first_image(self):
-        return Image.objects.filter(gallery=self).first()
+        return Photo.objects.filter(gallery=self).first()
+
+    class Meta:
+        verbose_name_plural = 'galleries'
 
 
 class Tag(models.Model):
@@ -37,33 +45,38 @@ class Tag(models.Model):
         return self.tag
 
 
-class Image(models.Model):
+class ImageAttributes(models.Model):
+    attribute = models.CharField(max_length=35)
+
+    def __unicode__(self):
+        return self.attribute
+
+
+class Photo(models.Model):
     title = models.CharField(max_length=64, blank=True)
-    gallery = models.ForeignKey(Gallery)
-    image = models.FileField(upload_to='uploads/')
+    description = models.TextField(blank=True, null=True)
+    gallery = models.ManyToManyField(Gallery)
+    image = models.ImageField(upload_to='uploads/')
+    # thumbnail = models.FileField(upload_to='uploads/thumbnails/')
     tags = models.ManyToManyField(Tag)
+    image_attributes = models.ManyToManyField(ImageAttributes)
+    model_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)
+    property_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)
+    published = models.BooleanField(default=True)
 
     def __unicode__(self):
         if self.title.strip(' ').__len__() > 0:
             return self.title
         else:
-            return str(self.pk).zfill(5)
+            return str(self.pk)
 
-
-class GalleryCover(models.Model):
-    gallery = models.ForeignKey(Gallery)
-    cover = models.ForeignKey(Image)
-
-    def __unicode__(self):
-        return self.cover.title + " as cover for " + self.cover.gallery.name
-
-    def gallery_covers(self):
-        return self
+    def get_tags(self):
+        return self.tags
 
 
 class GalleryFeature(models.Model):
     gallery = models.ForeignKey(Gallery)
-    image = models.ForeignKey(Image)
+    image = models.ForeignKey(Photo)
     type = models.SmallIntegerField(choices=FEATURE_TYPE)
 
     def __unicode__(self):
@@ -73,7 +86,7 @@ class GalleryFeature(models.Model):
 class LightBox(models.Model):
     name = models.CharField(max_length=35)
     user = models.ForeignKey(Customer)
-    images = models.ManyToManyField(Image)
+    images = models.ManyToManyField(Photo)
 
     def __unicode__(self):
         return self.name

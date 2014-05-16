@@ -1,0 +1,66 @@
+{% extends "manage/manage_base.html" %}
+{% block head_area %}
+<style>
+body{
+    background-color: #ebedee;
+}
+.rigidish-container {
+    width: 960px;
+    display: block;
+    height: 640px;
+    margin: 0 auto;
+    padding: 0;
+
+}
+.image-thumbnail {
+    max-height: 160px;
+    max-width: 160px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 0;
+    font-size: 0;
+}
+.image-thumbnail-container {
+    margin: 0;
+    padding: 0;
+    background-color: #ced0d1;
+    position: relative;
+    height: 160px;
+    width: 160px;
+    display: block;
+    float: left;
+    line-height: 0;
+    font-size: 0;
+}
+.pagination-wrapper {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+    width: inherit;
+}
+.pagination {text-align: center;}
+</style>
+{% endblock %}
+{% block content %}
+{#    <h3>Showing page {{ photos.number }} of {{ photos.paginator.num_pages }}</h3>#}
+    <div class="rigidish-container">
+        {% for photo in photos %}
+            <div class="image-thumbnail-container"><a href="{% url "manage_photo_by_id" photo.pk %}"><img class="image-thumbnail" src="{{ photo.image.url }}" alt="{{ image.title }}" /></a></div>
+        {% endfor %}
+    </div>
+    {#    <div class="pagination-wrapper">#}
+        <ul class="pagination pagination-center">
+            {% if photos.has_previous %}<li><a href="{% url "manage_photos_by_page" photos.previous_page_number %}">&laquo; prev</a></li>{% endif %}
+            {% for page in photos.paginator.page_range %}
+                <li{% if forloop.counter == photos.number %} class="active"{% endif %}><a href="{% url "manage_photos_by_page" page %}">{{ page }}</a></li>
+            {% endfor %}
+            {% if photos.has_next %}<li><a href="{% url "manage_photos_by_page" photos.next_page_number  %}">next &raquo;</a></li>{% endif %}
+        </ul>
+{#    </div>#}
+{% endblock %}

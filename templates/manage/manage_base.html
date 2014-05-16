@@ -1,0 +1,43 @@
+{% load staticfiles %}
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Management Suite | {% block page_title %}Main{% endblock %}</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+{#        <link rel="stylesheet" href="{% static "style.css" %}">#}
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script>
+        {% block head_area %}{% endblock %}
+    </head>
+    <body>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+                {% block content %}
+                    <h1>Things to manage...</h1>
+                    <hr />
+                    <h3>Management Actions</h3>
+                    <ul style="list-style: none">
+                        <li><a href="{% url "manage_gallery" %}">Galleries</a></li>
+                        <li><a href="{% url "manage_photos" %}">Individual Photos</a></li>
+                        <li><a href="{% url "manage_clients" %}">Clients</a></li>
+                    </ul>
+                    <hr />
+                    <h3>Quick Links</h3>
+                    <ul style="list-style: none">
+                        <li><a href="upload/">Upload</a></li>
+                        <li><a href="features/">Set Features</a></li>
+                    </ul>
+                {% endblock %}
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+        {% block put_script_tags_here %}
+        <script></script>
+        {% endblock %}
+    </body>
+</html>

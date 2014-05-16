@@ -1,0 +1,90 @@
+{% extends "manage/manage_base.html" %}
+{% block page_title %}{% endblock %}
+{% block head_area %}
+    <style>
+        .image-thumbnail {
+            max-width: 300px;
+            max-height: 300px;
+        }
+    .image-container {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+    .tag-item {
+        background-color: rgb(214, 214, 214);
+    }
+    .tag-item:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+        color: rgb(245, 245, 245);
+    }
+    .add-tag-textbox {
+        width: 180px;
+    }
+    .image-manipulation-buttons {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+    .image-manipulation-buttons li {
+        display: table-cell;
+        text-align: center;
+        border-right: 1px dotted #919293;
+    }
+    .image-manipulation-buttons li:last-child {
+        border-right: 0;
+    }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>Gallery: <strong>{{ gallery.name }}</strong></h1>
+
+    <ul class="image-manipulation-buttons">
+        <li style="width: 400px; text-align: left"><span style="font-style: italic; font-size: 16pt">Contains {{ images.count }} image{{ images.count|pluralize }}</span></li>
+        <li style="width: 250px"><input type="text" style="position: relative; top: 2px" />&nbsp;<button class="btn btn-sm btn-primary" type="button">Add Tag</button></li>
+        <li style="width: 80px"><button class="btn btn-sm btn-success">Update</button></li>
+        <li style="width: 80px"><button class="btn btn-sm btn-danger">Delete</button></li>
+    </ul>
+    <hr />
+    <table class="table table-bordered table-responsive">
+        <tr>
+            <th>Select</th>
+            <th>Cover Image</th>
+            <th>Name</th>
+            <th>ID:</th>
+            <th>Published</th>
+            <th>Tags</th>
+            <th>Thumbnail</th>
+        </tr>
+    {% for image in images %}
+        {% if forloop.counter|divisibleby:2 %}
+            <tr>
+        {% else %}
+            <tr class="active">
+        {% endif %}
+            <td><label><input type="checkbox" name="select-image-{{ image.pk }}" /></label></td>
+            <td><label><input type="radio" name="cover-image" {% if image.pk == gallery.cover_photo.pk %}checked{% endif %} /></label></td>
+            <td>
+                <label>Title: <input type="text" value="{{ image.title }}" size="20"/></label>
+            </td>
+            <td style="width: 65px"><h4>{{ image.pk }}</h4></td>
+            <td style="width: 80px"><input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} />
+            </td>
+            <td>
+                <div style="width: 180px; overflow: scroll; max-height: 140px">
+                    <ul style="list-style: none; margin: 0; padding: 0">
+                        {% for tag in image.tags.all %}
+                        <li class="tag-item" style="margin: 0; padding: 2px">{{ tag }}<button style="float: right" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></button></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <label><input class="add-tag-textbox" id="image-tag-box-{{ image.pk }}" /></label>
+{#                <button style="margin-left: 2px;" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus"></span></button>#}
+            </td>
+            <td>
+                <a href="/manage/photo/{{ image.pk }}" ><img class="image-thumbnail" src="{{ image.image.url }}" alt="{{ image.title }}" /></a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Manage Galleries</title>
+        <style>
+            .image-listing {
+                list-style: none;
+            }
+            .image-listing li {
+            }
+            .image-listing li img {
+                height: 200px;
+            }
+
+            .panel-body img {
+                height: 200px;
+            }
+        </style>
+</head>
+    <body>
+        <p>Hey, {{ user.first_name }}! Looks like you want to manage the {{ gallery.name }} gallery. Cool.</p>
+{#        {% for k,v in gallery_list_all_selected.items %}#}
+{#            <hr/>{{ k }}<br/>{{ v }}#}
+{#        {% endfor %}#}
+        <p>Here are the images in that gallery:</p>
+        <form action="delete" method="post">
+{#            <ul class="image-listing">#}
+            {% for image in images_in_gallery %}
+                <div class="panel panel-default">
+                <div class="panel-heading"><strong>Title: </strong><input size="60" type="text" value="{{ image.title }}" /></div>
+                    <div class="panel-body">
+    {#                <li>#}
+                        <img src="{{ image.image.url }}" /><br />
+                        <span>Delete: </span><input type="checkbox" name="delete-{{ image.pk }}" value="Delete">
+                        Tags:
+                        <div class="well">
+                            <ul>
+                                {% for tag in image.tags.all %}
+                                    <li>{{ tag }}</li>
+                                {% endfor %}
+                            </ul>
+                            <select name="galleries-{{ image.pk }}" multiple>
+                                {% for gallery in image.gallery.all %}
+                                    <option selected value="{{ gallery.slug }}">{{ gallery.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+    {#                </li>#}
+                    </div>
+                </div>
+            {% endfor %}
+{#            </ul>#}
+        </form>
+    </body>
+</html>

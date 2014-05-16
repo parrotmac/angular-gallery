@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block body_block %}
+    <div style="height: 200px"></div>
+    <div class="row">
+        <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <form class="panel" action="" method="post">
+                    {% csrf_token %}
+                    <div class="panel-heading color3a">
+                        <h3 class="panel-title">log in</h3>
+                    </div>
+                    <div class="panel-body color3c">
+                        <div class="form-group">
+                            <input type="text" name="username" class="form-control" placeholder="username">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control" placeholder="password">
+                        </div>
+                    </div>
+                    <div class="panel-footer color3c">
+                        <button type="submit" class="btn btn-default btn-lg btn-block color3a">submit</button>
+                    </div>
+                </form>
+            </div>
+        <div class="col-md-4"></div>
+{#<form role="form" method="POST" action="">#}
+{#    {% csrf_token %}#}
+{#    Login to an existing account:#}
+{#    <div class="form-group">#}
+{#        <input type="text" name="username" class="form-control" placeholder="Username">#}
+{#    </div>#}
+{#    <div class="form-group">#}
+{#        <input type="password" name="password" class="form-control" placeholder="Password">#}
+{#    </div>#}
+{#    <button type="submit" class="btn btn-default">Login</button>#}
+{#    </hr>#}
+{#    Register for an account:#}
+{#    <br />#}
+{#    <br />#}
+{#    COMING SOON!<br/>#}
+{#    OOOH SUCH PRETTY CODE.#}
+{#</form>#}
+    <hr/>
+    {% if notwelcome.invalid %}
+        <h4>Invalid Username/Password combination</h4>
+    {% elif notwelcome.disabled %}
+        <h4>This account has been disabled</h4>
+    {% endif %}
+{% endblock body_block %}

@@ -1,0 +1,230 @@
+{% extends "manage/manage_base.html" %}
+{% block page_title %}Galleries{% endblock %}
+{% block head_area %}
+<style>
+.gallery-cover-thumbnail {
+    max-height: 100px;
+    max-width: 100px;
+}
+.rename-field {
+    display: inline;
+}
+
+.spin {
+    margin-right: 5px;
+    -webkit-animation: spin 1s infinite linear;
+    -moz-animation: spin .2s infinite linear;
+    -o-animation: spin .2s infinite linear;
+    animation: spin .2s infinite linear;
+}
+
+@-moz-keyframes spin {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.page-title {
+    font-size: 30pt;
+    font-weight: 400;
+}
+.new-gallery {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    float: right;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+    <span class="page-title">Galleries:</span><button class="btn btn-md btn-success new-gallery" data-toggle="modal" data-backdrop="static"  data-target="#newGalleryModal"><span class="glyphicon glyphicon-plus"></span></button>
+    <table id="gallery-table" class="table">
+        <tr>
+            <th>Cover Photo</th><th>Gallery Name</th><th>Active</th><th>Actions</th>
+        </tr>
+    {% for gallery in galleries %}
+        <tr id="{{ gallery.pk }}" class="gallery-table-row">
+            <td>
+                <img id="gallery-cover-{{ gallery.pk }}" class="gallery-cover-thumbnail" src="{{ gallery.cover_photo.image.url }}" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." />
+            </td>
+            <td id="rename-row-{{ gallery.pk }}"><strong id="gallery-name-{{ gallery.pk }}">{{ gallery.name }}</strong><br /><span style="font-style: italic">Slug: <span id="gallery-slug-{{ gallery.pk }}">{{ gallery.slug }}</span></span></td>
+            <td><input type="checkbox" name="gallery-active-{{ gallery.pk }}"{% if gallery.active %} {% endif %} /></td>
+            <td>
+                <a href="{{ gallery.pk }}/" class="btn btn-success btn-xs">Edit</a> <button name="rename" id="rename-{{ gallery.pk }}" class="btn btn-primary btn-xs">Rename</button> <button name="delete" value="{{ gallery.pk }}" class="btn btn-danger btn-xs">Delete</button>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # #  You're getting into modal territory  # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+
+    <div class="modal fade" id="newGalleryModal" tabindex="-1" role="dialog" aria-labelledby="newGalleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="newGalleryModalLabel">Create Gallery</h4>
+                </div>
+            <div class="modal-body">
+                <label>
+                    Title: <input id="new-gallery-name" class="new-gallery-title-input" type="text" />
+                </label>
+                <br />
+                Slug:<span id="new-gallery-slug"></span>
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick='$("#new-gallery-name").val("");$("#new-gallery-slug").text("");'>Cancel</button>
+                    <button id="save-new-gallery" type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # Enough o' dat # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+    <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+
+    <script>
+
+    //In my book, this is really...controversial...but I'm doing it anyways...
+    String.prototype.getSlug = function() {
+        return this.trim().replace(/[^a-zA-Z0-9\s\-]/g, '').replace(/\s+/g, '-').toLowerCase();
+    }
+
+    function createTableRow(name, slug, id) {
+        var newTR = '<tr id="' + id + '" class="gallery-table-row">';
+        newTR += '<td>';
+        newTR += '<img id="gallery-cover-' + id + '" class="gallery-cover-thumbnail" src="' + '" />';
+        newTR += '</td>';
+        newTR += '<td id="rename-row-' + id +'"><strong id="gallery-name-' + id +'">' + name +'</strong><br /><span style="font-style: italic">Slug: <span id="gallery-slug-' + id +'">' + slug +'</span></span></td>';
+        newTR += '<td>';
+        newTR += '<a href="' + id +'/" class="btn btn-success btn-xs">Edit</a> <button name="rename" id="rename-' + id + '" class="btn btn-primary btn-xs">Rename</button> <button name="delete" value="{{ gallery.pk }}" class="btn btn-danger btn-xs">Delete</button>';
+        newTR += '</td>';
+        newTR += '</tr>';
+        return newTR;
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    $("#save-new-gallery").click(function() {
+        $.post("", {csrfmiddlewaretoken: csrftoken, new_gallery:true, name: $("#new-gallery-name").val(), slug: $("#new-gallery-slug").text()}).done(function(data) {
+            var newGalleryFromSerer = JSON.parse(data);
+            $("#newGalleryModal").modal('hide');
+            $("#gallery-table").append(createTableRow(newGalleryFromSerer.name, newGalleryFromSerer.slug, newGalleryFromSerer.id));
+            bindActionButtons();
+            $("#new-gallery-name").val("");
+            $("#new-gallery-slug").text("");
+        });
+    });
+
+
+    function updateGalleryName(galleryId, name, slug) {
+        var galleryRow = $("#rename-row-" + galleryId);
+        galleryRow.prepend('<span class="glyphicon glyphicon-refresh spin"></span>');
+        $.ajax({
+            type: "POST",
+            url: "",
+            data: {csrfmiddlewaretoken: csrftoken, rename: true, gallery_id: galleryId, name: name, slug: slug}
+        }).done(function( data ) {
+            galleryRow.find(".spin").remove();
+            var serverValidatedNames = JSON.parse(data);
+            $("#gallery-name-" + serverValidatedNames.id).text(serverValidatedNames.name);
+            $("#gallery-slug-" + serverValidatedNames.id).text(serverValidatedNames.slug);
+        });
+    }
+
+    function bindActionButtons() {
+
+        $("button[name='rename']").click(function() {
+            var galleryRenamePk = $(this).attr("id").split("-")[1];
+            var galleryNameSpan = $("#gallery-name-" + galleryRenamePk);
+            var gallerySlugSpan = $("#gallery-slug-" + galleryRenamePk);
+
+            if($("#rename-field-" + galleryRenamePk).length === 0) {
+
+                var renameInput = $('<input />', {'type': 'text', 'name': 'rename-field', 'class': 'rename-field', 'id': 'rename-field-' + galleryRenamePk, 'value': $(galleryNameSpan).html()});
+                $(galleryNameSpan).parent().prepend(renameInput);
+                $(galleryNameSpan).text("");
+                renameInput.focus();
+
+                var newSlug = "";
+                renameInput.keyup(function(event){
+                    if(renameInput.val() !== null | renameInput !== undefined){
+                        var rawNewName = renameInput.val().toString();
+                         newSlug = rawNewName.getSlug();
+                        gallerySlugSpan.text(newSlug);
+                    }
+                    if(event.keyCode == 13){
+                        var newGalleryName = renameInput.val().trim();
+                        renameInput.remove();
+                        galleryNameSpan.text(newGalleryName);
+                        updateGalleryName(galleryRenamePk, newGalleryName, newSlug);
+                    }
+                });
+            }
+
+        });
+
+        $("button[name='delete']").click(function() {
+             if (confirm("Are you sure you want to delete the gallery \"" + $("#gallery-name-" + $(this).val()).text() + "\"?") == true) {
+                $.post('', {csrfmiddlewaretoken: csrftoken, gallery_to_delete: $(this).val()});
+                 $("#" + $(this).val()).hide(300);
+             }
+        });
+    }
+    bindActionButtons();
+
+    $("#new-gallery-name").keyup(function(event) {
+        $("#new-gallery-slug").text($("#new-gallery-name").val().getSlug());
+        if(event.keyCode == 13) {
+            $("#save-new-gallery").click();
+        }
+    });
+
+
+    </script>
+{% endblock %}

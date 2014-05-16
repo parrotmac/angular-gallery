@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+{#        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>#}
         <style>
             html, body{
                 margin:0;
@@ -130,8 +130,10 @@
                 margin: 0 !important;
             }
         </style>
+    {% block custom_style %}{% endblock %}
     </head>
     <body>
+    {% block body_block %}
         <div class="outer">
             <div class="middle">
                 <div class="inner">
@@ -139,7 +141,7 @@
 {#                        <div class="col-md-12">#}
                             <nav class="navbar navbar-inverse" role="navigation">
 {#                                <img class="navbar-brand" src="http://isaacparker.org/mts/mts-logo.png" />#}
-                                <a class="navbar-brand" href="#">Matthew Turley Stock</a>
+                                <a class="navbar-brand" href="/">Matthew Turley Stock</a>
 {#                                <ul class="nav navbar-nav">#}
 {#                                    <li><a href="#">Sign In/Sign Up</a></li>#}
 {#                                    <li><a href="#" data-toggle="modal" data-target="#pricingModal">Pricing</a></li>#}
@@ -153,12 +155,25 @@
                                 </form>
                                 <ul class="nav navbar-nav navbar-right">
 {#                                <ul class="nav navbar-nav">#}
-                                    <li><a href="#">Galleries</a></li>
-                                    <li><a href="#">Recents</a></li>
+                                    {% if user.is_authenticated %}
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, {{ user.first_name }} {{ user.last_name }}<b class="caret"></b></a>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <form action="/" method="post" id="logoutForm">
+                                                        {% csrf_token %}
+                                                        <input style="width: 100%" class="btn btn-default" type="button" name="logout" value="Logout" />
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    {% endif %}
+                                    <li><a href="/galleries/">Galleries</a></li>
+                                    <li><a href="#">Recent</a></li>
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
                                         <ul class="dropdown-menu">
-                                            <li><a href="#">Sign In/Sign Up</a></li>
+                                            <li><a href="#" data-toggle="modal" data-target="#loginModal">Sign In/Sign Up</a></li>
                                             <li class="divider"></li>
                                             <li><a href="#" data-toggle="modal" data-target="#pricingModal">Pricing</a></li>
                                             <li><a href="#" data-toggle="modal" data-target="#contactModal">Contact</a></li>
@@ -168,22 +183,23 @@
                             </nav>
 {#                        </div>#}
 {#                    </div>#}
+                {% block content_area %}
                     <div class="row nopadding">
                         <div class="primary-feature nopadding">
-                            <a href="/gallery/{{ primary_feature.image.gallery.slug }}">
+                            <a href="/gallery/{{ primary_feature.gallery.slug }}">
                                 <img src="{{ primary_feature.image.image.url }}" alt="{{ primary_feature.image.gallery.name }}"/>
                             </a>
                             <div class="popover-common">
-                                <span>{{ primary_feature.image.title }}</span>
+                                <span>{{ primary_feature.gallery.name }}</span>
                             </div>
                         </div>
                         <div class="secondary-feature-group nopadding">
                             <div class="secondary-feature nopadding">
-                                <a href="/gallery/{{ secondary_feature_top.image.gallery.slug }}">
+                                <a href="/gallery/{{ secondary_feature_top.gallery.slug }}">
                                     <img src="{{ secondary_feature_top.image.image.url }}" alt="{{ secondary_feature_top.image.gallery.name }}" />
                                 </a>
                                 <div class="popover-common">
-                                    <span>{{ secondary_feature_top.image.title }}</span>
+                                    <span>{{ secondary_feature_top.gallery.name }}</span>
                                 </div>
                             </div>
                             <div class="secondary-feature nopadding">
@@ -191,7 +207,7 @@
                                     <img src="{{ secondary_feature_bottom.image.image.url }}" alt="{{ secondary_feature_bottom.image.gallery.name }}" />
                                 </a>
                                 <div class="popover-common">
-                                    <span>{{ secondary_feature_bottom.image.title }}</span>
+                                    <span>{{ secondary_feature_bottom.gallery.name }}</span>
                                 </div>
                             </div>
                         </div>
@@ -199,37 +215,21 @@
 
                     <div class="row nopadding">
                         <div class="gallery-carousel">
-                        {% for gallery_cover in gallery_covers %}
+                        {% for gallery in galleries %}
                             <div class="gallery-image nopadding">
-                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" alt="{{ gallery_cover.gallery.name }}" /></a>
+                                <a href="/gallery/{{ gallery.slug }}"><img src="{{ gallery.cover_photo.image.url }}" alt="{{ gallery.name }}" /></a>
                                 <div class="popover-common">
-                                    <span>{{ gallery_cover.gallery.name }}</span>
+                                    <span>{{ gallery.name}}</span>
                                 </div>
                             </div>
                         {% endfor %}
 
                         <!-- Hey, here's a great idea: Let's do that 3 more times -->
-                        {% for gallery_cover in gallery_covers %} <!-- #Hashtag we're asking for trouble -->
-                            <div class="gallery-image nopadding">
-                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" /></a>
+                        {% for gallery in galleries %}
+                            <div class="gallery-image nopadding"><!-- #Hashtag we're asking for trouble -->
+                                <a href="/gallery/{{ gallery.slug }}"><img src="{{ gallery.cover_photo.image.url }}" alt="{{ gallery.name }}" /></a>
                                 <div class="popover-common">
-                                    <span>{{ gallery_cover.gallery.name }}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        {% for gallery_cover in gallery_covers %} <!-- #Hashtag we're asking for trouble -->
-                            <div class="gallery-image nopadding">
-                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" /></a>
-                                <div class="popover-common">
-                                    <span>{{ gallery_cover.gallery.name }}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        {% for gallery_cover in gallery_covers %} <!-- #Hashtag we're asking for trouble -->
-                            <div class="gallery-image nopadding">
-                                <a href="/gallery/{{ gallery_cover.gallery.slug }}"><img src="{{ gallery_cover.cover.image.url }}" /></a>
-                                <div class="popover-common">
-                                    <span>{{ gallery_cover.gallery.name }}</span>
+                                    <span>{{ gallery.name}}</span>
                                 </div>
                             </div>
                         {% endfor %}
@@ -238,25 +238,17 @@
                     </div>
 
                     <div class="row nopadding">
-                        <div class="col-md-2 nopadding">
-                            <img src="http://dummyimage.com/150x100/555/ddd">
-                        </div>
-                        <div class="col-md-2 nopadding">
-                            <img src="http://dummyimage.com/150x100/777/eee">
-                        </div>
-                        <div class="col-md-2 nopadding">
-                            <img src="http://dummyimage.com/150x100/999/fff">
-                        </div>
-                        <div class="col-md-2 nopadding">
-                            <img src="http://dummyimage.com/150x100/555/ddd">
-                        </div>
-                        <div class="col-md-2 nopadding">
-                            <img src="http://dummyimage.com/150x100/777/eee">
-                        </div>
-                        <div class="col-md-2 nopadding">
-                            <img src="http://dummyimage.com/150x100/999/fff">
-                        </div>
+                        {% for image in latest %}
+                            <div class="gallery-image nopadding">
+                                <a href="/image/{{ image.pk }}"><img src="{{ image.image.url }}" /></a>
+{#                                <div class="popover-common">#}
+{#                                    <span>{{ image }}</span>#}
+{#                                </div>#}
+                            </div>
+                        {% endfor %}
                     </div>
+
+                {% endblock content_area %}
 
                     </div>
 
@@ -337,7 +329,48 @@
                     </div>
                 </div>
             </div>
+
+
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="loginModalLabel">Contact</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form role="form" method="POST" action="">
+                                {% csrf_token %}
+                                Login to an existing account:
+                                <div class="form-group">
+                                        <input type="text" name="username" class="form-control" placeholder="Username">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" name="password" class="form-control" placeholder="Password">
+                                </div>
+                                <button type="submit" class="btn btn-default">Login</button>
+                                </hr>
+                                Register for an account:
+                                <br />
+                                <br />
+                                COMING SOON!<br/>
+                                OOOH SUCH PRETTY CODE.
+                            </form>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
     <!-- End Modal Boxes -->
+
+    <script>
+        //TODO: DO TOO
+    </script>
+
+    {% endblock body_block %}
 
     </body>
 </html>
