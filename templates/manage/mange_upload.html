@@ -1,4 +1,5 @@
 {% extends "manage/manage_base.html" %}
+{% load staticfiles %}
 {% block page_title %}Upload{% endblock %}
 {% block head_area %}
     <style>
@@ -6,10 +7,69 @@
     </style>
 {% endblock %}
 {% block content %}
-
-
+    <input type="file" id="files" name="files[]" multiple />
+    <div id="fileList"></div>
 {% endblock %}
-{% block put_script_tags_here %}<script>
-            //Whoohoo uploader time
-            //Uh oh...gotta get staticfiles working....
+{% block put_script_tags_here %}<script src="{% static "hermite.js" %}"></script>
+        <script>
+
+        function scaleMax(tempCanvas, maxWidth, maxHeight, origWidth, origHeight) {
+            var scaleFactor = 0;
+                if(origHeight > origWidth) {
+                //Portrait image
+                    scaleFactor = maxHeight/origHeight;
+                    return resample_hermite(tempCanvas, origWidth, origHeight, Math.floor(origWidth*scaleFactor), maxHeight);
+                } else if(origWidth > origHeight) {
+                    //Landscape image
+                    scaleFactor = maxWidth/origWidth;
+                    return resample_hermite(tempCanvas, origWidth, origHeight, maxWidth, Math.floor(origHeight*scaleFactor));
+                } else {
+                    //Square image or not an image...I guess
+                    return resample_hermite(tempCanvas, origWidth, origHeight, maxWidth, maxHeight);
+                }
+        }
+
+        function hermiteScaleFromFile(file, maxHeight, maxWidth) {
+            var tempImage = document.createElement('img')
+            tempImage.onload = function() {
+                var origWidth = tempImage.width;
+                var origHeight = tempImage.height;
+                var tempCanvas = document.createElement('canvas');
+                tempCanvas.width = origWidth;
+                tempCanvas.height = origHeight;
+                var tempCtx = tempCanvas.getContext("2d");
+                tempCtx.drawImage(tempImage, 0, 0);
+                var scaledImage = scaleMax(tempCanvas, maxWidth, maxHeight, origWidth, origHeight);
+                tempCanvas.width = scaledImage.width;
+                tempCanvas.height = scaledImage.height;
+                var scaledCtx = tempCanvas.getContext("2d");
+                scaledCtx.putImageData(scaledImage, 0, 0);
+                var dataUrl = tempCanvas.toDataURL("image/jpeg");
+                var imageThumbnail = $("<img />").attr("src", dataUrl);
+                $("#fileList").append(imageThumbnail);
+            }
+            tempImage.src=file;
+        }
+
+        function handleFileSelect(evt) {
+            var files = evt.target.files; // FileList object
+
+            for (var i = 0, f; f = files[i]; i++) {
+                //Do shit
+
+                // Only process image files.
+                if (!f.type.match('image.*')) {
+                    continue;
+                }
+                var reader = new FileReader();
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        hermiteScaleFromFile(e.target.result, 160, 160);
+                    }
+                })(f);
+                reader.readAsDataURL(f);
+            }
+        }
+
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
         </script>{% endblock %}
