@@ -173,7 +173,7 @@ def manage_clients(request):
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_upload(request):
-    return render(request, "manage/mange_upload.html")
+    return render(request, "manage/mange_upload.html", {'galleries': Gallery.objects.all()})
 
 
 # @user_passes_test(lambda u:u.is_staff, login_url='/login/')

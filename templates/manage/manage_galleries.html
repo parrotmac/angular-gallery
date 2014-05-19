@@ -151,30 +151,38 @@
     var csrftoken = getCookie('csrftoken');
 
     $("#save-new-gallery").click(function() {
-        $.post("", {csrfmiddlewaretoken: csrftoken, new_gallery:true, name: $("#new-gallery-name").val(), slug: $("#new-gallery-slug").text()}).done(function(data) {
-            var newGalleryFromSerer = JSON.parse(data);
-            $("#newGalleryModal").modal('hide');
-            $("#gallery-table").append(createTableRow(newGalleryFromSerer.name, newGalleryFromSerer.slug, newGalleryFromSerer.id));
-            bindActionButtons();
-            $("#new-gallery-name").val("");
-            $("#new-gallery-slug").text("");
-        });
+        if ($("#new-gallery-name").val().trim() !== "") {
+            $.post("", {csrfmiddlewaretoken: csrftoken, new_gallery:true, name: $("#new-gallery-name").val(), slug: $("#new-gallery-slug").text()}).done(function(data) {
+                var newGalleryFromSerer = JSON.parse(data);
+                $("#newGalleryModal").modal('hide');
+                $("#gallery-table").append(createTableRow(newGalleryFromSerer.name, newGalleryFromSerer.slug, newGalleryFromSerer.id));
+                bindActionButtons();
+                $("#new-gallery-name").val("");
+                $("#new-gallery-slug").text("");
+            });
+        } else {
+            alert("That's not a vaild name");
+        }
     });
 
 
     function updateGalleryName(galleryId, name, slug) {
         var galleryRow = $("#rename-row-" + galleryId);
-        galleryRow.prepend('<span class="glyphicon glyphicon-refresh spin"></span>');
-        $.ajax({
-            type: "POST",
-            url: "",
-            data: {csrfmiddlewaretoken: csrftoken, rename: true, gallery_id: galleryId, name: name, slug: slug}
-        }).done(function( data ) {
-            galleryRow.find(".spin").remove();
-            var serverValidatedNames = JSON.parse(data);
-            $("#gallery-name-" + serverValidatedNames.id).text(serverValidatedNames.name);
-            $("#gallery-slug-" + serverValidatedNames.id).text(serverValidatedNames.slug);
-        });
+        if(name.trim() !== "") {
+            galleryRow.prepend('<span class="glyphicon glyphicon-refresh spin"></span>');
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {csrfmiddlewaretoken: csrftoken, rename: true, gallery_id: galleryId, name: name, slug: slug}
+            }).success(function( data ) {
+                galleryRow.find(".spin").remove();
+                var serverValidatedNames = JSON.parse(data);
+                $("#gallery-name-" + serverValidatedNames.id).text(serverValidatedNames.name);
+                $("#gallery-slug-" + serverValidatedNames.id).text(serverValidatedNames.slug);
+            });
+        } else {
+            alert("Name can't be blank");
+        }
     }
 
     function bindActionButtons() {

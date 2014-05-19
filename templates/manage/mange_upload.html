@@ -1,75 +1,319 @@
 {% extends "manage/manage_base.html" %}
 {% load staticfiles %}
 {% block page_title %}Upload{% endblock %}
-{% block head_area %}
+{% block head_area %}<link rel="stylesheet" href="{% static "bootstrap-tags.css" %}">
     <style>
+        #drop_zone {
+            margin: 20px 0;
+            background-color: #C1C1C1;
+            border: 3px dashed #88888a;
+            height: 100px;
+            width: 100%;
+            border-radius: 10px;
+        }
+        .drop-zone-main {
+            color: #444444;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .drop-zone-label-secondary {
+            color: #FDFDFD;
+            font-size: 14px;
+        }
+        .drop-zone-common {
+            font-family: Veranda, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            text-align: center;
+            display: block;
+            text-shadow: 1px 1px 2px #757575;
+        }
 
+        .thumbnail-direct-wrapper {
+            position: relative;
+            display: block;
+            margin: 0 auto;
+            padding: 0;
+            width: 160px;
+            height: 160px;
+        }
+        .image-thumb {
+            position: absolute;
+            margin: auto;
+            padding: 0;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: inline-block;
+            max-height: 160px;
+            max-width: 160px;
+        }
+        .tag-textarea {
+            width: 100%;
+            margin: 5px 0;
+            height: 160px;
+            border: 2px solid #ACACAC;
+            resize: vertical;
+        }
+        .upload-block {
+            border: 2px solid #DDD;
+            border-radius: 5px;
+            margin: 5px 0;
+            padding: 15px;
+        }
+        .gallery-toggle-button-holder {
+            /* Ehhh I don't think this needs styling */
+        }
+        .gallery-toggle {
+            margin: 2px;
+        }
+{#        .thumbnail-direct-wrapper {#}
+{#            position: relative;#}
+{#            display: block;#}
+{#            margin: 0 auto;#}
+{#            padding: 0;#}
+{#            width: 160px;#}
+{#            height: 160px;#}
+{#        }#}
+{#        .image-thumb {#}
+{#            position: absolute;#}
+{#            margin: auto;#}
+{#            padding: 0;#}
+{#            top: 0;#}
+{#            bottom: 0;#}
+{#            left: 0;#}
+{#            right: 0;#}
+{#            display: inline-block;#}
+{#        }#}
+{#        .tag-textarea {#}
+{#            width: 100%;#}
+{#            margin: 5px 0;#}
+{#            height: 160px;#}
+{#            border: 2px solid #ACACAC;#}
+{#            resize: vertical;#}
+{#        }#}
+{#        .upload-block {#}
+{#            border: 2px solid #DDD;#}
+{#            border-radius: 5px;#}
+{#            margin: 5px 0;#}
+{#        }#}
+{#        .gallery-button {#}
+{#            margin: 5px 0;#}
+{#        }#}
     </style>
 {% endblock %}
 {% block content %}
-    <input type="file" id="files" name="files[]" multiple />
+    <div id="drop_zone"><span class="drop-zone-common drop-zone-main">Drop Files Here</span><span class="drop-zone-common drop-zone-label-secondary">or click for a file selector dialog</span></div>
+    <input type="file" id="hiddenFileInput" multiple accept="image/*" style="display:none" onchange="processFileList(this.files)">
     <div id="fileList"></div>
 {% endblock %}
-{% block put_script_tags_here %}<script src="{% static "hermite.js" %}"></script>
+{% block put_script_tags_here %}<script src="{% static "bootstrap-tags.min.js" %}"></script>
+        <script src="{% static "resize.js" %}"></script>
+        <script src="{% static "iptc.js" %}"></script>
         <script>
 
-        function scaleMax(tempCanvas, maxWidth, maxHeight, origWidth, origHeight) {
-            var scaleFactor = 0;
-                if(origHeight > origWidth) {
-                //Portrait image
-                    scaleFactor = maxHeight/origHeight;
-                    return resample_hermite(tempCanvas, origWidth, origHeight, Math.floor(origWidth*scaleFactor), maxHeight);
-                } else if(origWidth > origHeight) {
-                    //Landscape image
-                    scaleFactor = maxWidth/origWidth;
-                    return resample_hermite(tempCanvas, origWidth, origHeight, maxWidth, Math.floor(origHeight*scaleFactor));
-                } else {
-                    //Square image or not an image...I guess
-                    return resample_hermite(tempCanvas, origWidth, origHeight, maxWidth, maxHeight);
-                }
-        }
+         var galleryArray = new Array({% for gallery in galleries %}{name: "{{gallery.name|escapejs}}", id: {{gallery.pk}}}{% if not forloop.last %}, {% endif %}{% endfor %});
 
-        function hermiteScaleFromFile(file, maxHeight, maxWidth) {
-            var tempImage = document.createElement('img')
-            tempImage.onload = function() {
-                var origWidth = tempImage.width;
-                var origHeight = tempImage.height;
-                var tempCanvas = document.createElement('canvas');
-                tempCanvas.width = origWidth;
-                tempCanvas.height = origHeight;
-                var tempCtx = tempCanvas.getContext("2d");
-                tempCtx.drawImage(tempImage, 0, 0);
-                var scaledImage = scaleMax(tempCanvas, maxWidth, maxHeight, origWidth, origHeight);
-                tempCanvas.width = scaledImage.width;
-                tempCanvas.height = scaledImage.height;
-                var scaledCtx = tempCanvas.getContext("2d");
-                scaledCtx.putImageData(scaledImage, 0, 0);
-                var dataUrl = tempCanvas.toDataURL("image/jpeg");
-                var imageThumbnail = $("<img />").attr("src", dataUrl);
-                $("#fileList").append(imageThumbnail);
+         var globalImageCounter = 0;
+
+         function galleryButtonClick(sender) {
+            console.log($(sender).parent().parent().attr("id"));
+         }
+
+        function updateCanvas(contextHandlePassed, imageBuffer, frameBuffer) {
+            var data = imageBuffer.data;
+            var length = data.length;
+            for (var x = 0; x < length; ++x) {
+                data[x] = frameBuffer[x] & 0xFF;
             }
-            tempImage.src=file;
+            contextHandlePassed.putImageData(imageBuffer, 0, 0);
         }
 
-        function handleFileSelect(evt) {
-            var files = evt.target.files; // FileList object
+        function calcScaleMaxDim(originalWidth, originalHeight, maxWidth, maxHeight) {
+            if (originalWidth > originalHeight) {
+                //Landscape, height will be calculated value
+                return {width: maxWidth, height: Math.floor(originalHeight*(maxWidth/originalWidth))}
+            } else if (originalWidth < originalHeight) {
 
-            for (var i = 0, f; f = files[i]; i++) {
-                //Do shit
+                return {width: Math.floor(originalWidth*(maxHeight/originalHeight)), height: maxHeight}
+            } else {
+                return {width: maxWidth, height: maxHeight}
+            }
+        }
 
-                // Only process image files.
-                if (!f.type.match('image.*')) {
+
+        function createImageThumbnail(imgSrc, tags) {
+            var newImageTag = document.createElement('img');
+            newImageTag.style.display = "none";
+            newImageTag.onload = function() {
+                var origWidth = this.width;
+                var origHeight = this.height;
+                var origTempCanvas = document.createElement('canvas');
+                origTempCanvas.width = origWidth;
+                origTempCanvas.height = origHeight;
+                var origContextHandle = origTempCanvas.getContext("2d");
+                origContextHandle.drawImage(this, 0, 0);
+                var dataToScale = origContextHandle.getImageData(0, 0, this.width, this.height).data;
+                var thumbnailResizeDimensions = calcScaleMaxDim(origWidth, origHeight, 160, 160);
+                var fullSizeResizeDimensions = calcScaleMaxDim(origWidth, origHeight, 600, 400);
+                var tempThumbnailCanvas = document.createElement('canvas');
+                tempThumbnailCanvas.width = thumbnailResizeDimensions.width;
+                tempThumbnailCanvas.height = thumbnailResizeDimensions.height;
+                var tempCtx = tempThumbnailCanvas.getContext("2d");
+                var re_sizedThumbnail = new Resize(origWidth, origHeight, thumbnailResizeDimensions.width, thumbnailResizeDimensions.height, true, true, false, function(buffer) {
+                    updateCanvas(tempCtx, tempCtx.createImageData(thumbnailResizeDimensions.width, thumbnailResizeDimensions.height), buffer);
+                });
+                re_sizedThumbnail.resize(dataToScale);
+                //Find
+
+                this.src = tempThumbnailCanvas.toDataURL("image/jpeg");
+                this.style.display = "block";
+            }
+            newImageTag.src = imgSrc;
+            newImageTag.classList.add("image-thumb");
+
+
+            var uploadBlock = document.createElement('div');
+            uploadBlock.classList.add("upload-block");
+            uploadBlock.id = "ub-" + (globalImageCounter++).toString();
+
+            //First row of upload block
+            var bsBlockRow = document.createElement('div');
+            bsBlockRow.classList.add("row");
+            uploadBlock.appendChild(bsBlockRow);
+
+            //Upload Status Column
+            var bsIndicatorColumn = document.createElement('div');
+            bsIndicatorColumn.classList.add("col-md-2");
+            bsBlockRow.appendChild(bsIndicatorColumn);
+
+            //Upload "Done" indicator
+            var uploadDoneParagraph = document.createElement('p');
+                uploadDoneParagraph.classList.add("upload-indicator")
+                uploadDoneParagraph.classList.add("upload-indicator-done")
+                uploadDoneParagraph.innerHTML = "Done";
+            bsIndicatorColumn.appendChild(uploadDoneParagraph);
+
+            var uploadDoneGlyph = document.createElement("span");
+                uploadDoneGlyph.classList.add("glyphicon");
+                uploadDoneGlyph.classList.add("glyphicon-ok");
+            uploadDoneParagraph.appendChild(uploadDoneGlyph);
+
+            //Upload in progress indicator
+            var uploadInProgressParagraph = document.createElement("span");
+                uploadInProgressParagraph.classList.add("upload-indicator")
+                uploadInProgressParagraph.classList.add("upload-indicator-uploading");
+                uploadInProgressParagraph.innerHTML = "Uploading...";
+            bsIndicatorColumn.appendChild(uploadInProgressParagraph)
+
+            var uploadInProgressGlyph = document.createElement("span");
+                uploadInProgressGlyph.classList.add("upload-spinner");
+                uploadInProgressGlyph.classList.add("glyphicon");
+                uploadInProgressGlyph.classList.add("glyphicon-refresh");
+            uploadInProgressParagraph.appendChild(uploadInProgressGlyph);
+
+            //Image Thumbnail Bootstrap Column
+            var bsThumbnailColumn = document.createElement('div');
+                bsThumbnailColumn.classList.add("col-md-4");
+            bsBlockRow.appendChild(bsThumbnailColumn);
+
+            var thumbnailDirectWrapper = document.createElement("div");
+                thumbnailDirectWrapper.classList.add("thumbnail-direct-wrapper");
+                thumbnailDirectWrapper.appendChild(newImageTag);
+            bsThumbnailColumn.appendChild(thumbnailDirectWrapper);
+
+            // Tag COLUMN
+            var bsTagColumn = document.createElement("div");
+                bsTagColumn.classList.add("col-md-6");
+            bsBlockRow.appendChild(bsTagColumn);
+
+            // Tag TEXTAREA
+            var tagTextArea = document.createElement("textarea");
+                tagTextArea.classList.add("tag-textarea");
+                tagTextArea.rows = 5;
+                tagTextArea.placeholder = "No tags defined";
+            if (tags.length > 0) {
+                tagTextArea.innerHTML = tags.join(", ");
+            }
+            bsTagColumn.appendChild(tagTextArea);
+
+            //End bootstrap row ------ time for the lower bar
+
+            uploadBlock.appendChild(document.createElement('hr')); // Easy!
+
+            var galleryToggleButtonHolder = document.createElement("div");
+                galleryToggleButtonHolder.classList.add("gallery-toggle-button-holder");
+            uploadBlock.appendChild(galleryToggleButtonHolder);
+
+            var galleryArrayLength = galleryArray.length;
+            for(var galCount = 0; galCount < galleryArrayLength; galCount++) {
+                var galleryToggleButton = document.createElement("button");
+                galleryToggleButton.classList.add("btn");
+                galleryToggleButton.classList.add("btn-xs");
+                galleryToggleButton.classList.add("btn-default");
+                galleryToggleButton.classList.add("gallery-toggle");
+                galleryToggleButton.classList.add("gallery-" + galleryArray[galCount].id.toString());
+                galleryToggleButton.setAttribute("onclick", "galleryButtonClick(this)");
+                galleryToggleButton.innerHTML = galleryArray[galCount].name;
+
+                galleryToggleButtonHolder.appendChild(galleryToggleButton);
+            }
+
+            document.getElementById("fileList").appendChild(uploadBlock);
+
+        }
+        function processFileList(fileList) {
+            for (var i = 0, f; f = fileList[i]; i++) {
+                if(!f.type.match('image.*')) {
                     continue;
                 }
                 var reader = new FileReader();
-                reader.onload = (function(theFile) {
+                reader.onload = (function() {
                     return function(e) {
-                        hermiteScaleFromFile(e.target.result, 160, 160);
-                    }
-                })(f);
+
+                        var tempImage = e.target.result;
+
+                        var byteString;
+                        if (tempImage.split(',')[0].indexOf('base64') >= 0) {
+                            byteString = atob(tempImage.split(',')[1]);
+                        } else {
+                            debugger;
+                            byteString = unescape(tempImage.split(',')[1]);
+                        }
+                        var binaryFile = new BinaryFile(byteString);
+                        var keywords = findIPTCKeywordsinJPEG(binaryFile);
+{#                        console.log(keywords);#}
+                        createImageThumbnail(tempImage, keywords);
+                    };
+                })();
                 reader.readAsDataURL(f);
             }
         }
+        function showDropZoneActive(bool) {
+            if(bool) {
+                document.getElementById("drop_zone").style.border = "3px solid #4597ee";
+            } else {
+                document.getElementById("drop_zone").style.border = "3px dashed #88888a";
+            }
+        }
+        function handleFileSelect(evt) {
+            showDropZoneActive(false);
+            evt.stopPropagation();
+            evt.preventDefault();
+            processFileList(evt.dataTransfer.files);
+        }
+        function handleDragOver(evt) {
+            showDropZoneActive(true);
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+        }
 
-        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+        // Setup the dnd listeners.
+        var dropZone = document.getElementById('drop_zone');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
+        dropZone.addEventListener('dragleave', function() {showDropZoneActive(false)}, false);
+        dropZone.addEventListener('click', function() {document.getElementById('hiddenFileInput').click()}, false)
+
         </script>{% endblock %}
