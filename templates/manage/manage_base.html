@@ -16,12 +16,19 @@
     <body>
     <div class="container">
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-10">
                 <h1>Welcome, {{ user|capfirst }}</h1>
                 <a href="{% url "manage_home" %}">Manage</a>
-                <button class="btn btn-default btn-block">Logout</button>
+                <br>
+                <br>
+                <button class="btn btn-default">Logout</button>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-1"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-10">
                 {% block content %}
                     <h1>Things to manage...</h1>
                     <hr />
@@ -39,7 +46,7 @@
                     </ul>
                 {% endblock %}
             </div>
-            <div class="col-sm-2"></div>
+            <div class="col-sm-1"></div>
         </div>
     </div>
         {% block put_script_tags_here %}

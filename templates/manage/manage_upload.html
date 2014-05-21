@@ -1,0 +1,377 @@
+{% extends "manage/manage_base.html" %}
+{% load staticfiles %}
+{% block page_title %}Upload{% endblock %}
+{% block head_area %}<link rel="stylesheet" href="{% static "bootstrap-tagsinput.css" %}">
+    <style>
+        #drop_zone {
+            margin: 20px 0;
+{#            background-color: #C1C1C1;#}
+
+            background: #828282; /* Old browsers */
+            background: -moz-linear-gradient(left, #828282 0%, #e0e0e0 50%, #828282 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, right top, color-stop(0%,#828282), color-stop(50%,#e0e0e0), color-stop(100%,#828282)); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(left, #828282 0%,#e0e0e0 50%,#828282 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(left, #828282 0%,#e0e0e0 50%,#828282 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(left, #828282 0%,#e0e0e0 50%,#828282 100%); /* IE10+ */
+            background: linear-gradient(to right, #828282 0%,#e0e0e0 50%,#828282 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#828282', endColorstr='#828282',GradientType=1 ); /* IE6-9 */
+
+            border: 3px dashed #88888a;
+            height: 100px;
+            width: 100%;
+            border-radius: 10px;
+        }
+        .drop-zone-main {
+            color: #444444;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .drop-zone-label-secondary {
+            color: #FDFDFD;
+            font-size: 14px;
+        }
+        .drop-zone-common {
+            font-family: Veranda, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            text-align: center;
+            display: block;
+            text-shadow: 1px 1px 2px #757575;
+        }
+        .progress-wrapper {
+            display: block;
+            position: relative;
+            width: 95%;
+            margin: 0 auto;
+            top: 10px;
+        }
+        .progress-text {
+            text-align: center;
+            display: block;
+            top: -20px;
+            position: relative;
+            font-size: 24px;
+            color: #FFF;
+        }
+        .tag-text-area {
+            width: 100%;
+        }
+        .gallery-button-toggle {
+            margin: 2px;
+        }
+        .bootstrap-tagsinput {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div id="drop_zone">
+        <span class="drop-zone-common drop-zone-main">Drop Files Here</span><span class="drop-zone-common drop-zone-label-secondary">or click for a file selector dialog</span>
+        <div class="progress-wrapper">
+            <div class="progress progress-striped active">
+                <div class="progress-bar upload-progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <span class="progress-text"></span>
+        </div>
+    </div>
+    <input type="file" id="hiddenFileInput" multiple accept="image/*" style="display:none" onchange="processFileList(this.files)">
+    <hr>
+    <h4>Add all images listed to:</h4>
+    <div class="gallery-toggles-global">
+        {% for gallery in galleries %}
+            <button class="btn btn-default btn-sm global-gallery-toggle" onclick="handleGlobalGalleryToggle(this,{{ gallery.pk }})" id="gallery-toggle-{{ gallery.pk }}">{{ gallery.name }}</button>
+        {% endfor %}
+    </div>
+    <hr>
+    <div id="fileList"></div>
+{% endblock %}
+{% block put_script_tags_here %}<script src="{% static "bootstrap-tagsinput.js" %}"></script>
+    <script src="{% static "typeahead.js" %}"></script>
+    <script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function handleGlobalGalleryToggle(sender, galleryId) {
+        var senderHandle = $(sender);
+        var galleryButtons = $("[data-gallery-pk=" + galleryId + "]");
+
+        if (senderHandle.hasClass("btn-default")) {
+            senderHandle.removeClass("btn-default");
+            senderHandle.addClass("btn-primary");
+            //Time to toggle things to YES
+
+            galleryButtons.removeClass("btn-primary");
+            galleryButtons.click();
+        } else {
+            senderHandle.removeClass("btn-primary");
+            senderHandle.addClass("btn-default");
+            //Time to toggle gallery buttons to NO
+            galleryButtons.removeClass("btn-default");
+            galleryButtons.click();
+        }
+    }
+
+
+    function handleGalleryToggleClick(sender, imageId, siteId, targetGalleryId) {
+
+        var makeBreak = false; //True is make relation, false is break relation
+
+        if ($(sender).hasClass("btn-default")) {
+            sender.classList.remove("btn-default");
+            sender.classList.add("btn-primary");
+            //Image should be added to the targetGalleryId
+            makeBreak = true;
+        } else {
+            sender.classList.remove("btn-primary");
+            sender.classList.add("btn-default");
+            makeBreak = false;
+        }
+
+        $.ajax({
+            url: "{% url 'manage_photo_json' %}",
+            method: "POST",
+            data: {
+                csrfmiddlewaretoken: csrftoken,
+                transaction_type: 'photo-gallery-relation',
+                makeBreak: makeBreak,
+                photoPk: siteId,
+                galleryPk: targetGalleryId
+            }
+        }).done(function(data) {
+            console.log(data);
+        }).error(function(data) {
+            console.error(data);
+            alert("There was an issue updating a photo-gallery relationship");
+        });
+    }
+
+    var galleryArray = new Array({% for gallery in galleries %}{name: "{{gallery.name|escapejs}}", id: {{gallery.pk}}}{% if not forloop.last %}, {% endif %}{% endfor %});
+
+    var arbitraryId = 0;
+
+
+    var progressWrapper = $(".progress-wrapper");
+    var doneText = $(".progress-text");
+    function showProgressBar(bool) {
+        if(bool) {
+            $("#drop_zone").animate({height: '150'}, 'fast', 'linear', function() {
+                progressWrapper.show();
+            });
+        } else {
+            doneText.delay(500).show();
+            progressWrapper.delay(2000).hide(function() {
+                $("#drop_zone").animate({height: '100'}, 'fast', 'linear');
+            });
+        }
+    }
+    doneText.hide();
+    progressWrapper.hide();
+
+    var fileListLength = 0;
+    var numberDone = 0;
+    function anotherFileDone(responseObject) {
+
+        var fileList = document.getElementById("fileList");
+
+        var panelMaster = document.createElement("div");
+            panelMaster.classList.add("panel");
+            panelMaster.classList.add("panel-default");
+
+        var panelHeading = document.createElement("div");
+            panelHeading.classList.add("panel-heading");
+        panelMaster.appendChild(panelHeading);
+
+        var panelTitle = document.createElement("h3");
+            panelTitle.classList.add("panel-title");
+            panelTitle.innerHTML = "Stock Number: " + responseObject.siteId;
+        panelHeading.appendChild(panelTitle);
+
+        var panelBody = document.createElement("div");
+            panelBody.classList.add("panel-body");
+        panelMaster.appendChild(panelBody);
+
+        var thumbnailPreview = document.createElement("img");
+            thumbnailPreview.src = responseObject.thumbnailUrl;
+        panelBody.appendChild(thumbnailPreview);
+
+        panelBody.appendChild(document.createElement("br"));
+
+{#        var tagTextArea = document.createElement("textarea");#}
+{#            tagTextArea.classList.add("tag-text-area");#}
+{#            tagTextArea.rows = 3;#}
+{#            tagTextArea.innerHTML = responseObject.tags.join(", ");#}
+{#            tagTextArea.placeholder = "No tags defined";#}
+{#        panelBody.appendChild(tagTextArea);#}
+
+{#        var tagInput = $("<input>");#}
+{#            tagInput.addClass("tagInput");#}
+{#            tagInput.attr("type", "text");#}
+{#            tagInput.attr("data-role", "tagsinput");#}
+{#            $(tagInput).tagsinput('add', "Cars");#}
+{#        panelBody.appendChild(tagInput[0]);#}
+
+
+        var panelFooter = document.createElement("div");
+            panelFooter.classList.add("panel-footer");
+            for (var i = 0; i < galleryArray.length; i++) {
+                var galleryToggle = document.createElement("button");
+                    galleryToggle.classList.add("btn");
+                    galleryToggle.classList.add("btn-default");
+                    galleryToggle.classList.add("btn-xs");
+                    galleryToggle.classList.add("gallery-button-toggle");
+                    galleryToggle.setAttribute("data-gallery-pk", galleryArray[i].id);
+                    galleryToggle.setAttribute("onclick", "handleGalleryToggleClick(this, " + responseObject.id + ", " + responseObject.siteId + ", " + (galleryArray[i].id).toString() + ")")
+                    galleryToggle.innerHTML = galleryArray[i].name;
+                panelFooter.appendChild(galleryToggle);
+            }
+        panelMaster.appendChild(panelFooter);
+
+        fileList.appendChild(panelMaster);
+
+{#        $(tagInput).tagsinput({#}
+{#            itemValue: 'value',#}
+{#            itemText: 'text'#}
+{#        });#}
+{#        debugger;#}
+{#        $(tagInput).tagsinput({#}
+{#            tagClass: function(item) {#}
+{#                return 'label label-primary';#}
+{#            },#}
+{#            itemValue: 'value',#}
+{#            itemText: 'text'#}
+{#        });#}
+{#        $(tagInput).tagsinput('add', { "value": 1 , "text": "Amsterdam" });#}
+
+{#        for(var j = 0, tagLen = responseObject.tags.length; j < tagLen; j++) {#}
+{#            $(tagInput).tagsinput('add', {"value": responseObject.tags[j].value, "text": responseObject.tags[j].text})#}
+{#        }#}
+
+        var tag_array = [];
+        for(var j = 0, tagLen = responseObject.tags.length; j < tagLen; j++) {
+            tag_array.push(responseObject.tags[j].text);
+        }
+
+        var server_global_tag_array = $.get('{% url "manage_tag_json" %}');
+
+        var $newInput = $('<input class="typeahead" type="text" value="' + tag_array.join(",") + '" data-role="tagsinput" data-image-id="' + responseObject.siteId + '" data-image-internal-id="' + responseObject.id + '" />');
+        $(panelBody).append($newInput);
+        $newInput.tagsinput({
+            tagClass: function(item) {
+                return 'label label-primary';
+            },
+            typeahead: {
+                source: server_global_tag_array
+            }
+        });
+
+
+        var typeahead = $('.typeahead').typeahead({source: server_global_tag_array }).data('typeahead');
+
+        $newInput.on('change', function (e) {
+            var $target = $(e.target);
+            if (typeahead.mousedover) {
+                console.log("mousedover [ignored selection]");
+            }
+            else if ($.inArray($target.val(), server_global_tag_array) < 0) {
+                console.log("show add");
+                $.ajax({
+                    url: "{% url 'manage_tag_json' %}",
+                    method: "POST",
+                    data: {transaction_type: "update_tags", csrfmiddlewaretoken: csrftoken, tag_list: $target.val(), photoId: responseObject.siteId}
+                }).done(function() {
+                    //Show spnner next to stuff -- you can even use $target.attr("data-internal-id") to find which image in the list it is
+                }).error(function() {
+                    //Oh poopers
+                    alert("Error updating tags for stock photo number " + $target.attr("data-image-id"));
+                });
+            }
+        }).on('selected', function () {
+            console.log("selected");
+        });
+
+
+
+
+        numberDone++;
+        if(numberDone == fileListLength) {
+            $(".upload-progress-bar").attr("style", "width: 100%");
+            $(".progress-text").text("Done!");
+            showProgressBar(false);
+
+        } else {
+            var percentComplete = Math.round((numberDone/fileListLength)*100);
+            $(".upload-progress-bar").attr("style", "width: " + percentComplete + "%");
+            console.log(percentComplete);
+        }
+        //If currentIndexDone == fileListLength then hide progress bar
+
+    }
+
+    function processFileList(filelist) {
+        fileListLength = filelist.length;
+        showProgressBar(true);
+        for (var i = 0; i < fileListLength; i++) {
+            var reader = new FileReader();
+            reader.onload = (function() {
+                return function(e) {
+                    var thisImageId = arbitraryId++;
+                    $.ajax({
+                        url: "{% url "manage_upload" %}",
+                        method: "post",
+                        data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'upload', image: e.target.result, id: thisImageId}
+                    }).success(function(rawResultInfo) {
+                        var resultInfo = JSON.parse(rawResultInfo);
+                        anotherFileDone(resultInfo);
+                    }).error(function(response) {
+                        showProgressBar(false);
+                        console.log(response);
+                        alert(JSON.parse(response.responseText).error);
+                    });
+                }
+            })();
+            reader.readAsDataURL(filelist[i]);
+
+        }
+    }
+
+    function showDropZoneActive(bool) {
+        if(bool) {
+            document.getElementById("drop_zone").style.border = "3px solid #4597ee";
+        } else {
+            document.getElementById("drop_zone").style.border = "3px dashed #88888a";
+        }
+    }
+    function handleFileSelect(evt) {
+        showDropZoneActive(false);
+        evt.stopPropagation();
+        evt.preventDefault();
+        processFileList(evt.dataTransfer.files);
+    }
+    function handleDragOver(evt) {
+        showDropZoneActive(true);
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+    }
+
+    // Setup the dnd listeners.
+    var dropZone = document.getElementById('drop_zone');
+    dropZone.addEventListener('dragover', handleDragOver, false);
+    dropZone.addEventListener('drop', handleFileSelect, false);
+    dropZone.addEventListener('dragleave', function() {showDropZoneActive(false)}, false);
+    dropZone.addEventListener('click', function() {document.getElementById('hiddenFileInput').click()}, false)
+
+    </script>{% endblock %}

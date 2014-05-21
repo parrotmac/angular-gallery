@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^galleries/$', 'StockPhotos.views.list_galleries', name='galleries'),
     url(r'^gallery/(?P<gallery_id>\d{5})', 'StockPhotos.views.get_gallery_by_id', name='gallery_id'),
     url(r'^gallery/(?P<gallery_slug>[-\w]+)', 'StockPhotos.views.get_gallery_by_slug', name='gallery_slug'),
-    url(r'^image/(?P<image_id>\d+)', 'StockPhotos.views.image', name='image_id'),
+    url(r'^photo/(?P<image_id>\d+)', 'StockPhotos.views.image', name='image_id'),
 
     # url(r'^login/', 'StockPhotos.views.user_login'),
 
@@ -22,9 +22,10 @@ urlpatterns = patterns('',
     url(r'^manage/gallery/(?P<gallery_id>\d+)', 'StockPhotos.views.manage_gallery', name='manage_gallery_by_id'),
     url(r'^manage/photo/$', 'StockPhotos.views.manage_photos', name='manage_photos'),
     url(r'^manage/photo/page/(?P<page_number>\d+)$', 'StockPhotos.views.manage_photos', name='manage_photos_by_page'),
-    url(r'^manage/photo/(?P<image_id>\d+)', 'StockPhotos.views.manage_photos_by_id', name='manage_photo_by_id'),
+    url(r'^manage/photo/(?P<image_id>\d+)', 'StockPhotos.views.manage_photo', name='manage_photo_by_id'),
     url(r'^manage/clients/$', 'StockPhotos.views.manage_clients', name='manage_clients'),
-
+    url(r'^manage/photo/json/$', 'StockPhotos.views.manage_photo_json', name='manage_photo_json'),
+    url(r'^manage/tag/json/$', 'StockPhotos.views.manage_tag_json', name='manage_tag_json'),
     url(r'^manage/upload/$', 'StockPhotos.views.manage_upload', name='manage_upload'),
     # url(r'^manage/gallery/(?P<gallery_slug>[-\w]+)', 'StockPhotos.views.manage_gallery_slug', name='gallery_slug'),
 

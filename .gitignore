@@ -1,0 +1,9 @@
+.DS_Store
+*.pyc
+.idea/*
+.idea
+media/
+*.backup
+*.sql
+*.sqlite3
+*.db

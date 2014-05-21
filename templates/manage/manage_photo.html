@@ -39,6 +39,10 @@
     .image-release ul li label {
         font-weight: normal;
     }
+    .text-area {
+        width: 100%;
+        resize: vertical;
+    }
     </style>
 {% endblock %}
 {% block content %}
@@ -50,23 +54,25 @@
         </div>
         <div>
             <h4>Image:</h4>
-            <img class="image-thumbnail" src="{{ image.image.url }}" />
+            <img class="image-thumbnail" src="{{ image.thumbnail.url }}" />
         </div>
         <div>
             <h4>Description:</h4>
             <span style="font-style: italic">For ID purposes only, not displayed on website.</span><br />
-            <textarea cols="30" rows="5">{{ image.description }}</textarea>
+            <textarea class="text-area" rows="5">{{ image.description }}</textarea>
         </div>
         <div>
-            <h4>Tags:  <button class="btn btn-xs btn-success" data-toggle="modal" data-target="#newTabModal"><span class="glyphicon glyphicon-plus"></span></button></h4>
-            <select name="tags-selector" style="height: 300px" multiple>
-                {% for tag in tags %}
-                    <option value="{{ tag.pk }}"
-                            {% for image_tag in image.tags.all %}
-                                {% if image_tag.pk ==  tag.pk %} selected{% endif %}
-                            {% endfor %}>{{ tag }}</option>>
-                {% endfor %}
-            </select>
+            <h4>Tags:</h4>
+{#                <button class="btn btn-xs btn-success" data-toggle="modal" data-target="#newTabModal"><span class="glyphicon glyphicon-plus"></span></button></h4>#}
+            <textarea class="text-area">{% for tag in image.tags.all %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}</textarea>
+{#            <select name="tags-selector" style="height: 300px" multiple>#}
+{#                {% for tag in tags %}#}
+{#                    <option value="{{ tag.pk }}"#}
+{#                            {% for image_tag in image.tags.all %}#}
+{#                                {% if image_tag.pk ==  tag.pk %} selected{% endif %}#}
+{#                            {% endfor %}>{{ tag }}</option>>#}
+{#                {% endfor %}#}
+{#            </select>#}
 
         </div>
         <div>
@@ -74,7 +80,7 @@
             <input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} /></div>
         <div><h4>Galleries:</h4>
             <ul style="list-style: none; margin: 0; padding: 0">{% for gallery in galleries %}
-                    <li><input type="checkbox" value="{{ gallery.pk }}"{% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} checked="" {% endif %}{% endfor %} />&nbsp;{{ gallery.name }}</li>{% endfor %}
+                    <li><label><input type="checkbox" value="{{ gallery.pk }}"{% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} checked="" {% endif %}{% endfor %} />&nbsp;{{ gallery.name }}</label></li>{% endfor %}
             </ul>
 {#            <select name="in_galleries" multiple>{% for gallery in galleries %}#}
 {#                    <option value="{{ gallery.pk }}"{% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} selected{% endif %}{% endfor %}>{{ gallery.name }}</option>>{% endfor %}#}
@@ -107,11 +113,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="newTabModal" tabindex="-1" role="dialog" aria-labelledby="newTabModalLabel" aria-hidden="true">
+    <div class="modal fade" id="newTabModal" tabindex="-1" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title" id="newTabModalLabel">New Tag</h4>
           </div>
           <div class="modal-body">
@@ -131,4 +137,11 @@
         <button type="button" class="btn btn-lg btn-success">Save</button>
     </div>
 
+{% endblock %}
+{% block put_script_tags_here %}
+    <script>
+    function updateMostInformation() {
+
+    }
+    </script>
 {% endblock %}
