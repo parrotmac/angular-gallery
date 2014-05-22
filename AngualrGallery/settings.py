@@ -26,13 +26,14 @@ if socket.gethostname() == "AluminumBeast.local":
     }
 else:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '/cloudsql/your-project-id:your-instance-name',
-        'NAME': 'karma',
-        'USER': 'mysql-user',
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'django_stock_gallery',
+            'USER': 'django_gallery',
+            'PASSWORD': 'as22ni37LIB',
+            'HOST': 'localhost'
+        }
     }
-}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
