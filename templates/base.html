@@ -1,375 +1,103 @@
-<!DOCTYPE html>
+{% load staticfiles %}
 <html lang="en">
     <head>
-        <title>{% block easy_title %}Matthew Turley Stock Photography{% endblock %}</title>
-        <meta charset="utf-8" />
+        <title>Matthew Turley Stock Photography | {% block page_title %}Base{% endblock %}</title>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+        <!-- Bootstrap -->
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-{#        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>#}
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
         <style>
-            html, body{
-                margin:0;
-                padding:0;
-                height:100%;
-                background:#DCDDDE;
+            .page-wrapper {
+                min-height: 560px;
+                max-width: 980px;
+                margin: 0 auto;
             }
-
-            div.popover-common {
-                position: absolute;
-{#                width: 100%;#}
-                background-color: rgba(30, 30, 30, 0.64);
-            }
-            .popover-common span {
+            .photo-wrapper {
+                background-color: #F00;
                 position: relative;
-                margin: 0 10px;
-                font-weight: lighter;
-                color: #e5e5e5;
-            }
-
-            /* Primary feature */
-            .primary-feature {
-                position: relative;
-                float: left;
-                width: 600px;
-                height: 400px;
-            }
-            .primary-feature a img {
-                width: 600px;
-                height: 400px;
-            }
-            .primary-feature div {
-                /* Popover */
-                width: 600px;
-                height: 50px;
-                top: 350px;
-            }
-            .primary-feature div span {
-                /* Styles specific to Primary Feature popover */
-                font-size: 25pt;
-            }
-
-            /* Secondary Feature */
-            .secondary-feature-group {
-                position: relative;
-                float: left;
-                width: 300px;
-                height: 400px;
-            }
-            .secondary-feature {
-                position: relative;
-                float: left;
-                width: 300px;
-                height: 200px;
-            }
-            .secondary-feature a img {
-                width: 300px;
-                height: 200px;
-            }
-            .secondary-feature div {
-                /* Popover */
-                width: 300px;
-                height: 30px;
-                top: 170px; /* 200-30 */
-            }
-            .secondary-feature div span {
-                font-size: 18pt;
-            }
-
-
-            /* Gallery Cover Photos in carousel-esque thing */
-            .gallery-image {
-                /* Div with Img, Div & div -> span */
-                position: relative;
-                float: left;
-                width: 180px;
-                height: 120px; /* THIS IS NOT RIGHT */
-            }
-            .gallery-image a img {
-                width: 180px;
-                height: 120px; /* THIS IS NOT RIGHT */
-            }
-            .gallery-image div {
-                width: 180px;
-                height: 20px;
-                top: 100px;
-            }
-            .gallery-image div span {
-                font-size: 11pt;
-            }
-
-            /* carousel-esque thingy */
-            .gallery-carousel {
-                position: relative;
-                width: 100%;
-                height: 120px;
-                overflow: hidden;
-            }
-
-            .outer {
-                display: table;
-                position: absolute;
-                height: 100%;
-                width: 100%;
-            }
-
-            .middle {
-                display: table-cell;
-                vertical-align: middle;
-            }
-
-            .inner {
-                margin-left: auto;
-                margin-right: auto;
-                width: 900px;
-            }
-
-            .nopadding {
-                padding: 0 !important;
-                margin: 0 !important;
+                display: block;
+                min-height: 600px;
             }
         </style>
-    {% block custom_style %}{% endblock %}
+        {% block head_area %}{% endblock %}
     </head>
     <body>
-    {% block body_block %}
-        <div class="outer">
-            <div class="middle">
-                <div class="inner">
-{#                    <div class="row">#}
-{#                        <div class="col-md-12">#}
-                            <nav class="navbar navbar-inverse" role="navigation">
-{#                                <img class="navbar-brand" src="http://isaacparker.org/mts/mts-logo.png" />#}
-                                <a class="navbar-brand" href="/">Matthew Turley Stock</a>
-{#                                <ul class="nav navbar-nav">#}
-{#                                    <li><a href="#">Sign In/Sign Up</a></li>#}
-{#                                    <li><a href="#" data-toggle="modal" data-target="#pricingModal">Pricing</a></li>#}
-{#                                    <li><a href="#" data-toggle="modal" data-target="#contactModal">Contact</a></li>#}
-{#                                </ul>#}
-                                <form class="navbar-form navbar-right" role="search" style="margin-right: 0px">
-                                    <div class="form-group">
-                                        <input type="search" class="form-control" placeholder="Search">
-                                    </div>
-                                    <button type="submit" class="btn btn-default">Search</button>
-                                </form>
-                                <ul class="nav navbar-nav navbar-right">
-{#                                <ul class="nav navbar-nav">#}
-                                    {% if user.is_authenticated %}
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, {{ user }}<b class="caret"></b></a>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <form action="/" method="post" id="logoutForm">
-                                                        {% csrf_token %}
-                                                        <input style="width: 100%" class="btn btn-default" type="button" name="logout" value="Logout" />
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    {% endif %}
-                                    <li><a href="/galleries/">Galleries</a></li>
-                                    <li><a href="#">Recent</a></li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="#" data-toggle="modal" data-target="#loginModal">Sign In/Sign Up</a></li>
-                                            <li class="divider"></li>
-                                            <li><a href="#" data-toggle="modal" data-target="#pricingModal">Pricing</a></li>
-                                            <li><a href="#" data-toggle="modal" data-target="#contactModal">Contact</a></li>
-                                        </ul>
-                                    </li>
+        <div class="container">
+            <div class="row">
+                <div class="page-wrapper">
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div class="container-fluid">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mts-navbar-collapse">
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                                <a class="navbar-brand" href="#"><span>Matthew Turley Stock Photography</span></a>
+                            </div>
+                            <!-- Collect the nav links, forms, and other content for toggling -->
+                            <div class="collapse navbar-collapse" id="mts-navbar-collapse">
+
+                                <ul class="nav navbar-nav navbar-left">
+                                <li><a href="#">Login</a></li>
+                                <li><a href="#">Pricing &amp; FAQ</a></li>
+                                <li><a href="#">Contact</a></li>
                                 </ul>
-                            </nav>
-{#                        </div>#}
-{#                    </div>#}
-                {% block content_area %}
-                    <div class="row nopadding">
-                        <div class="primary-feature nopadding">
-                            <a href="/gallery/{{ primary_feature.gallery.slug }}">
-                                <img src="{{ primary_feature.image.image.url }}" alt="{{ primary_feature.image.gallery.name }}"/>
-                            </a>
-                            <div class="popover-common">
-                                <span>{{ primary_feature.gallery.name }}</span>
-                            </div>
+
+                                <form class="navbar-form navbar-right" role="search">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control hidden-sm search-box" placeholder="Search">
+                                    </div>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default" onclick="search(this)"><span class="glyphicon glyphicon-search"></span></button>
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            Options<span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu"> <!-- Need to make this styled like a dropdown, but not act like one -->
+                                            <li><a href="#">Color</a></li>
+                                            <li><a href="#">Black &amp; White</a></li>
+                                            <li><a href="#">Vertical</a></li>
+                                            <li><a href="#">Horizontal</a></li>
+                                            <li><a href="#">Panoramic</a></li>
+                                        </ul>
+                                    </div>
+                                </form>
+                            </div><!-- /.navbar-collapse -->
                         </div>
-                        <div class="secondary-feature-group nopadding">
-                            <div class="secondary-feature nopadding">
-                                <a href="/gallery/{{ secondary_feature_top.gallery.slug }}">
-                                    <img src="{{ secondary_feature_top.image.image.url }}" alt="{{ secondary_feature_top.image.gallery.name }}" />
-                                </a>
-                                <div class="popover-common">
-                                    <span>{{ secondary_feature_top.gallery.name }}</span>
-                                </div>
-                            </div>
-                            <div class="secondary-feature nopadding">
-                                <a href="/gallery/{{ secondary_feature_bottom.gallery.slug }}">
-                                    <img src="{{ secondary_feature_bottom.image.image.url }}" alt="{{ secondary_feature_bottom.image.gallery.name }}" />
-                                </a>
-                                <div class="popover-common">
-                                    <span>{{ secondary_feature_bottom.gallery.name }}</span>
-                                </div>
-                            </div>
-                        </div>
+                    </nav>
+
+                    <hr>
+
+                    <div class="photo-wrapper">
+                        {% block content %}{% endblock %}
                     </div>
 
-                    <div class="row nopadding">
-                        <div class="gallery-carousel">
-                        {% for gallery in galleries %}
-                            <div class="gallery-image nopadding">
-                                <a href="/gallery/{{ gallery.slug }}"><img src="{{ gallery.cover_photo.image.url }}" alt="{{ gallery.name }}" /></a>
-                                <div class="popover-common">
-                                    <span>{{ gallery.name}}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-
-                        <!-- Hey, here's a great idea: Let's do that 3 more times -->
-                        {% for gallery in galleries %}
-                            <div class="gallery-image nopadding"><!-- #Hashtag we're asking for trouble -->
-                                <a href="/gallery/{{ gallery.slug }}"><img src="{{ gallery.cover_photo.image.url }}" alt="{{ gallery.name }}" /></a>
-                                <div class="popover-common">
-                                    <span>{{ gallery.name}}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-
-                        </div>
-                    </div>
-
-                    <div class="row nopadding">
-                        {% for image in latest %}
-                            <div class="gallery-image nopadding">
-                                <a href="/image/{{ image.pk }}"><img src="{{ image.image.url }}" /></a>
-{#                                <div class="popover-common">#}
-{#                                    <span>{{ image }}</span>#}
-{#                                </div>#}
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                {% endblock content_area %}
-
-                    </div>
-
+                </div>
             </div>
-
-
         </div>
-
-    <!-- Popover Modal Boxes -->
-            <div class="modal fade" id="pricingModal" tabindex="-1" role="dialog" aria-labelledby="pricingModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="pricingModalLabel">Pricing</h4>
-                        </div>
-                        <div class="modal-body">
-                            <strong>Bacon ipsum</strong><br />
-                            Bacon ipsum dolor sit amet turkey swine short loin, strip steak beef ribs sirloin venison flank frankfurter brisket pork andouille ribeye pork belly tongue. Capicola pork chop pastrami, corned beef landjaeger shankle drumstick swine. Pork loin t-bone pork belly ribeye biltong. T-bone bacon landjaeger, tongue rump leberkas biltong shoulder jowl swine ribeye salami sirloin pork loin. Leberkas porchetta beef ribs cow pig filet mignon kevin bacon ground round pork belly meatloaf.
-                            <br />
-                            <br />
-                            <strong>Second Helping</strong><br />
-                            Drumstick hamburger cow, pastrami spare ribs shank pancetta chicken beef turkey strip steak ribeye frankfurter. Rump spare ribs sirloin turkey pork chop bacon meatloaf ham hock doner ribeye filet mignon. Pork belly bacon kevin, sirloin tenderloin beef frankfurter shank swine chuck. Chuck turducken pancetta, kielbasa kevin ground round porchetta beef cow spare ribs jerky turkey. Kielbasa salami sausage pork chop chuck tenderloin, meatloaf hamburger flank tail kevin pork corned beef. Doner venison capicola turkey tail pork belly. Short ribs chicken jowl, shankle kielbasa short loin pancetta pork bacon chuck bresaola frankfurter.
-                            <br />
-                            <br />
-                            <strong>Third Helping</strong><br />
-                            Ribeye chicken ball tip kielbasa rump strip steak landjaeger. Landjaeger shank flank tri-tip, meatball jerky spare ribs fatback prosciutto shankle swine. Sausage sirloin flank prosciutto pancetta andouille leberkas meatloaf boudin t-bone short ribs kielbasa strip steak. Turkey hamburger flank doner sausage ground round salami rump.
-                            <br />
-                            <br />
-                            <strong>Fourth Helping</strong><br />
-                            Pancetta tail corned beef bresaola cow meatball. Meatball tail hamburger bacon, ham tongue beef andouille ham hock tenderloin pig leberkas. T-bone ham hock meatball short loin ball tip leberkas cow turkey bacon shankle. Beef ribs ham hock bresaola, chuck meatloaf tail short loin tenderloin meatball jowl rump prosciutto. Rump pastrami meatball venison turkey chuck shoulder salami.
-                            <br />
-                            <br />
-                            <strong>Finish It Off The Right Way</strong><br />
-                            Doner bresaola kevin chicken flank hamburger swine, fatback sausage venison. Shoulder ball tip kevin flank, jerky porchetta ham hock pancetta shankle brisket hamburger. Venison frankfurter kevin, capicola cow chicken ground round jerky. Sausage shankle jerky ham, leberkas doner pork loin pancetta cow fatback.
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-             <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="contactModalLabel">Contact</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div>
-                                <span>Matthew Turley Photography</span><br />
-                                <span>3434 East 7800 South #310</span><br />
-                                <span>Salt Lake City, UT 84121</span><br />
-                            </div>
-                            <hr />
-                            <form role="form">
-                                <div class="form-group">
-                                        <input type="text" class="form-control" placeholder="Name">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Email">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Phone">
-                                </div>
-                                <div class="form-group">
-                                    <textarea class="form-control" placeholder="Message"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-default">Submit</button>
-                            </form>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="loginModalLabel">Contact</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form role="form" method="POST" action="">
-                                {% csrf_token %}
-                                Login to an existing account:
-                                <div class="form-group">
-                                        <input type="text" name="username" class="form-control" placeholder="Username">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" name="password" class="form-control" placeholder="Password">
-                                </div>
-                                <button type="submit" class="btn btn-default">Login</button>
-                                </hr>
-                                Register for an account:
-                                <br />
-                                <br />
-                                COMING SOON!<br/>
-                                OOOH SUCH PRETTY CODE.
-                            </form>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    <!-- End Modal Boxes -->
-
-    <script>
-    </script>
-
-    {% endblock body_block %}
-
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script>
+          function search(sender) {
+            if($(".search-box").is(':visible')) {
+              //Just go ahead with the search
+            } else {
+              //Need to show the search box is a not-ugly way
+            }
+          }
+        </script>
+        {% block put_script_tags_here %}{% endblock %}
     </body>
 </html>

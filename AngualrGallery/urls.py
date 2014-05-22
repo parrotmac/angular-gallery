@@ -7,16 +7,14 @@ from django.conf.urls.static import static
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'StockPhotos.views.home', name='home'),
-    url(r'^login/', 'StockPhotos.views.user_login', name="login_required"),
-    url(r'^galleries/$', 'StockPhotos.views.list_galleries', name='galleries'),
-    url(r'^gallery/(?P<gallery_id>\d{5})', 'StockPhotos.views.get_gallery_by_id', name='gallery_id'),
-    url(r'^gallery/(?P<gallery_slug>[-\w]+)', 'StockPhotos.views.get_gallery_by_slug', name='gallery_slug'),
-    url(r'^photo/(?P<image_id>\d+)', 'StockPhotos.views.image', name='image_id'),
+    url(r'^$', 'StockPhotos.views.view_home', name='home'),
+    url(r'^gallery/(?P<gallery_id>\d+)', 'StockPhotos.views.view_gallery', name='view_gallery'),
+    url(r'^photo/(?P<photo_id>\d+)', 'StockPhotos.views.view_photo', name='view_photo'),
 
-    # url(r'^login/', 'StockPhotos.views.user_login'),
+    url(r'^login/', 'StockPhotos.views.user_login', name="login"),
 
-    # url(r'^manage/galleries/', 'StockPhotos.views.manage_galleries'),
+    url(r'^dump/image-paths', 'StockPhotos.views.dump_image_paths'),
+
     url(r'^manage/$', 'StockPhotos.views.manage', name='manage_home'),
     url(r'^manage/gallery/$', 'StockPhotos.views.manage_galleries', name='manage_gallery'),
     url(r'^manage/gallery/(?P<gallery_id>\d+)', 'StockPhotos.views.manage_gallery', name='manage_gallery_by_id'),

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_title %}Home{% endblock %}
+{% block head_area %}
+    <style>
+        .feature-area {
+            height: 400px;
+        }
+
+        .photo-carousel {
+            max-width: 980px;
+            background-color: #00F;
+            min-height: 160px;
+            margin: 0;
+            padding: 0;
+        }
+        .photo-carousel ul {
+            list-style: none;
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
+        .photo-carousel-slide {
+            display: inline-table;
+            line-height: 0;
+            margin: 0;
+            padding: 0;
+            width: 160px;
+            height: 160px;
+            position: relative;
+        }
+        .photo-carousel-thumbnail {
+            padding: 0;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="feature-area">
+        <img src="http://isaacparker.org/mts/feature-big.png"><img src="http://isaacparker.org/mts/feature-small.png">
+    </div>
+    <div class="photo-carousel">
+        <ul>
+        {% for gallery in galleries %}
+            <li class="photo-carousel-slide"><a href="{% url 'view_gallery' gallery.id %}"><img class="photo-carousel-thumbnail" src="{{ gallery.get_cover_photo.thumbnail.url }}"></a></li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+{% block put_script_tags_here %}
+
+{% endblock %}

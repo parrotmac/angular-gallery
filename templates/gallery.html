@@ -1,61 +1,15 @@
-{% extends 'base.html' %}
-{% block easy_title %}{{ gallery.name }}{% endblock easy_title %}
-{% block custom_style %}
-<style>
-{#.gallery-listing {#}
-{#    width: 900px;#}
-{#    height: 900px;#}
-{#}#}
-{##}
-{#.image-thumbnail-container {#}
-{#    border: 1px black solid;#}
-{#    position: relative;#}
-{#    float: left;#}
-{#    width: 180px;#}
-{#    height: 180px;#}
-{#}#}
-{#.image-thumbnail-inner-container {#}
-{#}#}
-{#.image-thumbnail-container img {#}
-{#    position: absolute;#}
-{#    margin: 0;#}
-{#    top: 0;#}
-{#    bottom: 0;#}
-{#    left: 0;#}
-{#    right: 0;#}
-{#}#}
-        .image-thumbnail-container {
-            width: 190px;
-            height: 190px;
-            position: relative;
-        }
-        .image-thumbnail {
-            position: absolute;
-            margin: auto;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            max-width: 180px;
-            max-height: 180px;
-        }
-</style>
-{% endblock custom_style %}
-{% block content_area %}
-{#    <div class="gallery-listing">#}
-{#    {% for image in images %}#}
-{#        <div class="image-thumbnail-container">#}
-{#            <div class="image-thumbnail-inner-container">#}
-{#                <img style="max-width: 180px; max-height: 180px;" src="{{ image.image.url }}" />#}
-{#            </div>#}
-{#        </div>#}
-{#    {% endfor %}#}
-{#    </div>#}
-    <div class="row">
-    {% for image in images %}
-        <div class="col-lg-2 image-thumbnail-container">
-            <img class="image-thumbnail" src="{{ image.image.url }}" />
-        </div>
-    {% endfor %}
-    </div>
-{% endblock content_area %}
+{% extends "base.html" %}
+{% block page_title %}Gallery {{ gallery.id }}{% endblock %}
+{% block head_area %}
+
+{% endblock %}
+{% block content %}
+
+{% for photo in photos %}
+    <a href="{% url 'view_photo' photo.id %}"><img src="{{ photo.image.url }}" class="img-responsive"></a><br>
+{% endfor %}
+
+{% endblock %}
+{% block put_script_tags_here %}
+
+{% endblock %}

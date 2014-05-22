@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Image Data Dump</title>
+    <style>
+        td, th {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<table border="1">
+<tr><th>ID</th><th>Image Preview URL</th><th>Image Thumbnail URL</th></tr>
+{% for image in images %}
+<tr><td>{{ image.id }}</td><td>{{ image.image.url }}</td><td>{{ image.thumbnail.url }}</td></tr>
+{% endfor %}
+</table>
+</body>
+</html>

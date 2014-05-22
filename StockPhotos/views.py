@@ -15,45 +15,6 @@ import os
 import json
 
 
-
-# def home(request):
-#     primary_feature = GalleryFeature.objects.filter(type='0')[0] # You can call .first() or address [0]
-#     secondary_feature_top = GalleryFeature.objects.filter(type='1')[0]
-#     secondary_feature_bottom = GalleryFeature.objects.filter(type='2')[0]
-#     return render(request, "base.html", {'galleries': Gallery.objects.all(),
-#                                          'latest': Photo.objects.all().reverse()[:5],
-#                                          'primary_feature': primary_feature,
-#                                          'secondary_feature_top': secondary_feature_top,
-#                                          'secondary_feature_bottom': secondary_feature_bottom})
-
-
-def list_galleries(request):
-    return HttpResponse("Omg this doesn't actually work.")
-
-
-def get_gallery_by_id(request, gallery_id):
-    images = Photo.objects.filter(gallery=gallery_id)
-    return render(request, 'gallery.html', {'gallery': Gallery.objects.get(pk=gallery_id), 'images': images})
-    # return render(request, 'gallery.html', {"gallery": Gallery.objects.filter(pk=gallery_id)[0]})
-    # gallery_images = Photo.objects.filter(gallery=gallery_id)
-    # gallery_name = gallery_images[0].gallery.name
-    # return render(request, "gallery.html", {'gallery_name': gallery_name, 'images': gallery_images})
-
-
-def get_gallery_by_slug(request, gallery_slug):
-    # gallery_images = Photo.objects.filter(gallery__slug__contains=gallery_slug)
-    requested_gallery = Gallery.objects.filter(slug__contains=gallery_slug)[0]
-    images = Photo.objects.filter(gallery=requested_gallery.pk) # ################################################Need to paginate
-    return render(request, "gallery.html", {'gallery': requested_gallery, "images": images})
-    # print(gallery_slug)
-    # return HttpResponse("Are you looking for %s?" % gallery_slug)
-
-
-def image(request, image_id):
-    image_to_display = Photo.objects.filter(pk=image_id)[0]
-    return HttpResponse("You're looking for this: <img src=\"%s\" />" % image_to_display.image.url)
-
-
 def user_login(request):
     notwelcome = {}
     is_staff = False
@@ -83,46 +44,62 @@ def user_login(request):
                 notwelcome['invalid'] = "Invalid username or password"
     return render(request, "login.html", {'notwelcome': notwelcome})
 
-def home(request):
 
-    primary_feature = GalleryFeature.objects.filter(type='0').first()  # You can call .first() or address [0]
-    secondary_feature_top = GalleryFeature.objects.filter(type='1').first()
-    secondary_feature_bottom = GalleryFeature.objects.filter(type='2').first()
+def dump_image_paths(request):
+    return render(request, "dump_image_paths.html", {'images': Photo.objects.all()})
 
-    not_welcome = {}
-    is_staff = False
-    if request.method == 'POST':
-        if request.POST.has_key('logout'):
-            logout(request)
-        else:
-            #Login
-            username = request.POST['username']
-            password = request.POST['password']
-            active_user = authenticate(username=username, password=password)
-            if active_user is not None:
-                if active_user.is_active:
-                    login(request, active_user)
-                    if active_user.is_staff:
-                        is_staff = True
 
-                    # If user was going somewhere, but needs to sign in first,
-                    # this will send them on their way once authenticated
-                    if 'next' in request.GET.keys():
-                        return HttpResponseRedirect(request.GET['next'])
-                    else:
-                        return HttpResponseRedirect("/")
-                else:
-                    not_welcome['disabled'] = 'This account has been disabled.'
-            else:
-                not_welcome['invalid'] = "Invalid username or password"
-    return render(request, "base.html", {'problems': not_welcome,
-                                         'is_staff': is_staff,
-                                         'galleries': Gallery.objects.all(),
-                                         'latest': Photo.objects.all().reverse()[:5],
-                                         'primary_feature': primary_feature,
-                                         'secondary_feature_top': secondary_feature_top,
-                                         'secondary_feature_bottom': secondary_feature_bottom})
+# def home(request):
+#
+#     primary_feature = GalleryFeature.objects.filter(type='0').first()  # You can call .first() or address [0]
+#     secondary_feature_top = GalleryFeature.objects.filter(type='1').first()
+#     secondary_feature_bottom = GalleryFeature.objects.filter(type='2').first()
+#
+#     not_welcome = {}
+#     is_staff = False
+#     if request.method == 'POST':
+#         if request.POST.has_key('logout'):
+#             logout(request)
+#         else:
+#             #Login
+#             username = request.POST['username']
+#             password = request.POST['password']
+#             active_user = authenticate(username=username, password=password)
+#             if active_user is not None:
+#                 if active_user.is_active:
+#                     login(request, active_user)
+#                     if active_user.is_staff:
+#                         is_staff = True
+#
+#                     # If user was going somewhere, but needs to sign in first,
+#                     # this will send them on their way once authenticated
+#                     if 'next' in request.GET.keys():
+#                         return HttpResponseRedirect(request.GET['next'])
+#                     else:
+#                         return HttpResponseRedirect("/")
+#                 else:
+#                     not_welcome['disabled'] = 'This account has been disabled.'
+#             else:
+#                 not_welcome['invalid'] = "Invalid username or password"
+#     return render(request, "base.html", {'problems': not_welcome,
+#                                          'is_staff': is_staff,
+#                                          'galleries': Gallery.objects.all(),
+#                                          'latest': Photo.objects.all().reverse()[:5],
+#                                          'primary_feature': primary_feature,
+#                                          'secondary_feature_top': secondary_feature_top,
+#                                          'secondary_feature_bottom': secondary_feature_bottom})
 
+def view_home(request):
+    return render(request, "home.html", {'galleries': Gallery.objects.all()})
+
+
+def view_gallery(request, gallery_id):
+    return render(request, "gallery.html", {'gallery': Gallery.objects.get(id=gallery_id),
+                                            'photos': Photo.objects.filter(gallery=gallery_id)})
+
+
+def view_photo(request, photo_id):
+    return render(request, "photo.html", {'photo': Photo.objects.get(id=photo_id)})
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage(request):
@@ -239,9 +216,8 @@ def manage_photo(request, image_id):
             print json.dump(request.POST)
     else:
         return render(request, "manage/manage_photo.html", {'image': Photo.objects.get(pk=image_id),
-                                                        'image_attributes': ImageAttributes.objects.all(),
-                                                        'galleries': Gallery.objects.all(),
-                                                        'tags': Tag.objects.all()})
+                                                            'galleries': Gallery.objects.all(),
+                                                            'tags': Tag.objects.all()})
 
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')

@@ -38,13 +38,19 @@ class Gallery(models.Model):
     name = models.CharField(max_length=35)
     slug = models.SlugField(max_length=35)
     active = models.BooleanField(default=False)
-    cover_photo = models.ForeignKey('Photo', blank=True, related_name='gallery_cover_photo')
+    cover_photo = models.ForeignKey('Photo', blank=True, null=True, related_name='gallery_cover_photo')
 
     def __unicode__(self):
         return self.name
 
     def get_first_image(self):
         return Photo.objects.filter(gallery=self).first()
+
+    def get_cover_photo(self):
+        if self.cover_photo is None:
+            return self.get_first_image()
+        else:
+            return self.cover_photo
 
     class Meta:
         verbose_name_plural = 'galleries'
