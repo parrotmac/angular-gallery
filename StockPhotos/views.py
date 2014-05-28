@@ -9,7 +9,7 @@ from django.core.files import File
 from iptcinfo import IPTCInfo
 import re
 import cStringIO
-import Image
+from PIL import Image
 import uuid
 import os
 import json
