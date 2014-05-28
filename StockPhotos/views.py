@@ -90,7 +90,7 @@ def dump_image_paths(request):
 #                                          'secondary_feature_bottom': secondary_feature_bottom})
 
 def view_home(request):
-    return render(request, "home.html", {'galleries': Gallery.objects.all()})
+    return render(request, "home.html", {'galleries': Gallery.objects.filter(active=True)})
 
 
 def view_gallery(request, gallery_id):
@@ -105,6 +105,12 @@ def view_photo(request, photo_id):
 def manage(request):
     return render(request, "manage/manage_base.html")
 
+@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+def manage_gallery_cover(request):
+    selected_gallery = request.GET['selected_gallery'] if 'selected_gallery' in request.GET else None
+    return render(request, "manage/manage_gallery_covers.html",
+                  {'galleries': Gallery.objects.all().order_by("pk"),
+                   'selected_gallery': selected_gallery})
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_galleries(request):
@@ -114,26 +120,35 @@ def manage_galleries(request):
             new_gallery.save()
             json_response = '{"id": "%s", "name":"%s", "slug":"%s"}' % (new_gallery.pk, new_gallery.name, new_gallery.slug)
             return HttpResponse(json_response)
-        elif request.POST.has_key('gallery_to_delete'):
+        elif 'gallery_to_delete' in request.POST:
             Gallery.objects.get(pk=request.POST['gallery_to_delete']).delete()
-        elif request.POST.has_key('rename'):
+            return HttpResponse(json.dumps({"success": True}))
+        elif 'rename' in request.POST:
             gallery = Gallery.objects.get(pk=request.POST['gallery_id'])
             gallery.name = request.POST['name']
             gallery.slug = request.POST['slug']
             gallery.save()
             json_response = '{"id": "%s", "name":"%s", "slug":"%s"}' % (gallery.pk, gallery.name, gallery.slug)
             return HttpResponse(json_response)
+        elif 'toggle_active' in request.POST:
+            gallery_to_toggle = Gallery.objects.get(pk=request.POST['toggle_active'])
+            if request.POST['active_state'] == 'true':
+                gallery_to_toggle.active = True
+            else:
+                gallery_to_toggle.active = False
+            gallery_to_toggle.save()
+            return HttpResponse(json.dumps({gallery_to_toggle.pk: gallery_to_toggle.active}))
     return render(request, "manage/manage_galleries.html", {"galleries": Gallery.objects.all().order_by('pk')})
 
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_gallery(request, gallery_id):
-    return render(request, "manage/manage_gallery.html", {'gallery': Gallery.objects.get(pk=gallery_id), 'images': Photo.objects.filter(gallery=gallery_id)})
+    return render(request, "manage/manage_gallery.html", {'gallery': Gallery.objects.get(pk=gallery_id), 'images': Photo.objects.filter(gallery=gallery_id).order_by('pk')})
 
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_photos(request, page_number=None):
-    image_list = Photo.objects.all()
+    image_list = Photo.objects.all().order_by('pk')
     paginator = Paginator(image_list, 24) # Whoohoo for 6x4
     try:
         images = paginator.page(page_number)
@@ -147,15 +162,65 @@ def manage_photos(request, page_number=None):
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')  # This won't work for the rest api...we need to make it
 def manage_photo_json(request):
     if request.method == "POST":
+        photo_to_change = Photo.objects.get(id=request.POST['photoPk'])
         if request.POST['transaction_type'] == 'photo-gallery-relation':
-            photo_to_change = Photo.objects.get(id=request.POST['photoPk'])
             suspect_gallery = Gallery.objects.get(id=request.POST['galleryPk'])
             if request.POST['makeBreak'] == "true":
                 photo_to_change.gallery.add(suspect_gallery.pk)
             else:
                 photo_to_change.gallery.remove(suspect_gallery)
             return HttpResponse(json.dumps({"success": True}))
+        if request.POST['transaction_type'] == 'title':
+            photo_to_change.title = request.POST['value']
+        if request.POST['transaction_type'] == 'published':
+            photo_to_change.published = True if request.POST['value'] == 'true' else False
+            print request.POST['value']
+        if request.POST['transaction_type'] == 'delete' and request.POST['value'] == 'confirm':
+            photo_to_change.obliterate_object()  # This deletes the records, as well as the file
+            return HttpResponse(json.dumps({'success': True}))
+        if request.POST['transaction_type'].startswith('attr_'):
+            setattr(photo_to_change, request.POST['transaction_type'], request.POST['value'])
+            return HttpResponse(json.dumps({'success': True}))
+        if request.POST['transaction_type'].endswith('_release'):
+            setattr(photo_to_change, request.POST['transaction_type'], request.POST['value'])
+        photo_to_change.save()
+        HttpResponse(json.dumps({'success': True}))
     return HttpResponse(json.dumps({"cool": True}))
+
+@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+def manage_gallery_json(request):
+    if request.method == "POST":
+        if 'transaction_type' in request.POST:
+            if request.POST['transaction_type'] == "gallery_cover":
+                update_gallery = Gallery.objects.get(pk=request.POST['gallery_id'])
+                update_gallery.cover_photo = Photo.objects.get(id=request.POST['photo_id'])
+                update_gallery.save()
+                return HttpResponse(json.dumps({"success": True}))
+    if 'gallery_id' in request.GET:
+        image_array = []
+        images = list(Photo.objects.filter(gallery=request.GET['gallery_id']))
+        gallery = Gallery.objects.get(pk=request.GET['gallery_id'])
+        galleries_with_cover_photos = []
+        for gal in Gallery.objects.all():
+            if gal.cover_photo_defined():
+                galleries_with_cover_photos.append(gal)
+        gallery_photo_id = None
+        if gallery.cover_photo_defined():
+            gallery_photo_id = gallery.cover_photo.id
+        for image in images:
+            other_gallery_covers = []
+            for gallery_with_cover in galleries_with_cover_photos:
+                if str(gallery_with_cover.id) != request.GET['gallery_id']:
+                    if image.id == gallery_with_cover.cover_photo.id:
+                        other_gallery_covers.append({"id": gallery_with_cover.id, "name": gallery_with_cover.name})
+            galleries_in = list(image.gallery.all())
+            gallery_in_array = []
+            for gi in galleries_in:
+                if str(gi.id) != request.GET['gallery_id']:
+                    gallery_in_array.append({"id": gi.id, "name": gi.name, "cover_for": 0})
+            image_array.append({"id": image.id, "thumbnail_url": image.thumbnail.url, "title": image.title, "published": image.published, "cover": True if gallery_photo_id == image.id else False, 'other_galleries_in': gallery_in_array, 'also_cover_for': other_gallery_covers})
+        return HttpResponse(json.dumps(image_array))
+    return HttpResponse(json.dumps({"galleries": "r us"}))
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')  # This won't work for the rest api...we need to make it
 def manage_tag_json(request):
@@ -164,6 +229,10 @@ def manage_tag_json(request):
             photo = Photo.objects.get(id=request.POST['photoId'])
             photo_tags = photo.tags.values('id')
             tag_array = request.POST['tag_list'].split(",")
+
+            #The 'for' nonsense below can be fixed by simply 'get_or_create'-ing all the tags in the request, adding all
+            #  to the photo, then looping though the tags in the photo and creating a "destroy array" of all the objects
+            #  not in the array
 
             client_tag_id_array = []
 
@@ -253,6 +322,12 @@ def manage_upload(request):
             thumbnail_image.save(thumbnail_file_path, "JPEG")
             preview_image.save(preview_file_path, "JPEG")
 
+            orientation = None
+            if thumbnail_image.size[0] > thumbnail_image.size[1]:
+                orientation = 'attr_horizontal'
+            elif thumbnail_image.size[0] < thumbnail_image.size[1]:
+                orientation = 'attr_vertical'
+
             image_tags = []
             try:
                 image_tags = IPTCInfo(temp_tags_img).keywords
@@ -264,6 +339,8 @@ def manage_upload(request):
             new_image = Photo.objects.create(title='',
                                              image=File(open(preview_file_path)),
                                              thumbnail=File(open(thumbnail_file_path)))
+
+            print setattr(new_image, orientation, True)
 
             if os.remove(thumbnail_file_path) and os.remove(preview_file_path):
                 print "Removed thumbnail and preview"
@@ -282,8 +359,17 @@ def manage_upload(request):
             return HttpResponse(json.dumps({"id": request.POST['id'],
                                             "siteId": new_image.pk,
                                             "thumbnailUrl": new_image.thumbnail.url,
-                                            "tags": json_tags_response}))
-    return render(request, "manage/manage_upload.html", {'galleries': Gallery.objects.all(), 'tags': Tag.objects.all()})
+                                            "tags": json_tags_response,
+                                            "orientation": orientation}))
+    target_gallery_id = None
+    target_gallery_name = None
+    if 'target' in request.GET:
+        target_gallery_id = request.GET['target']
+        target_gallery_name = Gallery.objects.get(pk=target_gallery_id).name
+    return render(request, "manage/manage_upload.html", {'galleries': Gallery.objects.all(),
+                                                         'tags': Tag.objects.all(),
+                                                         'target_gallery_id': target_gallery_id,
+                                                         'target_gallery_name': target_gallery_name})
 
 
 # @user_passes_test(lambda u:u.is_staff, login_url='/login/')

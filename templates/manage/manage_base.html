@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 {#        <link rel="stylesheet" href="{% static "style.css" %}">#}
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>
         <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 {#        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script>#}
         {% block head_area %}{% endblock %}
@@ -35,6 +35,7 @@
                     <h3>Management Actions</h3>
                     <ul style="list-style: none">
                         <li><a href="{% url "manage_gallery" %}">Galleries</a></li>
+                        <li><a href="{% url "manage_gallery_cover" %}">Gallery Covers</a></li>
                         <li><a href="{% url "manage_photos" %}">Individual Photos</a></li>
                         <li><a href="{% url "manage_clients" %}">Clients</a></li>
                     </ul>
@@ -49,6 +50,74 @@
             <div class="col-sm-1"></div>
         </div>
     </div>
+
+    <div class="modal" tabindex="-1" id="messageModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <h1 style="text-align: center; margin: 10px;" class="message-modal-header"></h1>
+                <span style="text-align: center; font-size: 200px; display: block; margin: 30px auto;" class="glyphicon glyphicon-refresh spin"></span>
+            </div>
+        </div>
+    </div>
+
+   <div class="modal fade" tabindex="-1" id="errorMessageModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <h3 style="text-align: center; margin: 10px;" class="error-message-modal-header"></h3>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+    //The necessary evil
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function galleryActiveToggle(sender) {
+        var galleryToToggle = sender.value;
+        console.log("Gallery " + galleryToToggle + " is now:" + (sender.checked?"active":"inactive"));
+        $.ajax({
+            type: "POST",
+            url: "{% url 'manage_gallery' %}",
+            data: {csrfmiddlewaretoken: csrftoken, toggle_active: galleryToToggle, active_state: sender.checked}
+        }).done(function(data) {
+            console.log(data);
+            console.log(JSON.parse(data));
+        })
+    }
+
+    function showUserProgressMessage(showMessage, message) {
+        if(showMessage) {
+            $(".message-modal-header").text(message)
+            $('#messageModal').modal('show');
+        } else {
+            $('#messageModal').delay(500).modal('hide');
+        }
+    }
+    function showUserErrorMessage(message) {
+        $(".error-message-modal-header").text(message);
+        $("#errorMessageModal").modal('show');
+    }
+    </script>
         {% block put_script_tags_here %}
         <script></script>
         {% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'manage/manage_base.html' %}
+{% block page_title %}Manage Gallery Covers{% endblock %}
+{% block content %}
+    <h1>Manage Gallery Cover Photos Here</h1>
+    <h4>This includes feature images and the default cover photos</h4>
+    {% if galleries != None %}
+        <label>Gallery: <select id="gallery-select" onchange="loadImagesInGallery(this.value)">
+        {% for gallery in galleries %}
+            <option value="{{ gallery.id }}">{{ gallery.name }}</option>
+        {% endfor %}
+        </select></label>
+    {% else %}
+        <h2 style="font-weight: 200">Yo dawg, you don't have any galleries</h2>
+        <a href="{% url 'manage_galleries' %}" style="font-weight: 200">Go here to add some</a>
+    {% endif %}
+    <table class="table table-responsive" id="image-container">
+        <tr><th>Cover Photo</th><th>Preview</th><th>Other Galleries</th><th>Cover For Other Galleries</th><th>Edit Photo</th></tr>
+    </table>
+{% endblock %}
+{% block put_script_tags_here %}
+    <script>
+        {% if selected_gallery != None %}
+            document.getElementById("gallery-select").value = {{ selected_gallery }};
+            loadImagesInGallery({{ selected_gallery }});
+            {% else %}
+            loadImagesInGallery(parseInt(document.getElementById("gallery-select").value));
+        {% endif %}
+
+        function buildTableRow(incomingImage) {
+            var newTr = '<tr class="image-data">';
+            newTr +='<td><input onclick="updateGalleryCover(this)" type="radio" name="cover_photo" value="' + incomingImage.id + '"' + (incomingImage.cover?"checked":"") +'>';
+            newTr +='<td><img src="' + incomingImage.thumbnail_url + '"></td>';
+            newTr +='<td>';
+            if(typeof(incomingImage.other_galleries_in) !== 'undefined') {
+                for(var i = 0; i < incomingImage.other_galleries_in.length; i++) {
+                    newTr += '<a href="{% url "manage_gallery" %}' + incomingImage.other_galleries_in[i].id.toString() + '">' + incomingImage.other_galleries_in[i].name + "</a><br>";
+                }
+            }
+            newTr +='</td>';
+            newTr +='<td>';
+            if(typeof(incomingImage.also_cover_for) !== 'undefined') {
+                for(var i = 0; i < incomingImage.also_cover_for.length; i++) {
+                    newTr += '<a href="{% url "manage_gallery" %}' + incomingImage.also_cover_for[i].id.toString() + '">' + incomingImage.also_cover_for[i].name + "</a><br>";
+                }
+            }
+            newTr +='</td>';
+            newTr +='<td><a class="btn btn-default btn-md" href="{% url 'manage_photos' %}' + incomingImage.id.toString() + '">Edit</a></td>';
+            newTr +='</tr>';
+            return newTr;
+        }
+
+        function loadImagesInGallery(id) {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'manage_gallery_json' %}?gallery_id=' + id
+            }).success(function(data) {
+                try {
+                    var response = JSON.parse(data);
+                    console.log(response);
+                    $(".image-data").remove();
+                    for(var i = 0; i < response.length; i++) {
+                        $("#image-container").append(buildTableRow(response[i]));
+                    }
+                } catch (e) {
+                    showUserErrorMessage(e);
+                }
+            }).error(function(data) {
+                console.log(data);
+                showUserErrorMessage("Unable to fetch images for gallery");
+            });
+        }
+
+        function updateGalleryCover(sender) {
+            var targetGallery = parseInt($("#gallery-select")[0].value);
+            var newCover = sender.value;
+            $.ajax({
+                type: "POST",
+                url: '{% url "manage_gallery_json" %}',
+                data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'gallery_cover', gallery_id: targetGallery, photo_id: newCover}
+            }).success(function(data) {
+                if(JSON.parse(data).success) {
+                    console.log("Awesome");
+                } else {
+                    showUserErrorMessage("Unable to set cover photo");
+                }
+            }).error(function(data) {
+                showUserErrorMessage("Unable to set cover photo");
+            });
+        }
+
+
+    </script>
+{% endblock %}

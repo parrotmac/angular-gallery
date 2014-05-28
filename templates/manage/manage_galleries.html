@@ -3,8 +3,8 @@
 {% block head_area %}
 <style>
 .gallery-cover-thumbnail {
-    max-height: 100px;
-    max-width: 100px;
+    max-height: 160px;
+    max-width: 160px;
 }
 .rename-field {
     display: inline;
@@ -12,10 +12,10 @@
 
 .spin {
     margin-right: 5px;
-    -webkit-animation: spin 1s infinite linear;
-    -moz-animation: spin .2s infinite linear;
-    -o-animation: spin .2s infinite linear;
-    animation: spin .2s infinite linear;
+    -webkit-animation: spin 1.5s infinite linear;
+    -moz-animation: spin 1.5s infinite linear;
+    -o-animation: spin 1.5s infinite linear;
+    animation: spin 1.5s infinite linear;
 }
 
 @-moz-keyframes spin {
@@ -66,12 +66,22 @@
     {% for gallery in galleries %}
         <tr id="{{ gallery.pk }}" class="gallery-table-row">
             <td>
-                <img id="gallery-cover-{{ gallery.pk }}" class="gallery-cover-thumbnail" src="{{ gallery.cover_photo.image.url }}" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." />
+                <a href="{% url 'manage_gallery_cover' %}?selected_gallery={{ gallery.pk }}">
+                    {% if gallery.get_cover_photo == None %}
+                        <div style="display: block; height: 160px; width: 160px; position: relative">
+                            <span style="font-size: 50px; color: #88888a; text-align: center; display: block; position: relative; top: 10px;" class="glyphicon glyphicon-plus"></span>
+                        </div>
+                    {% else %}
+                        <img id="gallery-cover-{{ gallery.pk }}" class="gallery-cover-thumbnail" src="{{ gallery.get_cover_photo.image.url }}" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." />
+                    {% endif %}
+                </a>
             </td>
             <td id="rename-row-{{ gallery.pk }}"><strong id="gallery-name-{{ gallery.pk }}">{{ gallery.name }}</strong><br /><span style="font-style: italic">Slug: <span id="gallery-slug-{{ gallery.pk }}">{{ gallery.slug }}</span></span></td>
-            <td><input type="checkbox" name="gallery-active-{{ gallery.pk }}"{% if gallery.active %} {% endif %} /></td>
+            <td><input type="checkbox" value="{{ gallery.pk }}" {% if gallery.active %}checked{% endif %}  onclick="galleryActiveToggle(this)" /></td>
             <td>
-                <a href="{{ gallery.pk }}/" class="btn btn-success btn-xs">Edit</a> <button name="rename" id="rename-{{ gallery.pk }}" class="btn btn-primary btn-xs">Rename</button> <button name="delete" value="{{ gallery.pk }}" class="btn btn-danger btn-xs">Delete</button>
+                <a href="{{ gallery.pk }}/" class="btn btn-success btn-xs">Edit</a>
+                <button name="rename" class="btn btn-primary btn-xs" value="{{ gallery.pk }}"  onclick="renameGallery(this)">Rename</button>
+                <button name="delete" class="btn btn-danger btn-xs" value="{{ gallery.pk }}" onclick="deleteGallery(this)">Delete</button>
             </td>
         </tr>
     {% endfor %}
@@ -112,7 +122,8 @@
     <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
     <!-- # # # # # # # # # # # # # # # # # # # # # # # # # Enough o' dat # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
     <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
-
+{% endblock %}
+{% block put_script_tags_here %}
     <script>
 
     //In my book, this is really...controversial...but I'm doing it anyways...
@@ -120,53 +131,44 @@
         return this.trim().replace(/[^a-zA-Z0-9\s\-]/g, '').replace(/\s+/g, '-').toLowerCase();
     }
 
-    function createTableRow(name, slug, id) {
-        var newTR = '<tr id="' + id + '" class="gallery-table-row">';
-        newTR += '<td>';
-        newTR += '<img id="gallery-cover-' + id + '" class="gallery-cover-thumbnail" src="' + '" />';
-        newTR += '</td>';
-        newTR += '<td id="rename-row-' + id +'"><strong id="gallery-name-' + id +'">' + name +'</strong><br /><span style="font-style: italic">Slug: <span id="gallery-slug-' + id +'">' + slug +'</span></span></td>';
-        newTR += '<td>';
-        newTR += '<a href="' + id +'/" class="btn btn-success btn-xs">Edit</a> <button name="rename" id="rename-' + id + '" class="btn btn-primary btn-xs">Rename</button> <button name="delete" value="{{ gallery.pk }}" class="btn btn-danger btn-xs">Delete</button>';
-        newTR += '</td>';
-        newTR += '</tr>';
-        return newTR;
+
+    //Forget binding event listeners to buttons, just set oncick methods...
+    function deleteGallery(sender) {
+         if (confirm("Are you sure you want to delete the gallery \"" + $("#gallery-name-" + sender.value).text() + "\"?") == true) {
+            $.post('', {csrfmiddlewaretoken: csrftoken, gallery_to_delete: sender.value});
+             $("#" + sender.value).hide(300);
+         }
     }
 
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+    function renameGallery(sender) {
+        var galleryRenamePk = sender.value;
+        var galleryNameSpan = $("#gallery-name-" + galleryRenamePk);
+        var gallerySlugSpan = $("#gallery-slug-" + galleryRenamePk);
+
+        if($("#rename-field-" + galleryRenamePk).length === 0) {
+
+            var renameInput = $('<input />', {'type': 'text', 'name': 'rename-field', 'class': 'rename-field', 'id': 'rename-field-' + galleryRenamePk, 'value': $(galleryNameSpan).html()});
+            $(galleryNameSpan).parent().prepend(renameInput);
+            $(galleryNameSpan).text("");
+            renameInput.focus();
+
+            var newSlug = "";
+            renameInput.keyup(function(event){
+                if(renameInput.val() !== null | renameInput !== undefined){
+                    var rawNewName = renameInput.val().toString();
+                     newSlug = rawNewName.getSlug();
+                    gallerySlugSpan.text(newSlug);
                 }
-            }
-        }
-        return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
-
-    $("#save-new-gallery").click(function() {
-        if ($("#new-gallery-name").val().trim() !== "") {
-            $.post("", {csrfmiddlewaretoken: csrftoken, new_gallery:true, name: $("#new-gallery-name").val(), slug: $("#new-gallery-slug").text()}).done(function(data) {
-                var newGalleryFromSerer = JSON.parse(data);
-                $("#newGalleryModal").modal('hide');
-                $("#gallery-table").append(createTableRow(newGalleryFromSerer.name, newGalleryFromSerer.slug, newGalleryFromSerer.id));
-                bindActionButtons();
-                $("#new-gallery-name").val("");
-                $("#new-gallery-slug").text("");
+                if(event.keyCode == 13){
+                    var newGalleryName = renameInput.val().trim();
+                    renameInput.remove();
+                    galleryNameSpan.text(newGalleryName);
+                    updateGalleryName(galleryRenamePk, newGalleryName, newSlug, sender);
+                }
             });
-        } else {
-            alert("That's not a vaild name");
         }
-    });
-
-
-    function updateGalleryName(galleryId, name, slug) {
+    }
+    function updateGalleryName(galleryId, name, slug, sender) {
         var galleryRow = $("#rename-row-" + galleryId);
         if(name.trim() !== "") {
             galleryRow.prepend('<span class="glyphicon glyphicon-refresh spin"></span>');
@@ -179,52 +181,44 @@
                 var serverValidatedNames = JSON.parse(data);
                 $("#gallery-name-" + serverValidatedNames.id).text(serverValidatedNames.name);
                 $("#gallery-slug-" + serverValidatedNames.id).text(serverValidatedNames.slug);
+            }).error(function(data) {
+                showUserErrorMessage("Unable to update gallery name");
             });
         } else {
-            alert("Name can't be blank");
+            showUserErrorMessage("Name can't be blank");
+            renameGallery(sender);
         }
     }
 
-    function bindActionButtons() {
-
-        $("button[name='rename']").click(function() {
-            var galleryRenamePk = $(this).attr("id").split("-")[1];
-            var galleryNameSpan = $("#gallery-name-" + galleryRenamePk);
-            var gallerySlugSpan = $("#gallery-slug-" + galleryRenamePk);
-
-            if($("#rename-field-" + galleryRenamePk).length === 0) {
-
-                var renameInput = $('<input />', {'type': 'text', 'name': 'rename-field', 'class': 'rename-field', 'id': 'rename-field-' + galleryRenamePk, 'value': $(galleryNameSpan).html()});
-                $(galleryNameSpan).parent().prepend(renameInput);
-                $(galleryNameSpan).text("");
-                renameInput.focus();
-
-                var newSlug = "";
-                renameInput.keyup(function(event){
-                    if(renameInput.val() !== null | renameInput !== undefined){
-                        var rawNewName = renameInput.val().toString();
-                         newSlug = rawNewName.getSlug();
-                        gallerySlugSpan.text(newSlug);
-                    }
-                    if(event.keyCode == 13){
-                        var newGalleryName = renameInput.val().trim();
-                        renameInput.remove();
-                        galleryNameSpan.text(newGalleryName);
-                        updateGalleryName(galleryRenamePk, newGalleryName, newSlug);
-                    }
-                });
-            }
-
-        });
-
-        $("button[name='delete']").click(function() {
-             if (confirm("Are you sure you want to delete the gallery \"" + $("#gallery-name-" + $(this).val()).text() + "\"?") == true) {
-                $.post('', {csrfmiddlewaretoken: csrftoken, gallery_to_delete: $(this).val()});
-                 $("#" + $(this).val()).hide(300);
-             }
-        });
+    function createTableRow(name, slug, id) {
+        var newTR = '<tr id="' + id + '" class="gallery-table-row">';
+        newTR += '<td>';
+        newTR += '<img id="gallery-cover-' + id + '" class="gallery-cover-thumbnail" src="' + '" />';
+        newTR += '</td>';
+        newTR += '<td id="rename-row-' + id +'"><strong id="gallery-name-' + id +'">' + name +'</strong><br /><span style="font-style: italic">Slug: <span id="gallery-slug-' + id +'">' + slug +'</span></span></td>';
+        newTR += '<td><input type="checkbox" value="' + id + '" onclick="galleryActiveToggle(this)"></td>';
+        newTR += '<td>';
+        newTR += '<a href="' + id +'/" class="btn btn-success btn-xs">Edit</a>\n';
+        newTR += '<button name="rename" class="btn btn-primary btn-xs" value="' + id + '" onclick="renameGallery(this)">Rename</button>\n';
+        newTR += '<button name="delete" class="btn btn-danger btn-xs" value="' + id + '" onclick="deleteGallery(this)">Delete</button>\n';
+        newTR += '</td>';
+        newTR += '</tr>';
+        return newTR;
     }
-    bindActionButtons();
+
+    $("#save-new-gallery").click(function() {
+        if ($("#new-gallery-name").val().trim() !== "") {
+            $.post("", {csrfmiddlewaretoken: csrftoken, new_gallery:true, name: $("#new-gallery-name").val(), slug: $("#new-gallery-slug").text()}).done(function(data) {
+                var newGalleryFromSerer = JSON.parse(data);
+                $("#newGalleryModal").modal('hide');
+                $("#gallery-table").append(createTableRow(newGalleryFromSerer.name, newGalleryFromSerer.slug, newGalleryFromSerer.id));
+                $("#new-gallery-name").val("");
+                $("#new-gallery-slug").text("");
+            });
+        } else {
+            showUserErrorMessage("That's not a valid name");
+        }
+    });
 
     $("#new-gallery-name").keyup(function(event) {
         $("#new-gallery-slug").text($("#new-gallery-name").val().getSlug());

@@ -8,19 +8,45 @@
 
         .photo-carousel {
             max-width: 980px;
-            background-color: #00F;
-            min-height: 160px;
+            overflow: hidden;
+            height: 160px;
             margin: 0;
             padding: 0;
+            position: relative;
+        }
+        .photo-carousel span {
+            width: 30px;
+            height: 30px;
+            font-size: 30px;
+            position: relative;
+            z-index: 99;
+            text-shadow: 0 0 10px #000000;
+            color: #FFFFFF;
+            cursor: pointer;
+        }
+        .carousel-button-left {
+            float: left;
+            margin-top: -30px;
+            top: 95px;
+            margin-left: 3px;
+        }
+        .carousel-button-right {
+            float: right;
+            top: -95px;
+            margin-right: 5px;
         }
         .photo-carousel ul {
             list-style: none;
             display: block;
+            font-size: 0;
+            width: {% widthratio galleries.count 1 160 %}px;
             margin: 0;
             padding: 0;
         }
         .photo-carousel-slide {
             display: inline-table;
+            background-color: #484848;
+            font-size: 0;
             line-height: 0;
             margin: 0;
             padding: 0;
@@ -32,6 +58,7 @@
             padding: 0;
             margin: auto;
             position: absolute;
+            font-size: 0;
             top: 0;
             bottom: 0;
             left: 0;
@@ -41,16 +68,26 @@
 {% endblock %}
 {% block content %}
     <div class="feature-area">
-        <img src="http://isaacparker.org/mts/feature-big.png"><img src="http://isaacparker.org/mts/feature-small.png">
+{#        <img src="http://isaacparker.org/mts/feature-big.png"><img src="http://isaacparker.org/mts/feature-small.png">#}
     </div>
     <div class="photo-carousel">
+        <span class="glyphicon glyphicon-chevron-left carousel-button-left"></span>
         <ul>
         {% for gallery in galleries %}
             <li class="photo-carousel-slide"><a href="{% url 'view_gallery' gallery.id %}"><img class="photo-carousel-thumbnail" src="{{ gallery.get_cover_photo.thumbnail.url }}"></a></li>
         {% endfor %}
         </ul>
+        <span class="glyphicon glyphicon-chevron-right carousel-button-right"></span>
     </div>
 {% endblock %}
 {% block put_script_tags_here %}
+    <script>
+    var carouselWidth =  $(".photo-carousel ul").width();
+    $(".carousel-button-left").click(function() {
 
+    });
+    $(".carousel-button-right").click(function() {
+
+    });
+    </script>
 {% endblock %}

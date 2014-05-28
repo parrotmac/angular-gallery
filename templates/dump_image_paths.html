@@ -9,9 +9,9 @@
 </head>
 <body>
 <table border="1">
-<tr><th>ID</th><th>Image Preview URL</th><th>Image Thumbnail URL</th></tr>
+<tr><th>ID</th><th>Image Preview URL</th><th>Image Thumbnail URL</th><th>Image Thumbnail</th></tr>
 {% for image in images %}
-<tr><td>{{ image.id }}</td><td>{{ image.image.url }}</td><td>{{ image.thumbnail.url }}</td></tr>
+<tr><td>{{ image.id }}</td><td>{{ image.image.url }}</td><td>{{ image.thumbnail.url }}</td><td><img src="{{ image.thumbnail.url }}"></td></tr>
 {% endfor %}
 </table>
 </body>

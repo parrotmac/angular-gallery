@@ -6,15 +6,14 @@
         #drop_zone {
             margin: 20px 0;
 {#            background-color: #C1C1C1;#}
-
             background: #828282; /* Old browsers */
-            background: -moz-linear-gradient(left, #828282 0%, #e0e0e0 50%, #828282 100%); /* FF3.6+ */
-            background: -webkit-gradient(linear, left top, right top, color-stop(0%,#828282), color-stop(50%,#e0e0e0), color-stop(100%,#828282)); /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(left, #828282 0%,#e0e0e0 50%,#828282 100%); /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(left, #828282 0%,#e0e0e0 50%,#828282 100%); /* Opera 11.10+ */
-            background: -ms-linear-gradient(left, #828282 0%,#e0e0e0 50%,#828282 100%); /* IE10+ */
-            background: linear-gradient(to right, #828282 0%,#e0e0e0 50%,#828282 100%); /* W3C */
-            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#828282', endColorstr='#828282',GradientType=1 ); /* IE6-9 */
+            background: -moz-linear-gradient(left, #afafaf 0%, #e0e0e0 50%, #afafaf 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, right top, color-stop(0%,#afafaf), color-stop(50%,#e0e0e0), color-stop(100%,#afafaf)); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(left, #afafaf 0%,#e0e0e0 50%,#afafaf 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(left, #afafaf 0%,#e0e0e0 50%,#afafaf 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(left, #afafaf 0%,#e0e0e0 50%,#afafaf 100%); /* IE10+ */
+            background: linear-gradient(to right, #afafaf 0%,#e0e0e0 50%, #afafaf 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#afafaf', endColorstr='#afafaf',GradientType=1 ); /* IE6-9 */
 
             border: 3px dashed #88888a;
             height: 100px;
@@ -58,12 +57,26 @@
         .gallery-button-toggle {
             margin: 2px;
         }
-        .bootstrap-tagsinput {
+
+        .attribute-well {
             margin-top: 10px;
+            display: table;
+            width: 100%;
         }
+        .attribute-well label {
+            display: table-cell;
+            text-align: center;
+        }
+
     </style>
 {% endblock %}
 {% block content %}
+    {% if target_gallery_name != None %}
+        <span style="margin: 0 auto; text-align: center">
+            <h2>Images are being uploaded to <strong><span style="font-style: oblique;">{{ target_gallery_name }}</span></strong> by default.</h2>
+            <h4><a href="?">You can click here to stop this</a></h4>
+        </span>
+    {% endif %}
     <div id="drop_zone">
         <span class="drop-zone-common drop-zone-main">Drop Files Here</span><span class="drop-zone-common drop-zone-label-secondary">or click for a file selector dialog</span>
         <div class="progress-wrapper">
@@ -87,22 +100,11 @@
 {% block put_script_tags_here %}<script src="{% static "bootstrap-tagsinput.js" %}"></script>
     <script src="{% static "typeahead.js" %}"></script>
     <script>
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
+    var targetGallery = undefined;
+    {% if target_gallery_id != None %}
+    targetGallery = {{ target_gallery_id }};
+    $("#gallery-toggle-" + targetGallery).click();
+    {% endif %}
 
     function handleGlobalGalleryToggle(sender, galleryId) {
         var senderHandle = $(sender);
@@ -162,7 +164,6 @@
 
     var arbitraryId = 0;
 
-
     var progressWrapper = $(".progress-wrapper");
     var doneText = $(".progress-text");
     function showProgressBar(bool) {
@@ -179,6 +180,13 @@
     }
     doneText.hide();
     progressWrapper.hide();
+
+    var imageAttributes = new Array({name: "Color", "model_name": "attr_color"},
+                           {name: "Black & White", "model_name": "attr_black_white"},
+                           {name: "Horizontal", "model_name": "attr_horizontal"},
+                           {name: "Vertical", "model_name": "attr_vertical"},
+                           {name: "Panoramic", "model_name": "attr_panoramic"});
+    var imageAttributesLength = imageAttributes.length;
 
     var fileListLength = 0;
     var numberDone = 0;
@@ -207,7 +215,28 @@
             thumbnailPreview.src = responseObject.thumbnailUrl;
         panelBody.appendChild(thumbnailPreview);
 
-        panelBody.appendChild(document.createElement("br"));
+        var imageAttributeWell = document.createElement('div');
+            imageAttributeWell.classList.add('well');
+            imageAttributeWell.classList.add('attribute-well');
+        panelBody.appendChild(imageAttributeWell);
+
+        for(var imageAttributeCounter = 0; imageAttributeCounter < imageAttributesLength; imageAttributeCounter++) {
+            var imageAttributeLabel = document.createElement('label');
+                imageAttributeLabel.innerHTML = imageAttributes[imageAttributeCounter].name + "&nbsp;";
+            imageAttributeWell.appendChild(imageAttributeLabel);
+
+            var imageAttributeCheck = document.createElement('input');
+                imageAttributeCheck.type = "checkbox";
+                imageAttributeCheck.value = responseObject.siteId;
+                imageAttributeCheck.name = imageAttributes[imageAttributeCounter].model_name;
+                imageAttributeCheck.setAttribute("onclick", "setImageAttributes(this)");
+            if (responseObject.orientation != null) {
+                if (responseObject.orientation == imageAttributes[imageAttributeCounter].model_name) {
+                    imageAttributeCheck.setAttribute("checked", "true");
+                }
+            }
+            imageAttributeLabel.appendChild(imageAttributeCheck);
+        }
 
 {#        var tagTextArea = document.createElement("textarea");#}
 {#            tagTextArea.classList.add("tag-text-area");#}
@@ -233,6 +262,7 @@
                     galleryToggle.classList.add("btn-xs");
                     galleryToggle.classList.add("gallery-button-toggle");
                     galleryToggle.setAttribute("data-gallery-pk", galleryArray[i].id);
+                    galleryToggle.setAttribute("data-image-pk", responseObject.siteId);
                     galleryToggle.setAttribute("onclick", "handleGalleryToggleClick(this, " + responseObject.id + ", " + responseObject.siteId + ", " + (galleryArray[i].id).toString() + ")")
                     galleryToggle.innerHTML = galleryArray[i].name;
                 panelFooter.appendChild(galleryToggle);
@@ -240,6 +270,10 @@
         panelMaster.appendChild(panelFooter);
 
         fileList.appendChild(panelMaster);
+
+        if(targetGallery !== undefined) {
+            $("[data-gallery-pk=" + targetGallery.toString() + "][data-image-pk=" + responseObject.siteId.toString() + "]").click();
+        }
 
 {#        $(tagInput).tagsinput({#}
 {#            itemValue: 'value',#}
@@ -372,6 +406,30 @@
     dropZone.addEventListener('dragover', handleDragOver, false);
     dropZone.addEventListener('drop', handleFileSelect, false);
     dropZone.addEventListener('dragleave', function() {showDropZoneActive(false)}, false);
-    dropZone.addEventListener('click', function() {document.getElementById('hiddenFileInput').click()}, false)
+    dropZone.addEventListener('click', function() {document.getElementById('hiddenFileInput').click()}, false);
+
+
+    function updateImageAttribute(imageId, attribute, value, successCallback, failureCallback) {
+        $.ajax({
+            type: "POST",
+            url: '{% url 'manage_photo_json' %}',
+            data: {csrfmiddlewaretoken: csrftoken, photoPk: imageId, transaction_type: attribute, value: value}
+        }).done(successCallback).error(failureCallback);
+    }
+    function setImageAttributes(sender) {
+        updateImageAttribute(sender.value, sender.name, sender.checked, function(data) {
+            if(JSON.parse(data).success == true) {
+                //Awesome
+            } else {
+                console.log(data);
+                showUserErrorMessage("Unable to update attribute status...");
+            }
+        }, function(data) {
+            console.log(data);
+            sender.checked = (sender.checked?false:true);
+            showUserErrorMessage("Unable to update attribute status...");
+        });
+        console.log("Set image " + sender.value + " to " + (sender.checked?"":"not ") + "have attribute " + sender.name);
+    }
 
     </script>{% endblock %}

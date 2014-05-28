@@ -1,6 +1,8 @@
 {% extends "manage/manage_base.html" %}
-{% block page_title %}{% endblock %}
+{% load staticfiles %}
+{% block page_title %}Gallery: {{ gallery.name }}{% endblock %}
 {% block head_area %}
+    <link href="{% static 'bootstrap-tagsinput.css' %}" rel="stylesheet">
     <style>
         .image-thumbnail {
             max-width: 300px;
@@ -29,7 +31,7 @@
     .image-manipulation-buttons li {
         display: table-cell;
         text-align: center;
-        border-right: 1px dotted #919293;
+{#        border-right: 1px dotted #919293;#}
     }
     .image-manipulation-buttons li:last-child {
         border-right: 0;
@@ -37,54 +39,107 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>Gallery: <strong>{{ gallery.name }}</strong></h1>
-
-    <ul class="image-manipulation-buttons">
-        <li style="width: 400px; text-align: left"><span style="font-style: italic; font-size: 16pt">Contains {{ images.count }} image{{ images.count|pluralize }}</span></li>
-        <li style="width: 250px"><input type="text" style="position: relative; top: 2px" />&nbsp;<button class="btn btn-sm btn-primary" type="button">Add Tag</button></li>
-        <li style="width: 80px"><button class="btn btn-sm btn-success">Update</button></li>
-        <li style="width: 80px"><button class="btn btn-sm btn-danger">Delete</button></li>
-    </ul>
+    <span style="font-size: 24pt">Gallery: <strong>{{ gallery.name }}</strong></span>
+    <br>
+    <span style="font-size: 12pt; font-weight: bold"><span style="font-style: italic; font-size: 16pt">Contains {{ images.count }} image{{ images.count|pluralize }}</span>&nbsp;&nbsp;<a href="{% url 'manage_upload' %}?target={{ gallery.pk }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a><label style="float: right;">Active <input type="checkbox" value="{{ gallery.id }}" onclick="galleryActiveToggle(this)"></label></span>
     <hr />
-    <table class="table table-bordered table-responsive">
-        <tr>
-            <th>Select</th>
-            <th>Cover Image</th>
-            <th>Name</th>
-            <th>ID:</th>
-            <th>Published</th>
-            <th>Tags</th>
-            <th>Thumbnail</th>
-        </tr>
     {% for image in images %}
-        {% if forloop.counter|divisibleby:2 %}
-            <tr>
-        {% else %}
-            <tr class="active">
-        {% endif %}
-            <td><label><input type="checkbox" name="select-image-{{ image.pk }}" /></label></td>
-            <td><label><input type="radio" name="cover-image" {% if image.pk == gallery.cover_photo.pk %}checked{% endif %} /></label></td>
-            <td>
-                <label>Title: <input type="text" value="{{ image.title }}" size="20"/></label>
-            </td>
-            <td style="width: 65px"><h4>{{ image.pk }}</h4></td>
-            <td style="width: 80px"><input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} />
-            </td>
-            <td>
-                <div style="width: 180px; overflow: scroll; max-height: 140px">
-                    <ul style="list-style: none; margin: 0; padding: 0">
-                        {% for tag in image.tags.all %}
-                        <li class="tag-item" style="margin: 0; padding: 2px">{{ tag }}<button style="float: right" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></button></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <label><input class="add-tag-textbox" id="image-tag-box-{{ image.pk }}" /></label>
-{#                <button style="margin-left: 2px;" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus"></span></button>#}
-            </td>
-            <td>
-                <a href="/manage/photo/{{ image.pk }}" ><img class="image-thumbnail" src="{{ image.image.url }}" alt="{{ image.title }}" /></a>
-            </td>
-        </tr>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title"><label>Title: <input value="{{ image.title }}" onkeyup="if(event.keyCode == 13) {updateImageName({{ image.id }}, this)}"></label><span style="float: right; font-weight: bold;">Stock Number: <strong>{{ image.id }}</strong></span></span>
+            </div>
+            <div class="panel-body">
+                <img src="{{ image.thumbnail.url }}">
+                <hr>
+                <label>Tags: <input type="text" data-tags-for="{{ image.id }}" class="taginput" value="{% for tag in image.tags.all %}{{ tag }}{% if not forloop.last %},{% endif %}{% endfor %}"></label>
+            </div>
+            <div class="panel-footer">
+                <label>Published <input value="{{ image.id }}" type="checkbox" onclick="updateImagePublished({{ image.id }}, this)" {% if image.published %}checked=""{% endif %}></label>
+                <span style="float: right">
+                    <a class="btn btn-sm btn-primary" href="{% url 'manage_photo_by_id' image.id %}">Edit</a>
+                    <button class="btn btn-sm btn-danger" value="{{ image.id }}" onclick="deleteImage(this)">Delete</button>
+                </span>
+            </div>
+        </div>
+   {% empty %}
+        <h1 style="color: #757575; font-style: italic; font-weight: 200;">There are no images in this gallery...<a href="{% url 'manage_upload' %}?target={{ gallery.pk }}">Click Here</a> to add some</h1>
     {% endfor %}
-    </table>
+{% endblock %}
+{% block put_script_tags_here %}<script src="{% static 'bootstrap-tagsinput.js' %}"></script>
+    <script src="{% static 'typeahead.js' %}"></script>
+    <script>
+
+    $(".taginput").tagsinput({
+        tagClass: function(item) {
+            return 'label label-primary';
+        },
+        typeahead: {
+            source: function(query) {
+                return $.getJSON('{% url 'manage_tag_json' %}');
+            }
+        }
+    });
+   function postTagsToServer(imageId, tags) {
+        $.ajax({
+                url: "{% url 'manage_tag_json' %}",
+                method: "POST",
+                data: {transaction_type: "update_tags", csrfmiddlewaretoken: csrftoken, tag_list: tags, photoId: imageId}
+            }).success(function() {
+                //Show spnner next to stuff -- you can even use $target.attr("data-internal-id") to find which image in the list it is
+            }).error(function() {
+                showUserErrorMessage("Unable to update tag(s)");
+            });
+    }
+
+    $('input.taginput').on('change', function (e) {
+        postTagsToServer(e.target.getAttribute("data-tags-for"), e.target.value);
+    });
+
+
+    function updateImageAttribute(imageId, attribute, value, successCallback, failureCallback) {
+        $.ajax({
+            type: "POST",
+            url: '{% url 'manage_photo_json' %}',
+            data: {csrfmiddlewaretoken: csrftoken, photoPk: imageId, transaction_type: attribute, value: value}
+        }).done(successCallback).error(failureCallback);
+    }
+
+
+    function updateImageName(id, sender) {
+        updateImageAttribute(id, "title", sender.value, function() {
+            console.log("Success!");
+            sender.blur();
+        }, function() {
+            showuserProgressMessage(false, "");
+            console.log("Fail");
+        });
+        console.log("Set image " + id  + " to have title " + sender.value);
+    }
+
+    function updateImagePublished(id, sender) {
+        updateImageAttribute(id, "published", (sender.checked?"true":"false"), function() {
+            console.log("Updated Publish Status")
+        }, function(){
+            showUserErrorMessage("Unable to " + (sender.checked?"":"un") + "publish photo " + id);
+            if(sender.checked) {
+                sender.checked = false;
+            } else {
+                sender.checked = true;
+            }
+        });
+    }
+
+    function deleteImage(sender) {
+        if(confirm("Are you sure you want to delete image " + sender.value + "?")) {
+            updateImageAttribute(sender.value, 'delete', 'confirm', function(data) {
+                $(sender).parents(".panel").hide(500);
+                console.log(data);
+            }, function() {
+                showUserErrorMessage("Unable to delete image " + sender.value);
+            });
+        }
+    }
+
+
+    </script>
 {% endblock %}

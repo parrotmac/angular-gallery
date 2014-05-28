@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
 
 
 FEATURE_TYPE = (
@@ -55,6 +56,9 @@ class Gallery(models.Model):
     class Meta:
         verbose_name_plural = 'galleries'
 
+    def cover_photo_defined(self):
+        return False if self.cover_photo is None else True
+
 
 class Tag(models.Model):
     tag = models.CharField(max_length=35)
@@ -89,11 +93,23 @@ class Photo(models.Model):
     def get_tags(self):
         return self.tags
 
+    def obliterate_object(self):
+        if self.image is not None:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+        if self.thumbnail is not None:
+            if os.path.isfile(self.thumbnail.path):
+                os.remove(self.thumbnail.path)
+        self.delete()
+
 
 class GalleryFeature(models.Model):
     gallery = models.ForeignKey(Gallery)
     image = models.ForeignKey(Photo)
     type = models.SmallIntegerField(choices=FEATURE_TYPE)
+
+    def get_feature_type(self):
+        return str(FEATURE_TYPE[self.type][1])
 
     def __unicode__(self):
         return self.image.title + " - " + str(FEATURE_TYPE[self.type][1])

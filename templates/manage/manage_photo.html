@@ -13,7 +13,7 @@
     .main-table div:first-child {
         border-top: 0;
     }
-    .main-table div {
+    .table-row {
         border-top: 1px dotted #525253;
         margin: 20px 0;
 {#        display: table-row;#}
@@ -50,20 +50,23 @@
 {% block content %}
     <h1>Edit Photo</h1>
     <div class="main-table">
-        <div><h4>Photo ID: <strong>{{ image.pk }}</strong></h4></div>
-        <div>
-            <label><h4>Title: </h4><input type="text" value="{{ image.title }}" size="40" /></label>
+        <div class="table-row"><h4>Photo ID: <strong>{{ image.pk }}</strong></h4></div>
+        <div class="table-row">
+            <label><h4>Title: </h4><input type="text" value="{{ image.title }}" size="40" onkeyup="if(event.keyCode == 13) {updateImageName({{ image.id }}, this)}"></label>
         </div>
-        <div>
+        <div class="table-row">
             <h4>Image:</h4>
-            <img class="image-thumbnail" src="{{ image.thumbnail.url }}" />
+            <a href="{{ image.image.url }}" target="_blank"><img class="image-thumbnail" src="{{ image.thumbnail.url }}"></a>
         </div>
-        <div>
-            <h4>Description:</h4>
-            <span style="font-style: italic">For ID purposes only, not displayed on website.</span><br />
-            <textarea class="text-area" rows="5">{{ image.description }}</textarea>
-        </div>
-        <div>
+{#        <div class="table-row">#}
+{#           data-toggle="collapse" data-target="#description-box"#}
+{#            <h4>Description:</h4>#}
+{#            <div id="description-box" class="collapse">#}
+{#                <span style="font-style: italic" >For ID purposes only, not displayed on website.</span><br />#}
+{#                <textarea class="text-area" rows="5" placeholder="Nothing defined...">{{ image.description }}</textarea>#}
+{#            </div>#}
+{#        </div>#}
+        <div class="table-row">
             <h4>Tags:</h4>
             <input type="text" id="tagsinput" class="typeahead" value="{% for tag in image.tags.all %}{{ tag }}{% if not forloop.last %},{% endif %}{% endfor %}">
 {#                <button class="btn btn-xs btn-success" data-toggle="modal" data-target="#newTabModal"><span class="glyphicon glyphicon-plus"></span></button></h4>#}
@@ -78,43 +81,56 @@
 {#            </select>#}
 
         </div>
-        <div>
+        <div class="table-row">
             <h4>Published:</h4>
-            <input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} /></div>
-        <div><h4>Galleries:</h4>
+            <input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} />
+        </div>
+        <div class="table-row"><h4>Galleries:</h4>
             <ul style="list-style: none; margin: 0; padding: 0">{% for gallery in galleries %}
-                    <li><label><input type="checkbox" value="{{ gallery.pk }}"{% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} checked="" {% endif %}{% endfor %} />&nbsp;{{ gallery.name }}</label></li>{% endfor %}
+                    <li><label><input type="checkbox" value="{{ gallery.pk }}" onclick="updateImageGalleries(this)" {% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} checked="" {% endif %}{% endfor %}>&nbsp;{{ gallery.name }}</label></li>{% endfor %}
             </ul>
 {#            <select name="in_galleries" multiple>{% for gallery in galleries %}#}
 {#                    <option value="{{ gallery.pk }}"{% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} selected{% endif %}{% endfor %}>{{ gallery.name }}</option>>{% endfor %}#}
 {#            </select>#}
         </div>
-        <div class="image-release">
+        <div class="image-release table-row">
             <h4>Model Release:</h4>
             <ul>
-            <li><label>Yes <input name="model_release" type="radio" {% if image.model_release == 0 %}checked{% endif %} /></label></li>
-            <li><label>No <input name="model_release" type="radio" {% if image.model_release == 1 %}checked{% endif %} /></label></li>
-            <li><label>N/A <input name="model_release" type="radio" {% if image.model_release == 2 %}checked{% endif %} /></label></li>
+            <li><label>Yes <input onclick="updateImageRelease(this)" name="model_release" value="0" type="radio" {% if image.model_release == 0 %}checked{% endif %} /></label></li>
+            <li><label>No <input onclick="updateImageRelease(this)"  name="model_release" value="1" type="radio" {% if image.model_release == 1 %}checked{% endif %} /></label></li>
+            <li><label>N/A <input onclick="updateImageRelease(this)"  name="model_release" value="2" type="radio" {% if image.model_release == 2 %}checked{% endif %} /></label></li>
             </ul>
         </div>
-        <div class="image-release">
+        <div class="image-release table-row">
             <h4>Property Release:</h4>
             <ul>
-            <li><label>Yes <input name="property_release" type="radio" {% if image.property_release == 0 %}checked{% endif %} /></label></li>
-            <li><label>No <input name="property_release" type="radio" {% if image.property_release == 1 %}checked{% endif %} /></label></li>
-            <li><label>N/A <input name="property_release" type="radio" {% if image.property_release == 2 %}checked{% endif %} /></label></li>
+            <li><label>Yes <input onclick="updateImageRelease(this)"  name="property_release" value="0" type="radio" {% if image.property_release == 0 %}checked{% endif %} /></label></li>
+            <li><label>No <input onclick="updateImageRelease(this)"  name="property_release" value="1" type="radio" {% if image.property_release == 1 %}checked{% endif %} /></label></li>
+            <li><label>N/A <input onclick="updateImageRelease(this)"  name="property_release" value="2" type="radio" {% if image.property_release == 2 %}checked{% endif %} /></label></li>
             </ul>
         </div>
-        <div>
+        <div class="table-row">
             <h4>Attributes:</h4>
-{#            <ul style="padding: 0; margin: 0; list-style: none;">{% for image_attribute in image_attributes %}#}
-{#                    <li><input type="checkbox" value="{{ image_attribute.pk }}"{% for image_image_attr in image.image_attributes.all %}{% if image_image_attr.pk ==  image_attribute.pk %} checked="" {% endif %}{% endfor %} />&nbsp;{{ image_attribute }}</li>{% endfor %}#}
-{#            </ul>#}
-{#            <select name="image_attributes" multiple>{% for image_attribute in image_attributes %}#}
-{#                    <option value="{{ image_attribute.pk }}"{% for image_image_attr in image.image_attributes.all %}{% if image_image_attr.pk ==  image_attribute.pk %} selected{% endif %}{% endfor %}>{{ image_attribute }}</option>>{% endfor %}#}
-{#            </select>#}
+            <label>Color <input type="checkbox" name="attr_color" value="{{ image.id }}" {% if image.attr_color %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+            <label>Black & White <input type="checkbox" name="attr_black_white" value="{{ image.id }}" {% if image.attr_black_white %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+            <label>Horizontal <input type="checkbox" name="attr_horizontal" value="{{ image.id }}" {% if image.attr_horizontal %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+            <label>Vertical <input type="checkbox" name="attr_vertical" value="{{ image.id }}" {% if image.attr_vertical %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+            <label>Panoramic <input type="checkbox" name="attr_panoramic" value="{{ image.id }}" {% if image.attr_panoramic %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label>
+        </div>
+        <div  class="table-row">
+            <br>
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Danger Zone</h3>
+                </div>
+                <div class="panel-body">
+                    <button class="btn btn-danger btn-md" onclick="deleteImage(this)">Delete</button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div style="height: 50px"><!-- ALL THE MODS --></div>
 
     <div class="modal fade" id="newTabModal" tabindex="-1" role="dialog">
       <div class="modal-dialog">
@@ -134,33 +150,93 @@
       </div>
     </div>
 
-    <div class="btn-group" style="position: fixed; margin: 0; padding: 0; right: 15px; bottom: 15px;">
-        <button type="button" class="btn btn-lg btn-primary">Cancel</button>
-        <button type="button" class="btn btn-lg btn-danger">Delete</button>
-        <button type="button" class="btn btn-lg btn-success">Save</button>
-    </div>
-
 {% endblock %}
 {% block put_script_tags_here %}<script src="{% static 'bootstrap-tagsinput.js' %}"></script>
     <script src="{% static 'typeahead.js' %}"></script>
     <script>
-
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+    function updateImageAttribute(imageId, attribute, value, successCallback, failureCallback) {
+        $.ajax({
+            type: "POST",
+            url: '{% url 'manage_photo_json' %}',
+            data: {csrfmiddlewaretoken: csrftoken, photoPk: imageId, transaction_type: attribute, value: value}
+        }).done(successCallback).error(failureCallback);
     }
-    var csrftoken = getCookie('csrftoken');
+
+
+    function updateImageName(id, sender) {
+        updateImageAttribute(id, "title", sender.value, function() {
+            console.log("Success!");
+        }, function() {
+            showuserProgressMessage(false, "");
+            console.log("Fail");
+        });
+        console.log("Set image " + id  + " to have title " + sender.value);
+    }
+
+    function updateImagePublished(id, sender) {
+        updateImageAttribute(id, "published", (sender.checked?"true":"false"), function() {
+            console.log("Updated Publish Status")
+        }, function(){
+            showUserErrorMessage("Unable to " + (sender.checked?"":"un") + "publish photo " + id);
+            if(sender.checked) {
+                sender.checked = false;
+            } else {
+                sender.checked = true;
+            }
+        });
+    }
+
+    function deleteImage(sender) {
+        if(confirm("Are you sure you want to delete this image?")) {
+            updateImageAttribute({{ image.id }}, 'delete', 'confirm', function(data) {
+                alert("Image deleted");
+                history.back();
+            }, function() {
+                showUserErrorMessage("Unable to delete image " + sender.value);
+            });
+        }
+    }
+
+    function setImageAttributes(sender) {
+        updateImageAttribute(sender.value, sender.name, sender.checked, function(data) {
+            if(JSON.parse(data).success == true) {
+                //Awesome
+            } else {
+                console.log(data);
+                showUserErrorMessage("Unable to update attribute status...");
+            }
+        }, function(data) {
+            console.log(data);
+            sender.checked = (sender.checked?false:true);
+            showUserErrorMessage("Unable to update attribute status...");
+        });
+        console.log("Set image " + sender.value + " to " + (sender.checked?"":"not ") + "have attribute " + sender.name);
+    }
+
+    function updateImageRelease(sender) {
+        updateImageAttribute({{ image.id }}, sender.name, sender.value, function() {
+
+        }, function() {
+            showUserErrorMessage("Unable to update photo's release attribute");
+        });
+    }
+
+    function updateImageGalleries(sender) {
+        $.ajax({
+            type: "POST",
+            url: '{% url 'manage_photo_json' %}',
+            data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'photo-gallery-relation', photoPk:{{ image.pk }}, galleryPk: parseInt(sender.value), makeBreak: sender.checked}
+        }).success(function(data) {
+            console.log(data);
+        }).error(function(data) {
+            showUserErrorMessage("Unable to add image to gallery ");
+            console.log(data);
+        });
+    }
+
+    // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    // # # # # # # # # # # # # # # # # # # # # # Tag Troubles! # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     var imageTags = new Array({% for tag in image.tags.get_queryset %}"{{ tag }}"{% if not forloop.last %}, {% endif %}{% endfor %})
     var server_global_tag_array = new Array({% for tag in tags %}"{{ tag }}"{% if not forloop.last %}, {% endif %}{% endfor %});
@@ -169,7 +245,7 @@
     var ourPrettyLittleTagsInput = $("#tagsinput");
     ourPrettyLittleTagsInput.tagsinput({
         tagClass: function(item) {
-            return 'label label-success';
+            return 'label label-primary';
         },
         typeahead: {
             source: server_global_tag_array
