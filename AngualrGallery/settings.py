@@ -24,6 +24,16 @@ if socket.gethostname() == "AluminumBeast.local":
             'PORT': '',                        # Set to empty string for default.
         }
     }
+elif socket.gethostname() == "Masuoka.local":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'mtsdb',
+            'USER': 'mtsuser',
+            'PASSWORD': 'supersecretpassword',
+            'HOST': 'localhost'
+        }
+    }
 else:
     DATABASES = {
         'default': {
@@ -128,6 +138,8 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+print os.path.join(PROJECT_PATH, "templates/")
 
 INSTALLED_APPS = (
     'django.contrib.auth',

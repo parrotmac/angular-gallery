@@ -68,6 +68,9 @@
 {% endblock %}
 {% block content %}
     <div class="feature-area">
+        {% if galleries == None %}
+            <h1 style="font-size: 600px; font-weight: 200; font-style: italic; color: #757575">?</h1>
+        {% endif %}
 {#        <img src="http://isaacparker.org/mts/feature-big.png"><img src="http://isaacparker.org/mts/feature-small.png">#}
     </div>
     <div class="photo-carousel">
