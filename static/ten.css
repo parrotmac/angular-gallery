@@ -1,0 +1,81 @@
+.ten-1,
+.ten-1-1,
+.ten-1-2,
+.ten-1-5,
+.ten-2-5,
+.ten-3-5,
+.ten-4-5,
+.ten-1-10,
+.ten-2-10,
+.ten-3-10,
+.ten-4-10,
+.ten-5-10,
+.ten-6-10,
+.ten-7-10,
+.ten-8-10,
+.ten-9-10,
+.ten-10-10 {
+    display: inline-block;
+    *display: inline;
+    zoom: 1;
+    letter-spacing: normal;
+    word-spacing: normal;
+    vertical-align: top;
+    text-rendering: auto;
+}
+
+.ten-1-10 {
+    width: 10%;
+    *width: 9.9690%;
+}
+
+.ten-1-5,
+.ten-2-10 {
+    width: 20%;
+    *width: 19.9690%;
+}
+
+.ten-3-10 {
+    width: 30%;
+    *width: 29.9690%;
+}
+
+.ten-2-5,
+.ten-4-10 {
+    width: 40%;
+    *width: 39.9690%;
+}
+
+.ten-1-2,
+.ten-5-10 {
+    width: 50%;
+    *width: 49.9690%;
+}
+
+.ten-3-5,
+.ten-6-10 {
+    width: 60%;
+    *width: 59.9690%;
+}
+
+.ten-7-10 {
+    width: 70%;
+    *width: 69.9690%;
+}
+
+.ten-4-5,
+.ten-8-10 {
+    width: 80%;
+    *width: 79.9690%;
+}
+
+.ten-9-10 {
+    width: 90%;
+    *width: 89.9690%;
+}
+
+.ten-1,
+.ten-1-1,
+.ten-10-10 {
+    width: 100%;
+}

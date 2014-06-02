@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     url(r'^gallery/(?P<gallery_id>\d+)', 'StockPhotos.views.view_gallery', name='view_gallery'),
     url(r'^photo/(?P<photo_id>\d+)', 'StockPhotos.views.view_photo', name='view_photo'),
 
+    url(r'^json/tags/', 'StockPhotos.views.get_tags', name="get_all_tags"),
+
     url(r'^login/', 'StockPhotos.views.user_login', name="login"),
 
     url(r'^dump/image-paths', 'StockPhotos.views.dump_image_paths'),

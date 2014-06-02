@@ -1,102 +1,147 @@
 {% load staticfiles %}
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
     <head>
-        <title>Matthew Turley Stock Photography | {% block page_title %}Base{% endblock %}</title>
-
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
-        <!-- Bootstrap -->
+        <title>Matthew Turley Stock Photography | {% block page_name %}{% endblock %}</title>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
+        <link rel="stylesheet" href="{% static "ten.css" %}">
         <style>
-            .page-wrapper {
-                min-height: 560px;
+            .site-bounds {
                 max-width: 980px;
-                margin: 0 auto;
+                margin: 20px auto;
             }
-            .photo-wrapper {
+            .nav-ul {
+                float: right;
+            }
+            .search-box {
+                position: absolute;
+                right: 90px;
+                width: 175px;
+                height: 29px;
+                /* font-size: 16pt; */
+                /* margin-top: 3px; */
+                color: #4B4B4B;
+                font-weight: 400;
+                display: none;
+                top: 1px;
+            }
+            .carousel:first-child {
+                background-color: #cdcdcd;
+            }
+            .carousel:last-child {
+                background-color: #cdcdcd;
+            }
+            .carousel-item {
+                background-color: #444444;
+                max-height: 160px;
                 position: relative;
-                display: block;
-                min-height: 600px;
             }
+            .carousel-button {
+                color: #333333;
+                padding: 20px;
+                margin: 0 auto;
+                display: block;
+                width: 100%;
+            }
+            .thumbnail-square {
+
+            }
+            .modal-content { border-radius: 0 !important; }
         </style>
-        {% block head_area %}{% endblock %}
     </head>
     <body>
-        <div class="container">
-            <div class="row">
-                <div class="page-wrapper">
-                    <nav class="navbar navbar-default" role="navigation">
-                        <div class="container-fluid">
-                            <div class="navbar-header">
-                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mts-navbar-collapse">
-                                    <span class="icon-bar"></span>
-                                    <span class="icon-bar"></span>
-                                    <span class="icon-bar"></span>
-                                </button>
-                                <a class="navbar-brand" href="#"><span>Matthew Turley Stock Photography</span></a>
-                            </div>
-                            <!-- Collect the nav links, forms, and other content for toggling -->
-                            <div class="collapse navbar-collapse" id="mts-navbar-collapse">
+        <div class="site-bounds">
+            <div class="pure-menu pure-menu-open pure-menu-horizontal">
+                    <a href="#" class="pure-menu-heading" style="height: 100px; width: 250px; background-color: #cdcdcd">Site Title</a>
+{#                    <ul class="nav-ul">#}
+{#                         class="pure-menu-selected"#}
+{#                        <li><a href="#" data-toggle="modal" data-target="#loginModal">Login</a></li>#}
+{#                        <li><a href="#">Contact</a></li>#}
+{#                        <li><a href="#">Pricing/FAQ</a></li>#}
+{#                        <li><label><input name="searchbox" class="search-box form-control" size="10" type="search"></label><button class="pure-button search-button">Search</button></li>#}
+{#                    </ul>#}
+            </div>
+        {% block page_content %}
+        {% endblock %}
 
-                                <ul class="nav navbar-nav navbar-left">
-                                <li><a href="#">Login</a></li>
-                                <li><a href="#">Pricing &amp; FAQ</a></li>
-                                <li><a href="#">Contact</a></li>
-                                </ul>
 
-                                <form class="navbar-form navbar-right" role="search">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control hidden-sm search-box" placeholder="Search">
-                                    </div>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default" onclick="search(this)"><span class="glyphicon glyphicon-search"></span></button>
-                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                            Options<span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" role="menu"> <!-- Need to make this styled like a dropdown, but not act like one -->
-                                            <li><a href="#">Color</a></li>
-                                            <li><a href="#">Black &amp; White</a></li>
-                                            <li><a href="#">Vertical</a></li>
-                                            <li><a href="#">Horizontal</a></li>
-                                            <li><a href="#">Panoramic</a></li>
-                                        </ul>
-                                    </div>
-                                </form>
-                            </div><!-- /.navbar-collapse -->
-                        </div>
-                    </nav>
 
-                    <hr>
+        </div>
 
-                    <div class="photo-wrapper">
-                        {% block content %}{% endblock %}
+
+
+
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModaTitle" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="loginModaTitle">Login</h4>
                     </div>
+                    <div class="modal-body">
+                        <form class="pure-form pure-form-aligned">
+                            <fieldset>
+                                <div class="pure-control-group">
+                                    <label for="name">Email or Username</label>
+                                    <input id="name" type="text" placeholder="Email or Username">
+                                </div>
 
+                                <div class="pure-control-group">
+                                    <label for="password">Password</label>
+                                    <input id="password" type="password" placeholder="Password">
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pure-controls">
+                            <button type="button" class="pure-button pure-button" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="pure-button pure-button-primary">Login</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-        <!-- Include all compiled plugins (below), or include individual files as needed -->
-        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
         <script>
-          function search(sender) {
-            if($(".search-box").is(':visible')) {
-              //Just go ahead with the search
-            } else {
-              //Need to show the search box is a not-ugly way
-            }
-          }
+            var tags = [];
+            $.ajax({
+                url: "{% url "get_all_tags" %}"
+            }).success(function (data) {
+                tags = data.tags; //It's coming back as JSON, so no need to parse...weird.
+            }).error(function (data) {
+                console.error(data);
+            });
+            $(document).ready(function() {
+                var $searchBox = $(".search-box");
+                $(".search-button").hover(function() {
+                    $searchBox.show(200);
+{#                    $searchBox.hover(this.focus());#}
+                }, function() {
+                    if($searchBox.is(":focus") || $searchBox.is(":hover")) {
+                    } else {
+                        $searchBox.delay(3000).hide(200);
+                    }
+{#                    if($searchBox.focus()) {#}
+{#                        console.log("Nope, focused");#}
+{#                    } else {#}
+{#                        $searchBox.delay(1000).hide(200);#}
+{#                    }#}
+                });
+{#                $searchBox.focusout(function() {#}
+{#                    $(this).delay(100).hide(200);#}
+{#                });#}
+                $searchBox.hover(function() {
+                    $(this).show();
+                }, function() {
+                    if(!$(this).is(":focus")) {
+                        this.hide(200);
+                    }
+                })
+            });
         </script>
-        {% block put_script_tags_here %}{% endblock %}
     </body>
 </html>

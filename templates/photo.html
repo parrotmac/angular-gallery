@@ -3,10 +3,7 @@
 {% block head_area %}
 
 {% endblock %}
-{% block content %}
+{% block page_content %}
     <img src="{{ photo.image.url }}" class="img-responsive">
     <p>{% for tag in photo.tags.get_queryset %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-{% endblock %}
-{% block put_script_tags_here %}
-
 {% endblock %}

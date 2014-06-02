@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block page_title %}Gallery {{ gallery.id }}{% endblock %}
-{% block head_area %}
-
-{% endblock %}
-{% block content %}
-
+{% block page_title %}Gallery {{ gallery.name }}{% endblock %}
+{% block head_area %}{% endblock %}
+{% block page_content %}
+<div class="pure-g">
 {% for photo in photos %}
-    <a href="{% url 'view_photo' photo.id %}"><img src="{{ photo.image.url }}" class="img-responsive"></a><br>
+    <div class="pure-u-1-4 pure-u-lg-1-8">
+        <img src="{{ photo.preview.url }}" class="pure-img">
+    </div>
 {% endfor %}
-
+</div>
 {% endblock %}
 {% block put_script_tags_here %}
 

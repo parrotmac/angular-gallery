@@ -72,6 +72,7 @@ class Photo(models.Model):
     description = models.TextField(blank=True, null=True)
     gallery = models.ManyToManyField(Gallery)
     image = models.ImageField(upload_to='uploads/')
+    preview = models.ImageField(upload_to='uploads/previews/')
     thumbnail = models.FileField(upload_to='uploads/thumbnails/')
     tags = models.ManyToManyField(Tag)
     model_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)

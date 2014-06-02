@@ -90,7 +90,7 @@ def dump_image_paths(request):
 #                                          'secondary_feature_bottom': secondary_feature_bottom})
 
 def view_home(request):
-    return render(request, "home.html", {'galleries': Gallery.objects.filter(active=True)})
+    return render(request, "home.html", {'thumbnail_galleries': Gallery.objects.filter(active=True)})
 
 
 def view_gallery(request, gallery_id):
@@ -302,25 +302,31 @@ def manage_upload(request):
             img_str = re.search(r'base64,(.*)', data_uri).group(1)
             temp_thumb_img = cStringIO.StringIO(img_str.decode('base64'))
             temp_preview_img = cStringIO.StringIO(img_str.decode('base64'))
+            temp_full_img = cStringIO.StringIO(img_str.decode('base64'))
             temp_tags_img = cStringIO.StringIO(img_str.decode('base64'))
             try:
                 thumbnail_image = Image.open(temp_thumb_img)
                 preview_image = Image.open(temp_preview_img)
+                img_image = Image.open(temp_full_img)
             except IOError, e:
                 json_response = '{"id": "%s", "error": "%s"}' % (request.POST['id'], str(e))
                 return HttpResponseServerError(json_response)
 
             thumbnail_size = 160, 160
             preview_size = 600, 600
+            image_size = 980, 980
 
             thumbnail_image.thumbnail(thumbnail_size, Image.ANTIALIAS)
             preview_image.thumbnail(preview_size, Image.ANTIALIAS)
+            img_image.thumbnail(image_size, Image.ANTIALIAS)
 
             thumbnail_file_path = os.path.join(settings.MEDIA_ROOT, "tmp", str(uuid.uuid1()) + ".jpg")
             preview_file_path = os.path.join(settings.MEDIA_ROOT, "tmp", str(uuid.uuid1()) + ".jpg")
+            image_file_path = os.path.join(settings.MEDIA_ROOT, "tmp", str(uuid.uuid1()) + ".jpg")
 
             thumbnail_image.save(thumbnail_file_path, "JPEG")
             preview_image.save(preview_file_path, "JPEG")
+            img_image.save(image_file_path, "JPEG")
 
             orientation = None
             if thumbnail_image.size[0] > thumbnail_image.size[1]:
@@ -334,16 +340,16 @@ def manage_upload(request):
             except Exception:
                 pass  # We're just not gonna have keywords
 
-            print "Thumbnail temp: " + thumbnail_file_path + "\n Preview temp: " + preview_file_path
-
             new_image = Photo.objects.create(title='',
-                                             image=File(open(preview_file_path)),
-                                             thumbnail=File(open(thumbnail_file_path)))
+                                             image=File(open(image_file_path)),
+                                             thumbnail=File(open(thumbnail_file_path)),
+                                             preview=File(open(preview_file_path)))
 
-            print setattr(new_image, orientation, True)
+            setattr(new_image, orientation, True)
 
-            if os.remove(thumbnail_file_path) and os.remove(preview_file_path):
-                print "Removed thumbnail and preview"
+            os.remove(thumbnail_file_path)
+            os.remove(preview_file_path)
+            os.remove(image_file_path)
 
             json_tags_response = []
 
@@ -351,8 +357,6 @@ def manage_upload(request):
                 possibly_new_tag = Tag.objects.get_or_create(tag=tag)
                 json_tags_response.append({'value': possibly_new_tag[0].id, 'text': possibly_new_tag[0].tag })
                 new_image.tags.add(possibly_new_tag[0].id)
-
-            print json.dumps(json_tags_response)
 
             new_image.save()
 
@@ -377,3 +381,11 @@ def manage_upload(request):
 #     return render(request, "manage/manage_gallery_old.html", {"gallery": Gallery.objects.get(slug__contains=gallery_slug),
 #                                                    "images_in_gallery": Photo.objects.filter(
 #                                                        gallery=Gallery.objects.get(slug=gallery_slug).pk)})
+
+
+def get_tags(request):
+    tags = list(Tag.objects.values('tag'))
+    tag_array = []
+    for tag in tags:
+        tag_array.append(tag.values()[0])
+    return HttpResponse(json.dumps({"tags": tag_array}), content_type='application/json')
