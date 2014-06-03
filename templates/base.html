@@ -1,76 +1,258 @@
 {% load staticfiles %}
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
     <head>
         <title>Matthew Turley Stock Photography | {% block page_name %}{% endblock %}</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-        <link rel="stylesheet" href="{% static "ten.css" %}">
+{#        <link rel="stylesheet" href="{% static "ten.css" %}">#}
         <style>
+
+            body {
+                background-color: #F1F3F3;
+            }
             .site-bounds {
-                max-width: 980px;
+                max-width: 992px;
                 margin: 20px auto;
             }
-            .nav-ul {
-                float: right;
+            .container-fluid {
+                padding: 0;
             }
-            .search-box {
-                position: absolute;
-                right: 90px;
-                width: 175px;
-                height: 29px;
-                /* font-size: 16pt; */
-                /* margin-top: 3px; */
-                color: #4B4B4B;
-                font-weight: 400;
-                display: none;
-                top: 1px;
+            .navbar-default {
+                background-color: transparent;
+                border: none;
+                margin-top: 25px;
             }
-            .carousel:first-child {
-                background-color: #cdcdcd;
+            .navbar {
+                border-radius: 0;
             }
-            .carousel:last-child {
-                background-color: #cdcdcd;
+            .navbar-toggle {
+                background-color: #f8f8f8;
             }
-            .carousel-item {
-                background-color: #444444;
-                max-height: 160px;
-                position: relative;
-            }
-            .carousel-button {
-                color: #333333;
-                padding: 20px;
-                margin: 0 auto;
-                display: block;
-                width: 100%;
-            }
-            .thumbnail-square {
 
+            .searchbox {
+                border: none;
+                border-radius: 0;
+                background-color: #DDD;
+                height: 32px;
             }
-            .modal-content { border-radius: 0 !important; }
+            .searchbox:focus {
+                border: 1px;
+                border-color: #232323;
+                box-shadow: 0 0 10px #272727;
+            }
+
+            @media (max-width: 768px) {
+                .searchbox {
+                    margin-top: 5px;
+                    max-width: 100%;
+                }
+            }
+
+            .searchbutton {
+                background-color: #BBB;
+                display: none;
+
+                border: 1px;
+                border-color: #232323;
+                box-shadow: 0 0 10px #272727;
+            }
+
+            .mts-button {
+                border: none;
+                border-radius: 0;
+                color: #606060;
+                background-color: #DDD;
+            }
+            .mts-button:hover {
+                background-color: #999;
+                color: #EEE;
+            }
+
+            .searchbox::-webkit-input-placeholder { /* WebKit browsers */
+                color: #606060;
+            }
+            :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+                color:    #606060;
+                opacity:  1;
+            }
+            ::-moz-placeholder { /* Mozilla Firefox 19+ */
+                color:    #606060;
+                opacity:  1;
+            }
+            :-ms-input-placeholder { /* Internet Explorer 10+ */
+                color:    #606060;
+            }
+            
+            .page-options {
+                margin: 0;
+            }
+
+            .disclaimer-row {
+                font-size: 10px;
+                color: #444444;
+                opacity: 0.6;
+            }
+            .disclaimer-row a, a:visited {
+                color: #111111;
+            }
+
+            .pretty-image {
+                    -webkit-animation: fadein 1s; /* Safari and Chrome */
+                       -moz-animation: fadein 1s; /* Firefox */
+                        -ms-animation: fadein 1s; /* Internet Explorer */
+                         -o-animation: fadein 1s; /* Opera */
+                            animation: fadein 1s;
+            }
+
+            @keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+
+            /* Firefox */
+            @-moz-keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+
+            /* Safari and Chrome */
+            @-webkit-keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+
+            /* Internet Explorer */
+            @-ms-keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }​
+
+            /* Opera */
+            @-o-keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }​
+
+
+{#            .nav-ul {#}
+{#                float: right;#}
+{#            }#}
+{#            .search-box {#}
+{#                position: absolute;#}
+{#                right: 90px;#}
+{#                width: 175px;#}
+{#                height: 29px;#}
+{#                /* font-size: 16pt; */#}
+{#                /* margin-top: 3px; */#}
+{#                color: #4B4B4B;#}
+{#                font-weight: 400;#}
+{#                display: none;#}
+{#                top: 1px;#}
+{#            }#}
+{#            .carousel:first-child {#}
+{#                background-color: #cdcdcd;#}
+{#            }#}
+{#            .carousel:last-child {#}
+{#                background-color: #cdcdcd;#}
+{#            }#}
+{#            .carousel-item {#}
+{#                background-color: #444444;#}
+{#                max-height: 160px;#}
+{#                position: relative;#}
+{#            }#}
+{#            .carousel-button {#}
+{#                color: #333333;#}
+{#                padding: 20px;#}
+{#                margin: 0 auto;#}
+{#                display: block;#}
+{#                width: 100%;#}
+{#            }#}
+{#            .thumbnail-square {#}
+{##}
+{#            }#}
+{#            .modal-content { border-radius: 0 !important; }#}
+{#            http://isaacparker.org/mts/mts-logo.png#}
         </style>
+    {% block head_area %}{% endblock %}
     </head>
     <body>
+    <div class="container">
         <div class="site-bounds">
-            <div class="pure-menu pure-menu-open pure-menu-horizontal">
-                    <a href="#" class="pure-menu-heading" style="height: 100px; width: 250px; background-color: #cdcdcd">Site Title</a>
-{#                    <ul class="nav-ul">#}
-{#                         class="pure-menu-selected"#}
-{#                        <li><a href="#" data-toggle="modal" data-target="#loginModal">Login</a></li>#}
-{#                        <li><a href="#">Contact</a></li>#}
-{#                        <li><a href="#">Pricing/FAQ</a></li>#}
-{#                        <li><label><input name="searchbox" class="search-box form-control" size="10" type="search"></label><button class="pure-button search-button">Search</button></li>#}
-{#                    </ul>#}
+            <div class="row">
+                <div class="col-md-5 col-xs-12" style="right: -10px;"><a href="/"><img src="http://isaacparker.org/mts/mts-logo.png" class="img-responsive pretty-image"></a></div>
+                <div class="col-md-7 col-xs-12" style="right: 10px;">
+
+{#                    <nav class="navbar navbar-default" role="navigation">#}
+{#                      <div class="container-fluid">#}
+{#                        <div class="navbar-header">#}
+{#                          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">#}
+{#                            <span class="sr-only">Toggle navigation</span>#}
+{#                            <span class="icon-bar"></span>#}
+{#                            <span class="icon-bar"></span>#}
+{#                            <span class="icon-bar"></span>#}
+{#                          </button>#}
+{#                        </div>#}
+{#                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">#}
+{#                          <ul class="nav navbar-nav">#}
+{#                            <li><a href="#" class="nav-link-button">Login</a></li>#}
+{#                            <li><a href="#" class="nav-link-button">Pricing/FAQ</a></li>#}
+{#                            <li><a href="#" class="nav-link-button">Contact</a></li>#}
+{#                              <li><button class="btn btn-default searchbutton">Login</button></li>#}
+{#                              <li><button class="btn btn-default searchbutton">Pricing/FAQ</button></li>#}
+{#                              <li><button class="btn btn-default searchbutton">Contact</button></li>#}
+{#                          </ul>#}
+{#                          <form class="navbar-form navbar-left" role="search">#}
+{#                            <div class="form-group">#}
+{#                              <input type="text" class="form-control searchbox" placeholder="Search">#}
+{#                            </div>#}
+{#                            <button type="submit" class="btn btn-default searchbutton">Search</button>#}
+{#                          </form>#}
+{#                        </div><!-- /.navbar-collapse -->#}
+{#                      </div><!-- /.container-fluid -->#}
+{#                    </nav>#}
+                      <nav class="navbar navbar-default" role="navigation">
+                          <div class="navbar-form navbar-right">
+                              <button class="btn btn-default mts-button">Login</button>
+                              <button class="btn btn-default mts-button">Pricing/FAQ</button>
+                              <button class="btn btn-default mts-button">Contact</button>
+{#                            <div class="form-group">#}
+                              <form style="display: inline"><input type="text" class="form-control searchbox" placeholder="Search" onfocus="showSearchButton()" onblur="hideSearchButton()">
+{#                            </div>#}
+                            <button type="submit" class="btn btn-default searchbutton mts-button hidden-xs"><span class="glyphicon glyphicon-search" onclick="searchButtonClicked(this)"></span></button></form>
+                          </div>
+                    </nav>
+
+                </div>
+            </div>
+            <div class="row page-options">
+                {% block page_options %}
+                <div class="col-sm-4">{% block page_option_info %}Info{% endblock %}</div>
+                <div class="col-sm-4">{% block page_option_add_to_lightbox %}Add to Lightbox{% endblock %}</div>
+                <div class="col-sm-4">{% block page_option_extra_item %}Extra Item{% endblock %}</div>
+                {% endblock %}
             </div>
         {% block page_content %}
         {% endblock %}
 
-
-
         </div>
+    <br>
+        <div class="row disclaimer-row" style="max-width: 992px; clear: both; margin: 0 0 0 80px; padding: 10px">
+            <div class="col-sm-2"><a href="http://matthewturley.com/">Visit MatthewTurley.com</a></div>
+            <div class="col-sm-3"></div>
+            <div class="col-sm-4">&copy; 2014 Matthew Turley Photography, All rights reversed.</div>
+            <div class="col-sm-2"><a href="#privacy">Terms &amp; Conditions</a></div>
+            <div class="col-sm-1"><a href="#privacy">Privacy</a></div>
+        </div>
+    </div>
 
-
-
+        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
+        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->
+        <!-- # # # # # # # # # # #     It's just modals and scripts from here on out   # # # # # # # # # # # # # # -->
+        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->
+        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
 
         <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModaTitle" aria-hidden="true">
             <div class="modal-dialog">
@@ -115,33 +297,47 @@
             }).error(function (data) {
                 console.error(data);
             });
-            $(document).ready(function() {
-                var $searchBox = $(".search-box");
-                $(".search-button").hover(function() {
-                    $searchBox.show(200);
+
+
+            function showSearchButton() {
+                $('.searchbutton').show(200);
+            }
+
+            function hideSearchButton() {
+                $('.searchbutton').delay(250).hide(200);
+            }
+
+            function searchButtonClicked(sender) {
+
+            }
+
+{#            $(document).ready(function() {#}
+{#                var $searchBox = $(".search-box");#}
+{#                $(".search-button").hover(function() {#}
+{#                    $searchBox.show(200);#}
 {#                    $searchBox.hover(this.focus());#}
-                }, function() {
-                    if($searchBox.is(":focus") || $searchBox.is(":hover")) {
-                    } else {
-                        $searchBox.delay(3000).hide(200);
-                    }
+{#                }, function() {#}
+{#                    if($searchBox.is(":focus") || $searchBox.is(":hover")) {#}
+{#                    } else {#}
+{#                        $searchBox.delay(3000).hide(200);#}
+{#                    }#}
 {#                    if($searchBox.focus()) {#}
 {#                        console.log("Nope, focused");#}
 {#                    } else {#}
 {#                        $searchBox.delay(1000).hide(200);#}
 {#                    }#}
-                });
+{#                });#}
 {#                $searchBox.focusout(function() {#}
 {#                    $(this).delay(100).hide(200);#}
 {#                });#}
-                $searchBox.hover(function() {
-                    $(this).show();
-                }, function() {
-                    if(!$(this).is(":focus")) {
-                        this.hide(200);
-                    }
-                })
-            });
+{#                $searchBox.hover(function() {#}
+{#                    $(this).show();#}
+{#                }, function() {#}
+{#                    if(!$(this).is(":focus")) {#}
+{#                        this.hide(200);#}
+{#                    }#}
+{#                })#}
+{#            });#}
         </script>
     </body>
 </html>

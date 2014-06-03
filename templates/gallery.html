@@ -1,15 +1,117 @@
 {% extends "base.html" %}
 {% block page_title %}Gallery {{ gallery.name }}{% endblock %}
-{% block head_area %}{% endblock %}
-{% block page_content %}
-<div class="pure-g">
-{% for photo in photos %}
-    <div class="pure-u-1-4 pure-u-lg-1-8">
-        <img src="{{ photo.preview.url }}" class="pure-img">
-    </div>
-{% endfor %}
-</div>
+{% block head_area %}
+<style>
+html {
+    overflow-y: scroll;
+}
+.photo-square {
+    float: left;
+    width: 100%;
+    height: auto;
+{#    border-radius: 10px;#}
+{#    border-color: #C1C1C1;#}
+{#    background-color: #555555;#}
+           transition : background-color 500ms ease-out;
+   -webkit-transition : background-color 500ms ease-out;
+      -moz-transition : background-color 500ms ease-out;
+        -o-transition : background-color 500ms ease-out;
+}
+.photo-square:hover {
+    background-color: #d4d4d4;
+}
+
+.photo-preview {
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+}
+
+@media screen and (min-width:400px) {
+    body {
+        /* max-width: 1600px; */
+        overflow: hidden;
+    }
+    .photo-square{
+        position: relative;
+        top: 0;
+        overflow: hidden;
+    }
+    .photo-wrapper {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+}
+@media screen and (min-width:400px) {
+    .photo-square {
+        width: 50%;
+        padding-bottom: 50%;
+    }
+        .photo-wrapper {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+}
+/* Three Column */
+@media screen and (min-width:500px) {
+    .photo-square {
+        width: 33.3333%;
+        margin: 0 auto;
+        padding-bottom: 33.3333%;
+    }
+}
+/* Four Column */
+ @media screen and (min-width:800px) {
+    .photo-square {
+        width: 25%;
+        padding-bottom: 25%;
+    }
+        .photo-wrapper {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+            clear: both;
+    }
+}
+
+#fluid-holder {
+    background-color: #666468;
+}
+
+</style>
 {% endblock %}
-{% block put_script_tags_here %}
+
+{% block page_option_info %}{{ gallery.name }}{% endblock %}
+{% block page_option_add_to_lightbox %}{% endblock %}
+{% block page_option_extra_item %}{% endblock %}
+
+{% block page_content %}
+    <hr>
+    <div id="fluid-holder">
+    {% for photo in photos %}
+        <a class="photo-square" href="{% url 'view_photo' photo.id %}">
+            <div class="photo-wrapper">
+                <img src="{{ photo.preview.url }}" class="photo-preview pretty-image" />
+{#                <span class="photo-info">{{ photo }}</span>#}
+            </div>
+        </a>
+    {% endfor %}
+    </div>
 
 {% endblock %}

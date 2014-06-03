@@ -1,9 +1,47 @@
 {% extends "base.html" %}
-{% block page_title %}Stock Photo {{ photo.id }}{% endblock %}
+{% block page_name %}Photo {{ photo }}{% endblock %}
 {% block head_area %}
+    <style>
+    .preview-wrapper {
+        position: relative;
+    }
+    .preview-wrapper img {
+        margin: 0 auto;
+    }
 
+    .preview-wrapper:hover .go-back-hover {
+        opacity: 1;
+    }
+
+    .go-back-hover:hover {
+{#        opacity: 1;#}
+    }
+
+
+    .go-back-hover {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        border: 1px solid #BBBBBB;
+        color: #BBBBBB;
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(40, 40, 40, 0.84);
+        cursor: pointer;
+        opacity: 0;
+        -webkit-transition: opacity 1s ease-in-out;
+            -moz-transition: opacity 1s ease-in-out;
+            -o-transition: opacity 1s ease-in-out;
+            -ms-transition: opacity 1s ease-in-out;
+            transition: opacity 1s ease-in-out;
+    }
+    </style>
 {% endblock %}
+{% block page_option_info %}Stock Number: {{ photo.id|stringformat:"05d" }}{% endblock %}
 {% block page_content %}
-    <img src="{{ photo.image.url }}" class="img-responsive">
-    <p>{% for tag in photo.tags.get_queryset %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    <div class="preview-wrapper">
+        <span class="go-back-hover" onclick="history.back()">&lt; Go Back</span>
+        <img src="{{ photo.image.url }}" class="img-responsive pretty-image">
+    </div>
+{#    <p>{% for tag in photo.tags.get_queryset %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>#}
 {% endblock %}

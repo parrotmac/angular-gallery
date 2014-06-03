@@ -25,6 +25,7 @@ if socket.gethostname() == "AluminumBeast.local":
         }
     }
 elif socket.gethostname() == "Masuoka.local":
+    print 'on Masuoka'
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
