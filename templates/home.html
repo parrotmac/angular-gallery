@@ -1,29 +1,76 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block page_name %}Home{% endblock %}
+{% block head_area %}<link href="{% static "responsive-carousel.css" %}" rel="stylesheet">{% endblock %}
 {% block page_option_info %}{% endblock %}
 {% block page_option_add_to_lightbox %}{% endblock %}
 {% block page_option_extra_item %}{% endblock %}
 {% block page_content %}
-            <div class="pure-g">
-                <div class="pure-u-2-3" style="background-color: #C1C1C1; max-height: 400px;">
-                    <img src="http://dummyimage.com/653x400/777/CCC" class="pure-img pretty-image">
-                </div>
-                <div class="pure-u-1-3" style="background-color: #757575; max-height: 400px;">
-                    <img src="http://dummyimage.com/327x400/CCC/777" class="pure-img pretty-image">
-                </div>
+            <div class="featured-area" style="max-width: 1000px">
+                <img src="http://dummyimage.com/620x400/777/CCC" class="pure-img pretty-image" style="float: left; position: relative;">
+                <img src="http://dummyimage.com/360x400/CCC/777" class="pure-img pretty-image" style="float: left; position: relative;">
             </div>
+{#            <div class="pure-g">#}
+{#                <div class="pure-u-2-3" style="background-color: #C1C1C1; max-height: 400px;">#}
+{#                    <img src="http://dummyimage.com/653x400/777/CCC" class="pure-img pretty-image">#}
+{#                </div>#}
+{#                <div class="pure-u-1-3" style="background-color: #757575; max-height: 400px;">#}
+{#                    <img src="http://dummyimage.com/327x400/CCC/777" class="pure-img pretty-image">#}
+{#                </div>#}
+{#            </div>#}
+            <div class="responsive-carousel">
+                    <div class="rc-arrow-absolute">
+                        <span class="rc-arrow-container rc-arrow-container-left">
+                            <span class="rc-arrow">&lt;</span>
+                        </span>
+                    </div>
+                    <div class="rc-mask">
+                        <div class="rc-container">
+                            <div class="rc-item-collection">
+                                <a href="#" class="rc-item">
+                                    <img class="pretty-image" src="http://dummyimage.com/300x200/DDD/222.png&text=Carousel Image">
+                                    <span class="rc-item-info">First Carousel Image</span>
+                                </a>
+                                <a href="#" class="rc-item">
+                                    <img class="pretty-image" src="http://dummyimage.com/300x200/222/DDD.png&text=Carousel Image">
+                                    <span class="rc-item-info">Second Carousel Image</span>
+                                </a>
+                                <a href="#" class="rc-item">
 
-    <div class="pure-g carousel">
-        <div><span class="glyphicon glyphicon-chevron-left carousel-button"></span></div>
-        {% for gallery_thumb in thumbnail_galleries %}
-        <div class="carousel-item">
-            <a href="{% url "view_gallery" gallery_thumb.id %}">
-                <div class="thumbnail-square">
-                    <img src="{{ gallery_thumb.cover_photo.thumbnail.url }}" class="pure-img pretty-image">
+                                    <img class="pretty-image" src="http://dummyimage.com/300x200/DDD/222.png&text=Carousel Image">
+                                    <span class="rc-item-info">Third Carousel Image</span>
+                                </a>
+                                <a href="#" class="rc-item">
+
+                                    <img class="pretty-image" src="http://dummyimage.com/300x200/222/DDD.png&text=Carousel Image">
+                                    <span class="rc-item-info">Fourth Carousel Image</span>
+                                </a>
+                                <a href="#" class="rc-item">
+
+                                    <img class="pretty-image" src="http://dummyimage.com/300x200/DDD/222.png&text=Carousel Image">
+                                    <span class="rc-item-info">Fifth Carousel Image</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rc-arrow-absolute">
+                        <span class="rc-arrow-container rc-arrow-container-right">
+                            <span class="rc-arrow">&gt;</span>
+                        </span>
+                    </div>
                 </div>
-            </a>
-        </div>
-        {% endfor %}
-        <div><span class="glyphicon glyphicon-chevron-right carousel-button"></span></div>
-    </div>
+
+{#    <div class="pure-g carousel">#}
+{#        <div><span class="glyphicon glyphicon-chevron-left carousel-button"></span></div>#}
+{#        {% for gallery_thumb in thumbnail_galleries %}#}
+{#        <div class="carousel-item">#}
+{#            <a href="{% url "view_gallery" gallery_thumb.id %}">#}
+{#                <div class="thumbnail-square">#}
+{#                    <img src="{{ gallery_thumb.cover_photo.thumbnail.url }}" class="pure-img pretty-image">#}
+{#                </div>#}
+{#            </a>#}
+{#        </div>#}
+{#        {% endfor %}#}
+{#        <div><span class="glyphicon glyphicon-chevron-right carousel-button"></span></div>#}
+{#    </div>#}
 {% endblock %}

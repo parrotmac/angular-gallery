@@ -1,0 +1,92 @@
+.responsive-carousel {
+    height: 200px;
+    max-width: 1000px;
+    overflow: visible;
+    position: relative;
+    padding: 0;
+}
+
+.rc-arrow-container {
+    float: left;
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    top: 75px;
+    z-index: 10;
+
+    cursor: pointer;
+    text-align: center;
+    background-color: rgba(100, 100, 100, 0.35);
+    color: rgb(200, 200, 200);
+    line-height: 1.8;
+    font-weight: lighter;
+    font-size: 20pt;
+    font-family: sans-serif;
+
+}
+
+.rc-arrow-container:hover {
+    transition: background-color 0.2s ease;
+    background-color: rgba(100, 100, 100, 0.8);
+}
+
+.rc-arrow-container:active {
+    background-color: rgba(50, 50, 50, 0.8);
+}
+
+.rc-arrow-container-left {
+    left: 10px;
+}
+
+.rc-arrow-container-right {
+    right: 10px;
+}
+
+.rc-arrow-absolute {
+    width: 0;
+}
+
+.rc-container {
+    max-width: 1000px;
+    overflow: hidden;
+    display: table;
+    padding: 0;
+    margin: 0;
+}
+.rc-item-collection {
+    position: relative;
+    display: table-row;
+}
+.rc-item {
+    position: relative;
+    display: table-cell;
+}
+.rc-item img {
+    vertical-align: middle;
+}
+
+.rc-item:hover .rc-item-info{
+    transition: opacity 0.2s linear, background-color 0.1s linear;
+    opacity: 1;
+    background-color: rgba(50, 50, 50, 0.4);
+}
+
+.rc-item-info {
+    display: block;
+    opacity: 0;
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
+    color: #EEE;
+    font-size: 12pt;
+    font-weight: 100;
+    letter-spacing: 1px;
+    z-index: 10;
+    width: 100%;
+    /*vertical-align: bottom;*/
+}
+
+.rc-mask {
+    max-width: 1000px;
+    overflow: hidden;
+}

@@ -314,7 +314,7 @@ def manage_upload(request):
 
             thumbnail_size = 160, 160
             preview_size = 600, 600
-            image_size = 980, 980
+            image_size = 1000, 1000
 
             thumbnail_image.thumbnail(thumbnail_size, Image.ANTIALIAS)
             preview_image.thumbnail(preview_size, Image.ANTIALIAS)
