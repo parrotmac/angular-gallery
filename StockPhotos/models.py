@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import os
+import json
 
 
 FEATURE_TYPE = (
@@ -123,3 +124,19 @@ class LightBox(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class Configuration(models.Model):
+    name = models.CharField(blank=False, max_length=200)
+    document = models.TextField(blank=False)
+
+    def __unicode__(self):
+        return self.name
+
+    def get_value(self):
+        return json.loads(self.document)['value']
+
+    def set_value(self, key, value):
+        self.name = key
+        self.document = json.dumps({"key": key, "value": value})
+        self.save()

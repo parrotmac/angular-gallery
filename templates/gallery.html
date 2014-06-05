@@ -32,6 +32,25 @@ html {
         margin: auto;
 }
 
+@media screen and (max-width:400px) {
+    body {
+        overflow: hidden;
+    }
+    .photo-preview {
+        position: relative;
+    }
+    .photo-square{
+        position: relative;
+        height: auto;
+        width: 100%;
+        margin: 2px auto;
+    }
+    .photo-wrapper {
+        position: relative;
+        margin: 0 auto;
+    }
+}
+
 @media screen and (min-width:400px) {
     body {
         /* max-width: 1600px; */
@@ -41,6 +60,9 @@ html {
         position: relative;
         top: 0;
         overflow: hidden;
+        height: auto;
+        width: 100%;
+        padding-bottom: 50%;
     }
     .photo-wrapper {
         position: absolute;
@@ -97,7 +119,7 @@ html {
 </style>
 {% endblock %}
 
-{% block page_option_info %}{{ gallery.name }}{% endblock %}
+{% block page_option_info %}<h3>{{ gallery.name }}</h3>{% endblock %}
 {% block page_option_add_to_lightbox %}{% endblock %}
 {% block page_option_extra_item %}{% endblock %}
 

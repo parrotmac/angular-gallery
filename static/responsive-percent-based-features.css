@@ -1,0 +1,33 @@
+.feature-area {
+    max-width: 1000px;
+}
+
+.feature-link {
+    position: relative;
+    width: 100%;
+    float: left;
+}
+
+@media screen and (max-width: 400px) {
+    .feature-link {
+        float: none;
+    }
+}
+
+.primary-feature-link {
+    width: 60%;
+    height: auto;
+}
+.secondary-feature-link {
+    width: 40%;
+    height: auto;
+}
+
+.feature-hover-text {
+    position: absolute;
+    bottom: 0;
+    opacity: 0;
+}
+.clear-fix {
+    clear: both;
+}
