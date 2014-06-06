@@ -30,17 +30,19 @@
         cursor: pointer;
         opacity: 0;
         -webkit-transition: opacity 1s ease-in-out;
-            -moz-transition: opacity 1s ease-in-out;
-            -o-transition: opacity 1s ease-in-out;
+           -moz-transition: opacity 1s ease-in-out;
+             -o-transition: opacity 1s ease-in-out;
             -ms-transition: opacity 1s ease-in-out;
-            transition: opacity 1s ease-in-out;
+                transition: opacity 1s ease-in-out;
     }
     </style>
 {% endblock %}
 {% block page_option_info %}Stock Number: {{ photo.id|stringformat:"05d" }}{% endblock %}
+{% block page_option_add_to_lightbox %}<a href="#"><span class="glyphicon glyphicon-plus"></span> Add to Lightbox</a>{% endblock %}
+{% block page_option_extra_item %}{% endblock %}
 {% block page_content %}
     <div class="preview-wrapper">
-        <span class="go-back-hover" onclick="history.back()">&lt; Go Back</span>
+        <span class="go-back-hover" onclick="history.back()"><span class="glyphicon glyphicon-chevron-left"></span> Go Back</span>
         <img src="{{ photo.image.url }}" class="img-responsive pretty-image">
     </div>
 {#    <p>{% for tag in photo.tags.get_queryset %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>#}

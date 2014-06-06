@@ -125,73 +125,81 @@
             }
 
             @keyframes fadein {
-                from { opacity: 0; }
-                to   { opacity: 1; }
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
             }
 
             /* Firefox */
             @-moz-keyframes fadein {
-                from { opacity: 0; }
-                to   { opacity: 1; }
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
             }
 
             /* Safari and Chrome */
             @-webkit-keyframes fadein {
-                from { opacity: 0; }
-                to   { opacity: 1; }
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
             }
 
             /* Internet Explorer */
             @-ms-keyframes fadein {
-                from { opacity: 0; }
-                to   { opacity: 1; }
-            }​
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
 
             /* Opera */
             @-o-keyframes fadein {
-                from { opacity: 0; }
-                to   { opacity: 1; }
-            }​
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+
+            /* User features */
+            #user-dropdown {
+                position: absolute;
+                display: none;
+                height: 0;
+            }
+
+            .dropdown-button {
+                display: block;
+                position: relative;
+                width: 100px;
+                left: -20px;
+            }
+
+            #user-info-button {
+
+            }
+
+            #lightbox-button {
+
+            }
+
+            #logout-button {
+
+            }
 
 
-{#            .nav-ul {#}
-{#                float: right;#}
-{#            }#}
-{#            .search-box {#}
-{#                position: absolute;#}
-{#                right: 90px;#}
-{#                width: 175px;#}
-{#                height: 29px;#}
-{#                /* font-size: 16pt; */#}
-{#                /* margin-top: 3px; */#}
-{#                color: #4B4B4B;#}
-{#                font-weight: 400;#}
-{#                display: none;#}
-{#                top: 1px;#}
-{#            }#}
-{#            .carousel:first-child {#}
-{#                background-color: #cdcdcd;#}
-{#            }#}
-{#            .carousel:last-child {#}
-{#                background-color: #cdcdcd;#}
-{#            }#}
-{#            .carousel-item {#}
-{#                background-color: #444444;#}
-{#                max-height: 160px;#}
-{#                position: relative;#}
-{#            }#}
-{#            .carousel-button {#}
-{#                color: #333333;#}
-{#                padding: 20px;#}
-{#                margin: 0 auto;#}
-{#                display: block;#}
-{#                width: 100%;#}
-{#            }#}
-{#            .thumbnail-square {#}
-{##}
-{#            }#}
-{#            .modal-content { border-radius: 0 !important; }#}
-{#            http://isaacparker.org/mts/mts-logo.png#}
         </style>
     {% block head_area %}{% endblock %}
     </head>
@@ -201,38 +209,14 @@
             <div class="row">
                 <div class="col-md-5 col-xs-12 logo-container" style="right: -10px;"><a href="/"><img src="http://isaacparker.org/mts/mts-logo.png" class="logo img-responsive pretty-image"></a></div>
                 <div class="col-md-7 col-xs-12 nav-container" style="right: 10px;">
-
-{#                    <nav class="navbar navbar-default" role="navigation">#}
-{#                      <div class="container-fluid">#}
-{#                        <div class="navbar-header">#}
-{#                          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">#}
-{#                            <span class="sr-only">Toggle navigation</span>#}
-{#                            <span class="icon-bar"></span>#}
-{#                            <span class="icon-bar"></span>#}
-{#                            <span class="icon-bar"></span>#}
-{#                          </button>#}
-{#                        </div>#}
-{#                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">#}
-{#                          <ul class="nav navbar-nav">#}
-{#                            <li><a href="#" class="nav-link-button">Login</a></li>#}
-{#                            <li><a href="#" class="nav-link-button">Pricing/FAQ</a></li>#}
-{#                            <li><a href="#" class="nav-link-button">Contact</a></li>#}
-{#                              <li><button class="btn btn-default searchbutton">Login</button></li>#}
-{#                              <li><button class="btn btn-default searchbutton">Pricing/FAQ</button></li>#}
-{#                              <li><button class="btn btn-default searchbutton">Contact</button></li>#}
-{#                          </ul>#}
-{#                          <form class="navbar-form navbar-left" role="search">#}
-{#                            <div class="form-group">#}
-{#                              <input type="text" class="form-control searchbox" placeholder="Search">#}
-{#                            </div>#}
-{#                            <button type="submit" class="btn btn-default searchbutton">Search</button>#}
-{#                          </form>#}
-{#                        </div><!-- /.navbar-collapse -->#}
-{#                      </div><!-- /.container-fluid -->#}
-{#                    </nav>#}
                       <nav class="navbar navbar-default" role="navigation">
                           <div class="navbar-form navbar-right">
-                              <button class="btn btn-default mts-button">Login</button>
+                              <button class="btn btn-default mts-button" id="login-button" onclick="handleLoginClick(this)" onmouseover="handleLoginHover(this)">Login</button>
+                              <div id="user-dropdown">
+                                  <button class="btn btn-default mts-button dropdown-button" id="user-info-button">My Info</button>
+                                  <button class="btn btn-default mts-button dropdown-button" id="lightbox-button">Lightbox</button>
+                                  <button class="btn btn-default mts-button dropdown-button" id="logout-button">Logout</button>
+                              </div>
                               <button class="btn btn-default mts-button">Pricing/FAQ</button>
                               <button class="btn btn-default mts-button">Contact</button>
 {#                            <div class="form-group">#}
@@ -271,11 +255,11 @@
 
     </div>
 
-        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->
-        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->
-        <!-- # # # # # # # # # # #     It's just modals and scripts from here on out   # # # # # # # # # # # # # # -->
-        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->
-        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  # # # # # # # # # # -->
+{#        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # #     It's just modals and scripts from here on out   # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  # # # # # # # # # # -->#}
 
         <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModaTitle" aria-hidden="true">
             <div class="modal-dialog">
@@ -334,33 +318,19 @@
 
             }
 
-{#            $(document).ready(function() {#}
-{#                var $searchBox = $(".search-box");#}
-{#                $(".search-button").hover(function() {#}
-{#                    $searchBox.show(200);#}
-{#                    $searchBox.hover(this.focus());#}
-{#                }, function() {#}
-{#                    if($searchBox.is(":focus") || $searchBox.is(":hover")) {#}
-{#                    } else {#}
-{#                        $searchBox.delay(3000).hide(200);#}
-{#                    }#}
-{#                    if($searchBox.focus()) {#}
-{#                        console.log("Nope, focused");#}
-{#                    } else {#}
-{#                        $searchBox.delay(1000).hide(200);#}
-{#                    }#}
-{#                });#}
-{#                $searchBox.focusout(function() {#}
-{#                    $(this).delay(100).hide(200);#}
-{#                });#}
-{#                $searchBox.hover(function() {#}
-{#                    $(this).show();#}
-{#                }, function() {#}
-{#                    if(!$(this).is(":focus")) {#}
-{#                        this.hide(200);#}
-{#                    }#}
-{#                })#}
-{#            });#}
+            function handleLoginClick(sender) {
+                if (sender.text != 'Login') {
+                    //Show dropdown
+                }
+            }
+
+            //Hide dropdown:
+            //("#user-dropdown button").animate({height: 0, padding:0}, 'fast');
+
+            //Show dropdown:
+            //$("#user-dropdown button").animate({height: 32, 'padding-top': 6, 'padding-bottom':6, 'padding-left': 12, 'padding-right':12}, 'fast');
+
         </script>
+    {% block put_scripts_here %}{% endblock %}
     </body>
 </html>
