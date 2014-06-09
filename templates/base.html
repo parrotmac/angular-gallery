@@ -50,6 +50,7 @@
 {#            }#}
 
             .searchbox {
+                margin-top: 5px;
                 border: none;
                 border-radius: 0;
                 background-color: #DDD;
@@ -78,6 +79,7 @@
             }
 
             .mts-button {
+                margin-top: 5px;
                 border: none;
                 border-radius: 0;
                 color: #606060;
@@ -108,12 +110,18 @@
             }
 
             .disclaimer-row {
+                max-width: 1000px;
+                margin: 0 auto;
                 font-size: 10px;
                 color: #444444;
                 opacity: 0.6;
+                padding: 5px;
             }
-            .disclaimer-row a, a:visited {
+            .disclaimer-row a, .disclaimer-row a:visited {
                 color: #111111;
+            }
+            .disclaimer-row-right-text {
+                float: right;
             }
 
             .pretty-image {
@@ -173,30 +181,37 @@
                 }
             }
 
-            /* User features */
-            #user-dropdown {
+            /* Dropdown for user & lightbox */
+            .dropdown-slider {
                 position: absolute;
+                z-index: 10;
                 display: none;
-                height: 0;
             }
 
             .dropdown-button {
                 display: block;
                 position: relative;
-                width: 100px;
-                left: -20px;
+                z-index:15;
+
+                border: 1px;
+                border-color: #232323;
+                box-shadow: 0 0 10px #272727;
+
+                text-align: left;
             }
 
-            #user-info-button {
-
+            .lightbox-remove-icon {
+                background-color: #C2C2C2;
+                position: absolute;
+                top: 0;
+                margin-left: 10px;
+                padding: 7px 9px 5px 10px;
             }
-
-            #lightbox-button {
-
+            .lightbox-remove-icon:hover {
+                background-color: #525253;
             }
-
-            #logout-button {
-
+            .lightbox-remove-icon:hover span {
+                color: #C2C2C2;
             }
 
 
@@ -207,18 +222,29 @@
     <div class="container">
         <div class="site-bounds">
             <div class="row">
-                <div class="col-md-5 col-xs-12 logo-container" style="right: -10px;"><a href="/"><img src="http://isaacparker.org/mts/mts-logo.png" class="logo img-responsive pretty-image"></a></div>
-                <div class="col-md-7 col-xs-12 nav-container" style="right: 10px;">
+                <div class="col-md-4 col-xs-12 logo-container" style="right: -10px;"><a href="/"><img src="http://isaacparker.org/mts/mts-logo-cropped.png" class="logo img-responsive pretty-image"></a></div>
+                <div class="col-md-8 col-xs-12 nav-container" style="right: 10px;">
                       <nav class="navbar navbar-default" role="navigation">
                           <div class="navbar-form navbar-right">
-                              <button class="btn btn-default mts-button" id="login-button" onclick="handleLoginClick(this)" onmouseover="handleLoginHover(this)">Login</button>
-                              <div id="user-dropdown">
-                                  <button class="btn btn-default mts-button dropdown-button" id="user-info-button">My Info</button>
-                                  <button class="btn btn-default mts-button dropdown-button" id="lightbox-button">Lightbox</button>
-                                  <button class="btn btn-default mts-button dropdown-button" id="logout-button">Logout</button>
+                              {% if user.is_authenticated %}
+                                  <button class="btn btn-default mts-button dropdown-trigger" id="login-button" onclick="toggleCustomDropdown(this, '#user-dropdown')" data-dw-trigger-target="user-dropdown">{{ user.first_name }}</button>
+
+                                  <button class="btn btn-default mts-button dropdown-trigger" onclick="toggleCustomDropdown(this, '#lightbox-dropdown')" data-dw-trigger-target="lightbox-dropdown">Lightboxes</button>
+                                  <div id="lightbox-dropdown" class="dropdown-slider">
+                                    {% for lightbox in lightboxes %}
+                                        <a class="btn btn-default mts-button dropdown-button" data-lightbox-button-for="{{ lightbox.id }}" href="{% url 'view_lightbox_id' lightbox.id %}">{{ lightbox.name }}<span class="lightbox-remove-icon" onclick="$(this).parent().click(function(e) {e.preventDefault();}); deleteLightbox({{ lightbox.id }})"><span class="glyphicon glyphicon-remove"></span></span></a>
+                                    {% endfor %}
+                                    <button class="btn btn-default mts-button dropdown-button" id="create-lightbox-button" data-toggle="modal" data-target="#createLightboxModal"><span class="glyphicon glyphicon-plus"></span> Create</button>
+                                  </div>
+                              {% else %}
+                                <button class="btn btn-default mts-button" id="login-button" onclick="$('#loginModal').modal('show')">Login</button>
+                              {% endif %}
+                              <div id="user-dropdown" class="dropdown-slider">
+{#                                  <button class="btn btn-default mts-button dropdown-button">My Info</button>#}
+                                  <button class="btn btn-default mts-button dropdown-button" onclick="userLogout()">Logout</button>
                               </div>
-                              <button class="btn btn-default mts-button">Pricing/FAQ</button>
-                              <button class="btn btn-default mts-button">Contact</button>
+                              <button class="btn btn-default mts-button" data-toggle="modal" data-target="#pricingFaqModal">Pricing/FAQ</button>
+                              <button class="btn btn-default mts-button" data-toggle="modal" data-target="#contactModal">Contact</button>
 {#                            <div class="form-group">#}
                               <form style="display: inline"><input type="text" class="form-control searchbox" placeholder="Search" onfocus="showSearchButton()" onblur="hideSearchButton()">
 {#                            </div>#}
@@ -239,7 +265,7 @@
         {% endblock %}
 
         </div>
-    <br>
+{#    <br>#}
 {#        <div class="row disclaimer-row" style="max-width: 1000px; clear: both; margin: 0 0 0 80px; padding: 10px">#}
 {#            <div class="col-sm-2"><a href="http://matthewturley.com/">Visit MatthewTurley.com</a></div>#}
 {#            <div class="col-sm-3"></div>#}
@@ -247,12 +273,16 @@
 {#            <div class="col-sm-2"><a href="#privacy">Terms &amp; Conditions</a></div>#}
 {#            <div class="col-sm-1"><a href="#privacy">Privacy</a></div>#}
 {#        </div>#}
-        <div class="row disclaimer-row" style="max-width: 1000px; clear: both; margin: 0 0 0 80px; padding: 10px">
-            <div class="col-sm-2"><a href="http://matthewturley.com/">Visit MatthewTurley.com</a></div>
-            <div class="col-sm-5"></div>
-            <div class="col-sm-5">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#privacy">Terms&nbsp;&amp;&nbsp;Conditions</a> <a href="#privacy">Privacy</a></div>
-        </div>
+{#        <div class="row disclaimer-row" style="max-width: 1000px; clear: both; margin: 0 0 0 80px; padding: 10px">#}
+{#            <div class="col-sm-2"><a href="http://matthewturley.com/">Visit MatthewTurley.com</a></div>#}
+{#            <div class="col-sm-5"></div>#}
+{#            <div class="col-sm-5">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#privacy">Terms&nbsp;&amp;&nbsp;Conditions</a> <a href="#privacy">Privacy</a></div>#}
+{#        </div>#}
+    </div>
 
+    <div class="disclaimer-row">
+        <a href="http://matthewturley.com/">Visit MatthewTurley.com</a>
+        <span class="disclaimer-row-right-text">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#privacy">Terms&nbsp;&amp;&nbsp;Conditions</a> | <a href="#privacy">Privacy</a></span>
     </div>
 
 {#        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->#}
@@ -261,41 +291,254 @@
 {#        <!-- # # # # # # # # # # #                                                     # # # # # # # # # # # # # # -->#}
 {#        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  # # # # # # # # # # -->#}
 
-        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModaTitle" aria-hidden="true">
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalTitle" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="loginModaTitle">Login</h4>
+                    <h4 class="modal-title" id="loginModalTitle">Login</h4>
                     </div>
                     <div class="modal-body">
-                        <form class="pure-form pure-form-aligned">
+                        <form class="pure-form pure-form-aligned" action="{% url 'login' %}?next={{ request.path }}" method="POST" id="loginForm">
                             <fieldset>
                                 <div class="pure-control-group">
                                     <label for="name">Email or Username</label>
-                                    <input id="name" type="text" placeholder="Email or Username">
+                                    <input name="username" type="text" placeholder="Email or Username">
                                 </div>
 
                                 <div class="pure-control-group">
                                     <label for="password">Password</label>
-                                    <input id="password" type="password" placeholder="Password">
+                                    <input name="password" type="password" placeholder="Password" onkeydown="if(event.keyCode == 13){$('#loginSubmitButton').click()}">
                                 </div>
+
+                                {% csrf_token %}
                             </fieldset>
                         </form>
+                        <hr>
+                        <p>If you don't already have one, click below to create an account</p>
+                        <a class="pure-button pure-button-primary" data-dismiss="modal" href="{% url 'user_create_account' %}">Create Account</a>
                     </div>
                     <div class="modal-footer">
                         <div class="pure-controls">
-                            <button type="button" class="pure-button pure-button" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="pure-button pure-button-primary">Login</button>
+                            <button type="button" class="pure-button pure-button-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="pure-button pure-button-primary" id="loginSubmitButton" onclick="$('#loginForm').submit()">Login</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+
+{#        <!-- # # # # # # # # # # # # # # # # # #                             # # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # # # # # # # # #     Pricing & FAQ Modal     # # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # # # # # # # # #                             # # # # # # # # # # # # # # # -->#}
+        <div class="modal fade" id="pricingFaqModal" tabindex="-1" role="dialog" aria-labelledby="pricingFaqModalTitle" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="pricingFaqModalTitle">Pricing/FAQ</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Pricing & Purchasing Images</h4>
+                        <p>(content here)</p>
+                        <br>
+
+                        <h4>Prices</h4>
+                        <p>(content here)</p>
+                        <br>
+
+                        <h4>Royalty Free Licenses</h4>
+                        <p>(content here)</p>
+                        <br>
+
+                        <h4>Images Delivery</h4>
+                        <p>(content here)</p>
+                        <br>
+
+                        <h4>Image Specifications</h4>
+                        <p>(content here)</p>
+                        <br>
+
+                        <h4>Alterations/Retouching</h4>
+                        <p>(content here)</p>
+                        <br>
+
+                        <h4>Technical Problems With The Site</h4>
+                        <p>(content here)</p>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pure-controls">
+                            <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Okay</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{#        <!-- # # # # # # # # # # # # # # # # # #                             # # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # # # # # # # # #        Contact Modal        # # # # # # # # # # # # # # # -->#}
+{#        <!-- # # # # # # # # # # # # # # # # # #                             # # # # # # # # # # # # # # # -->#}
+        <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalTitle" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="contactModalTitle">Contact</h4>
+                    </div>
+
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+{#                    <!-- OMG IMPLEMENT ME -->                      #}
+
+{#                    <form role="form">#}
+{#                        <div class="form-group">#}
+{#                            <label for="senderEmailAddress">Email address</label>#}
+{#                            <input type="email" class="form-control" id="senderEmailAddress" placeholder="Enter email">#}
+{#                        </div>#}
+{##}
+{#                        <div class="form-group">#}
+{#                            <label for="messageBox">Message</label>#}
+{#                            <textarea id="messageBox" placeholder="Your message here..."></textarea>#}
+{#                        </div>#}
+{#                    </form>#}
+
+                    <div class="modal-footer">
+                        <div class="pure-controls">
+                            <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default mts-button" onclick="sendContactInformation(params)">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+{#        <!--                           # # # # #  Modal for creating a new lightbox  # # # # #                        -->#}
+        <div class="modal fade" tabindex="-1" role="dialog" id="createLightboxModal" aria-labelledby="createLightboxLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h1 id="createLightboxLabel">Create New Lightbox</h1>
+                    </div>
+                    <div class="modal-body">
+                        <label>Name: <input type="text" id="newLightboxName" onkeydown="if(event.keyCode == 13){$('#createLightboxSubmit').click()}"></label>
+                    </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary mts-button" id="createLightboxSubmit" data-return-to="" onclick="if($(this).attr('data-return-to') == 'addToLightbox'){$('#addToLightboxModal').modal('show')}createNewLightbox(this, '#createLightboxModal', '#newLightboxName')">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+{#                                                    Modal for adding an item to a lightbox                                            #}
+        <div class="modal fade" tabindex="-1" role="dialog" id="addToLightboxModal" aria-labelledby="addToLightboxLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h1 id="addToLightboxLabel">Add To Lightbox</h1>
+                    </div>
+                    <div class="modal-body">
+                        <div class="lightbox-modal-select" id="lightbox-modal-select"></div>
+                        <hr>
+                        <button type="button" class="btn btn-default mts-button" data-toggle="modal" data-target="#createLightboxModal" onclick="$('#createLightboxSubmit').attr('data-return-to', 'addToLightbox'); $('#addToLightboxModal').modal('hide')">Create New Lightbox</button>
+                    </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Cancel</button>
+{#                        <button type="button" class="btn btn-primary mts-button" onclick="createLightboxAndAdd(this, '#addToLightboxModal', '#addToAndCreateLightboxName')">Add</button>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="userProgressModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body" id="userProgressModalBody" style="min-height: 100px;">
+                        <h4 id="userProgressMessage"></h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Okay</button>
+                    </div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="promptUserModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body" id="userProgressModalBody" style="min-height: 100px;">
+                        <h4 id="promptMessage"></h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal" id="promptCancelButton">Cancel</button>
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal" id="promptConfirmButton">Okay</button>
+                    </div>
+            </div>
+        </div>
+
+
+
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="{% static "spin.min.js" %}"></script>
         <script>
+            //The necessary evil
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken');
+
+            var user_logged_in = false;
+            {% if user.is_authenticated %}
+                user_logged_in = true;
+            {% endif %}
+
+            var smallSpinOpts = {
+                lines: 9, // The number of lines to draw
+                  length: 0, // The length of each line
+                  width: 4, // The line thickness
+                  radius: 28, // The radius of the inner circle
+                  corners: 0, // Corner roundness (0..1)
+                  rotate: 0, // The rotation offset
+                  direction: 1, // 1: clockwise, -1: counterclockwise
+                  color: '#000', // #rgb or #rrggbb or array of colors
+                  speed: 1, // Rounds per second
+                  trail: 60, // Afterglow percentage
+                  shadow: false, // Whether to render a shadow
+                  hwaccel: false, // Whether to use hardware acceleration
+                  className: 'spinner', // The CSS class to assign to the spinner
+                  zIndex: 2e9, // The z-index (defaults to 2000000000)
+                  top: '50%', // Top position relative to parent
+                  left: '50%' // Left position relative to parent
+            };
+
             var tags = [];
             $.ajax({
                 url: "{% url "get_all_tags" %}"
@@ -318,10 +561,159 @@
 
             }
 
-            function handleLoginClick(sender) {
-                if (sender.text != 'Login') {
-                    //Show dropdown
+            function handleLoginHover(sender) {
+
+            }
+
+            function loginSubmit(username, password) {
+                var next = window.location.pathname;
+                var loginUrl = "{% url 'login' %}"; // add the 'next' parameter to the 'POST' as a 'GET' parameter
+                var loginForm = document.createElement('form');
+                loginForm.setAttribute("style", "display: none;");
+                loginForm.method = "POST";
+                loginForm.action = loginUrl + "?next=" + next;
+
+                var formUsername = document.createElement('input');
+                formUsername.setAttribute("type", "hidden");
+                formUsername.name = "username";
+                formUsername.value =  username;
+
+                var formPassword = document.createElement('input');
+                formPassword.setAttribute("type", "password");
+                formPassword.name = "password";
+                formPassword.value =  password;
+
+                var formCSRF = document.createElement('input');
+                formCSRF.setAttribute("type", "hidden");
+                formCSRF.name = "csrfmiddlewaretoken";
+                formCSRF.value =  csrftoken;
+
+                document.getElementsByTagName('body')[0].appendChild(loginForm);
+                loginForm.appendChild(formUsername);
+                loginForm.appendChild(formPassword);
+                loginForm.appendChild(formCSRF);
+
+                console.log(username);
+                console.log(formPassword.value);
+
+                loginForm.submit();
+
+
+
+                //This is when we actually create a fake form, fill with username & password data, then submit via post
+            }
+
+            function showUserErrorMessage(message) {
+
+            }
+
+            {% if user != None %}
+
+            var responseData;
+            function createLightboxServerside(lightboxName, successCallback, failureCallback) {
+                $.ajax({
+                    url: "{% url 'user_lightbox_ajax' %}",
+                    type: 'POST',
+                    data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'create', userId: {{ user.id }}, lightboxName: lightboxName}
+                }).success(function(data) {
+                    if (data.success == true) {
+                        successCallback(data);
+                    } else {
+                        failureCallback();
+                    }
+                }).error(function () {
+                    failureCallback();
+                });
+            }
+
+
+            function createNewLightbox(sender, parentModal, nameSource) {
+                var $parentModal = $(parentModal);
+                var $nameSource = $(nameSource);
+                var newLightboxName;
+                if($nameSource.val().trim() != "") {
+                    newLightboxName = $nameSource.val().trim();
+                    createLightboxServerside(newLightboxName, function(serverResponse) {
+                        $parentModal.modal('hide');
+                        $('<a class="btn btn-default mts-button dropdown-button" data-lightbox-button-for="' + serverResponse.id + '" href="/lightbox/' + serverResponse.id + '">' + serverResponse.name + '<span class="lightbox-remove-icon" onclick="$(this).parent().click(function(e) {e.preventDefault();}); deleteLightbox(' + serverResponse.id + ')"><span class="glyphicon glyphicon-remove"></span></span></a>').insertBefore("#create-lightbox-button");
+                        $nameSource.val('');
+                        addModalLightboxOption({name: serverResponse.name, id: serverResponse.id});
+                    }, function() {
+                        //Unable to create lightbox
+                    });
                 }
+            }
+
+            {% endif %}
+
+            function toggleCustomDropdown(sender, target) {
+                var $target = $(target);
+                if($target.is(":visible")) {
+                    $target.hide(200);
+                } else {
+                    $(".dropdown-slider").not(sender).hide(200);
+                    $target.css("left", $(sender).position().left);
+                    $target.show(200);
+                }
+            }
+
+            $(".dropdown-trigger").blur(function() {
+                $("#" + $(this).attr("data-dw-trigger-target")).delay(200).hide(200);
+            });
+
+            function deleteLightbox(id) {
+                if(confirm("Are you sure you want to delete the Lightbox \"" + $("[data-lightbox-button-for=" + id + "]").text() + "\"?")) {
+                    $.ajax({
+                        url: "{% url 'user_lightbox_ajax' %}",
+                        type: 'POST',
+                        data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'delete', id: id}
+                    }).success(function(data) {
+                        console.log(data.success);
+                        $("[data-lightbox-button-for=" + id + "]").remove();
+                    }).error(function(data) {
+                    });
+                }
+            }
+
+            function userLogout() {
+
+                var next = window.location.pathname;
+
+                var logoutForm = document.createElement('form');
+                logoutForm.setAttribute("style", "display: none;");
+                logoutForm.action = "{% url 'login' %}" + "?next=" + next;
+                logoutForm.method = "POST";
+
+                var logoutInput = document.createElement("input");
+                logoutInput.name = "logout";
+                logoutInput.value = "";
+                logoutInput.type = "hidden";
+
+                var formCSRF = document.createElement('input');
+                formCSRF.setAttribute("type", "hidden");
+                formCSRF.name = "csrfmiddlewaretoken";
+                formCSRF.value =  csrftoken;
+
+
+                logoutForm.appendChild(logoutInput);
+                logoutForm.appendChild(formCSRF);
+                logoutForm.submit();
+            }
+
+            function addModalLightboxOption(lightbox) {
+                $('<button class="btn btn-default mts-button lightbox-select-item" data-lightbox-id="' + lightbox.id + '" onclick="lightboxDropdownSelected(this)">' + lightbox.name + '</button>').appendTo(".lightbox-modal-select");
+            }
+
+            function showUserMessage(message) {
+                $("#userProgressMessage").text(message);
+                $("#userProgressModal").modal('show');
+            }
+
+            function promptUser(message, confirmCallback, cancelCallback) {
+                $("#promptMessage").text(message);
+                $("#promptUserModal").modal('show');
+                $("#promptConfirmButton").attr("onclick", "(" + confirmCallback + ")()");
+                $("#promptCancelButton").attr("onclick", "(" + cancelCallback + ")()");
             }
 
             //Hide dropdown:

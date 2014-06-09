@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block page_name %}Lightbox: {{ lightbox.name }}{% endblock %}
+{% block head_area %}{% endblock %}
+{% block page_option_info %}{{ lightbox.name }}{% endblock %}
+{% block page_option_add_to_lightbox %}<span class="glyphicon glyphicon-remove"></span> Delete Lightbox{% endblock %}
+{% block page_option_extra_item %}{% endblock %}
+{% block page_content %}
+    {% for photo in lightbox.images.all %}
+        <img src="{{ photo.preview.url }}"><br>
+    {% empty %}
+        <h3>There are no photos in this Lightbox</h3>
+    {% endfor %}
+{% endblock %}

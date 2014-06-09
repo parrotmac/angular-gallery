@@ -3,15 +3,20 @@ from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from django.conf.urls.static import static
+# from django.conf.urls.static import static
 admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'StockPhotos.views.view_home', name='home'),
     url(r'^gallery/(?P<gallery_id>\d+)', 'StockPhotos.views.view_gallery', name='view_gallery'),
     url(r'^photo/(?P<photo_id>\d+)', 'StockPhotos.views.view_photo', name='view_photo'),
+    url(r'^lightbox/(?P<lightbox_id>\d+)', 'StockPhotos.views.lightbox', name='view_lightbox_id'),
+    url(r'^lightbox/', 'StockPhotos.views.lightbox', name='view_lightbox'),
+
+    url(r'^create-account/', 'StockPhotos.views.user_create_account', name='user_create_account'),
 
     url(r'^json/tags/', 'StockPhotos.views.get_tags', name="get_all_tags"),
+    url(r'^json/lightbox/', 'StockPhotos.views.user_lightbox_ajax', name="user_lightbox_ajax"),
 
     url(r'^login/', 'StockPhotos.views.user_login', name="login"),
 

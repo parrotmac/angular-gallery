@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from StockPhotos.models import *
 from django.contrib.auth.decorators import user_passes_test
+from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from AngualrGallery import settings
 from django.core.files import File
+from django.template import *
 from iptcinfo import IPTCInfo
 import re
 import cStringIO
@@ -21,6 +23,10 @@ def user_login(request):
     if request.method == 'POST':
         if request.POST.has_key('logout'):
             logout(request)
+            if 'next' in request.GET.keys():
+                return HttpResponseRedirect(request.GET['next'])
+            else:
+                return HttpResponseRedirect("/")
         else:
             #Login
             username = request.POST['username']
@@ -42,7 +48,7 @@ def user_login(request):
                     notwelcome['disabled'] = 'This account has been disabled.'
             else:
                 notwelcome['invalid'] = "Invalid username or password"
-    return render(request, "login.html", {'notwelcome': notwelcome})
+    return render_to_response("login.html", {'notwelcome': notwelcome}, context_instance=RequestContext(request))
 
 
 def dump_image_paths(request):
@@ -90,16 +96,63 @@ def dump_image_paths(request):
 #                                          'secondary_feature_bottom': secondary_feature_bottom})
 
 def view_home(request):
-    return render(request, "home.html", {'thumbnail_galleries': Gallery.objects.filter(active=True)})
+    lightboxes = None
+    if request.user.is_authenticated():
+        lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
+    return render_to_response("home.html", {'thumbnail_galleries': Gallery.objects.filter(active=True), 'lightboxes': lightboxes}, context_instance=RequestContext(request))
 
 
 def view_gallery(request, gallery_id):
+    lightboxes = None
+    if request.user.is_authenticated():
+        lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
     return render(request, "gallery.html", {'gallery': Gallery.objects.get(id=gallery_id),
-                                            'photos': Photo.objects.filter(gallery=gallery_id)})
+                                            'photos': Photo.objects.filter(gallery=gallery_id),
+                                            'lightboxes': lightboxes}, context_instance=RequestContext(request))
 
 
 def view_photo(request, photo_id):
-    return render(request, "photo.html", {'photo': Photo.objects.get(id=photo_id)})
+    lightboxes = None
+    if request.user.is_authenticated():
+        lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
+    return render(request, "photo.html", {'photo': Photo.objects.get(id=photo_id),
+                                          'lightboxes': lightboxes}, context_instance=RequestContext(request))
+
+
+def lightbox(request, lightbox_id=None):
+    if request.user.is_authenticated():
+        lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
+        if lightbox_id:
+            lightbox = LightBox.objects.get(id=lightbox_id)
+            if lightbox.user.user == request.user:
+                return render_to_response("lightbox.html", {'lightbox': lightbox, 'lightboxes': lightboxes}, context_instance=RequestContext(request))
+            else:
+                return HttpResponse("You're not authorized to view this lightbox")
+        else:
+            if lightboxes.count() < 1:
+                lightboxes = None
+            return render_to_response("lightboxes.html", {'lightboxes': lightboxes}, context_instance=RequestContext(request))
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+
+def user_lightbox_ajax(request):
+    if request.method == "POST":
+        if request.POST['transaction_type'] == 'create':
+            new_or_excisting_lb = LightBox.objects.get_or_create(name=request.POST['lightboxName'],
+                                                                 user=Customer.objects.get(user=request.POST['userId']))
+            new_lb_id = new_or_excisting_lb[0].id
+            new_lb_name = new_or_excisting_lb[0].name
+            return HttpResponse(json.dumps({'success': True, 'id': new_lb_id, 'name': new_lb_name}),
+                                content_type='application/json')
+        if request.POST['transaction_type'] == 'delete':
+            LightBox.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+        if request.POST['transaction_type'] == 'add_photo':
+            new_lb_relation = LightBox.objects.get(id=request.POST['lightbox_id']).images.add(Photo.objects.get(id=request.POST['image_id']))
+            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage(request):
@@ -389,3 +442,7 @@ def get_tags(request):
     for tag in tags:
         tag_array.append(tag.values()[0])
     return HttpResponse(json.dumps({"tags": tag_array}), content_type='application/json')
+
+
+def user_create_account(request):
+    return render_to_response('user_create_account.html')

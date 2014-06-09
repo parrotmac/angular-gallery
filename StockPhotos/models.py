@@ -17,10 +17,10 @@ IMAGE_RELEASE = (
 
 
 class Customer(models.Model):
-    user = models.ForeignKey(User)
+    user = models.OneToOneField(User)
     # Django User model includes email and first+last name
 
-    website = models.URLField(verbose_name='Website')
+    website = models.URLField(verbose_name='Website', blank=True)
     phone_number = models.CharField(max_length=40, blank=True, verbose_name='Phone Number')
     fax_number = models.CharField(max_length=40, blank=True, verbose_name='Fax Number')
     address_1 = models.CharField(max_length=128, blank=True, verbose_name='Address')
@@ -33,7 +33,7 @@ class Customer(models.Model):
     agree_tos = models.BooleanField(default=False, blank=False)  # La la la you're gonna forget about this
 
     def __unicode__(self):
-        return self.user
+        return self.user.username
 
 
 class Gallery(models.Model):
@@ -124,6 +124,9 @@ class LightBox(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = 'light boxes'
 
 
 class Configuration(models.Model):

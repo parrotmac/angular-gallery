@@ -12,18 +12,18 @@
             <div class="feature-area">
                 <a class="feature-link primary-feature-link" href="#">
                     <img src="http://dummyimage.com/600x400/777/CCC" class="pretty-image img-responsive">
-                    <span class="feature-hover-text">OSWAP The Open Source Web Application Project. Sounds Tricky</span>
+                    <span class="feature-hover-text">This is where you can put an 600x400px to feature a gallery</span>
                 </a>
                 <a class="feature-link secondary-feature-link" href="#">
                     <img src="http://dummyimage.com/400x400/CCC/777" class="pretty-image img-responsive">
-                    <span class="feature-hover-text">CSRF Token: Cross-Site Request Forgery Token. Used extensively by Django</span>
+                    <span class="feature-hover-text">This is where you can put an 600x400px to feature a (probably) different gallery</span>
                 </a>
                 <div class="clear-fix"></div>
             </div>
             <div class="responsive-carousel">
                     <div class="rc-arrow-absolute">
 {#                        <!-- We should consider making this next span a button... -->#}
-                        <span class="rc-arrow-container rc-arrow-container-left" onclick="responsiveCarouselArrow('left')">
+                        <span class="rc-arrow-container rc-arrow-container-left" onclick="responsiveCarouselArrow('right')">
                             <span class="rc-arrow">&lt;</span>
                         </span>
                     </div>
@@ -64,7 +64,7 @@
                         </div>
                     </div>
                     <div class="rc-arrow-absolute">
-                        <span class="rc-arrow-container rc-arrow-container-right" onclick="responsiveCarouselArrow('right')">
+                        <span class="rc-arrow-container rc-arrow-container-right" onclick="responsiveCarouselArrow('left')">
                             <span class="rc-arrow">&gt;</span>
                         </span>
                     </div>
@@ -78,6 +78,7 @@
         var carouselContentWidth = $($(".rc-item-collection")[0]).width();
         var currentOffset = parseInt($($(".rc-container")[0]).css("left"));
         var viewWidth = $($(".rc-mask")).width();
+        incrementAmount = viewWidth*0.6;
         var overhang = carouselContentWidth - (Math.abs(currentOffset) + viewWidth);
         if(direction == 'left') {
 {#            var newLeft = #}
