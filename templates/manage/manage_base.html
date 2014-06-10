@@ -22,7 +22,10 @@
                 <a href="{% url "manage_home" %}">Manage</a>
                 <br>
                 <br>
-                <button class="btn btn-default">Logout</button>
+                <form action="{% url 'login' %}?next={{ request.path }}" method="POST">
+                    {% csrf_token %}
+                    <button name="logout" class="btn btn-default">Logout</button>
+                </form>
             </div>
             <div class="col-sm-1"></div>
         </div>
@@ -42,8 +45,8 @@
                     <hr />
                     <h3>Quick Links</h3>
                     <ul style="list-style: none">
-                        <li><a href="upload/">Upload</a></li>
-                        <li><a href="features/">Set Features</a></li>
+                        <li><a href="{% url 'manage_upload' %}">Upload</a></li>
+                        <li><a href="{% url 'manage_feature_upload' %}">Set Features</a></li>
                     </ul>
                 {% endblock %}
             </div>

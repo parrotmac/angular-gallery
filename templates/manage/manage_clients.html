@@ -1,0 +1,31 @@
+{% extends "manage/manage_base.html" %}
+{% block page_title %}Manage Clients{% endblock %}
+{% block head_area %}
+    <style>
+
+    </style>
+{% endblock %}
+{% block content %}
+    <hr>
+    <table class="table">
+        <tr><th>Name</th><th>Phone Number</th><th>Email Address</th><th>Lightboxes</th><th>Details</th></tr>
+        {% for customer in customers %}
+        <tr class="{% cycle '' 'active' %}">
+            <td>{{ customer.user.first_name }} {{ customer.user.last_name }}</td>
+            <td>{{ customer.phone_number|default:'<span class="small">None</span>' }}</td>
+            <td><a href="mailto:{{ customer.user.email }}">{{ customer.user.email|default_if_none:"None" }}</a></td>
+            <td>{{ customer.lightbox_set.count }}</td>
+            <td><a class="btn btn-default" href="{%  url 'view_client' customer.id %}">Details <span class="glyphicon glyphicon-chevron-right"></span></a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align: center">There are no registered customers</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+{% block put_script_tags_here %}
+    <script>
+
+    </script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block head_area %}
+    <style>
+
+    </style>
+{% endblock %}
+{% block page_options %}{% endblock %}
+{% block page_content %}
+    <form class="pure-form pure-form-aligned" action="{% url 'user_create_account' %}" method="POST">
+        <fieldset>
+            <div class="pure-control-group">
+                <label for="email">Email Address</label>
+                <input id="email" type="email" placeholder="Email Address">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Password">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Repeat Password">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="website">Website</label>
+                <input id="website" type="url" placeholder="Website">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="phone">Contact Phone</label>
+                <input id="phone" type="url" placeholder="Contact Phone">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="fax">Fax Number</label>
+                <input id="fax" type="tel" placeholder="Fax Number">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="address-line-1">Address</label>
+                <input id="address-line-1" type="text" placeholder="Address">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="address-line-2">Address (cont.)</label>
+                <input id="address-line-2" type="text" placeholder="Address (cont.)">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="city">City</label>
+                <input id="city" type="text" placeholder="City">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="state">State</label>
+                <input id="state" type="text" placeholder="State">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="zip">Zip</label>
+                <input id="zip" type="text" placeholder="Zip">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="country">Country</label>
+                <input id="country" type="text" placeholder="Country">
+            </div>
+
+            {##}
+            <div class="pure-controls">
+                <label for="cb" class="pure-checkbox">
+                    <input id="cb" type="checkbox"> I've read the terms and conditions
+                </label>
+
+                {% csrf_token %}
+                <button type="submit" class="pure-button pure-button-primary">Register</button>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
+{% block put_scripts_here %}
+    <script>
+
+    </script>
+{% endblock %}

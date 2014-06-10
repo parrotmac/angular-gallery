@@ -4,6 +4,7 @@
     <head>
         <title>Matthew Turley Stock Photography | {% block page_name %}{% endblock %}</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="UTF-8">
 {#        <meta name="viewport" content="width=device-width, initial-scale=1">#}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
@@ -282,7 +283,7 @@
 
     <div class="disclaimer-row">
         <a href="http://matthewturley.com/">Visit MatthewTurley.com</a>
-        <span class="disclaimer-row-right-text">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#privacy">Terms&nbsp;&amp;&nbsp;Conditions</a> | <a href="#privacy">Privacy</a></span>
+        <span class="disclaimer-row-right-text">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#">Terms&nbsp;&amp;&nbsp;Conditions</a> | <a href="#">Privacy</a></span>
     </div>
 
 {#        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->#}
@@ -316,7 +317,7 @@
                         </form>
                         <hr>
                         <p>If you don't already have one, click below to create an account</p>
-                        <a class="pure-button pure-button-primary" data-dismiss="modal" href="{% url 'user_create_account' %}">Create Account</a>
+                        <a class="pure-button pure-button-primary" href="{% url 'user_create_account' %}">Create Account</a>
                     </div>
                     <div class="modal-footer">
                         <div class="pure-controls">

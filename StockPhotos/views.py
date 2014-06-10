@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from AngualrGallery import settings
 from django.core.files import File
+from django.db.models import Q
 from django.template import *
 from iptcinfo import IPTCInfo
 import re
@@ -344,7 +345,12 @@ def manage_photo(request, image_id):
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_clients(request):
-    return render(request, "")
+    return render_to_response("manage/manage_clients.html", {'customers': Customer.objects.all()})
+
+
+@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+def view_client(request, image_id):
+    return render_to_response('manage/manage_client.html', {"customer": Customer.objects.get(id=image_id)})
 
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
@@ -429,6 +435,14 @@ def manage_upload(request):
                                                          'target_gallery_name': target_gallery_name})
 
 
+@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+def manage_feature_upload(request):
+    if request.method == "POST":
+        pass  # Set features based on primary-feature-input and secondary-feature-input
+    else:
+        return render_to_response("manage/manage_features.html", {"galleries": Gallery.objects.all()})
+
+
 # @user_passes_test(lambda u:u.is_staff, login_url='/login/')
 # def manage_gallery_slug(request, gallery_slug):
 #     return render(request, "manage/manage_gallery_old.html", {"gallery": Gallery.objects.get(slug__contains=gallery_slug),
@@ -445,4 +459,7 @@ def get_tags(request):
 
 
 def user_create_account(request):
-    return render_to_response('user_create_account.html')
+    if request.method == "POST":
+        pass
+    return render_to_response('user_create_account.html', context_instance=RequestContext(request))
+

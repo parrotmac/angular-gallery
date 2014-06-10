@@ -12,7 +12,6 @@ urlpatterns = patterns('',
     url(r'^photo/(?P<photo_id>\d+)', 'StockPhotos.views.view_photo', name='view_photo'),
     url(r'^lightbox/(?P<lightbox_id>\d+)', 'StockPhotos.views.lightbox', name='view_lightbox_id'),
     url(r'^lightbox/', 'StockPhotos.views.lightbox', name='view_lightbox'),
-
     url(r'^create-account/', 'StockPhotos.views.user_create_account', name='user_create_account'),
 
     url(r'^json/tags/', 'StockPhotos.views.get_tags', name="get_all_tags"),
@@ -30,10 +29,12 @@ urlpatterns = patterns('',
     url(r'^manage/photo/page/(?P<page_number>\d+)$', 'StockPhotos.views.manage_photos', name='manage_photos_by_page'),
     url(r'^manage/photo/(?P<image_id>\d+)', 'StockPhotos.views.manage_photo', name='manage_photo_by_id'),
     url(r'^manage/clients/$', 'StockPhotos.views.manage_clients', name='manage_clients'),
+    url(r'^manage/clients/(?P<image_id>\d+)$', 'StockPhotos.views.view_client', name='view_client'),
     url(r'^manage/photo/json/$', 'StockPhotos.views.manage_photo_json', name='manage_photo_json'),
     url(r'^manage/tag/json/$', 'StockPhotos.views.manage_tag_json', name='manage_tag_json'),
     url(r'^manage/gallery/json/$', 'StockPhotos.views.manage_gallery_json', name='manage_gallery_json'),
     url(r'^manage/upload/$', 'StockPhotos.views.manage_upload', name='manage_upload'),
+    url(r'^manage/features/$', 'StockPhotos.views.manage_feature_upload', name='manage_feature_upload'),
     # url(r'^manage/gallery/(?P<gallery_slug>[-\w]+)', 'StockPhotos.views.manage_gallery_slug', name='gallery_slug'),
 
     # Just for development

@@ -1,0 +1,35 @@
+{% extends "manage/manage_base.html" %}
+{% block page_title %}Manage Clients{% endblock %}
+{% block head_area %}
+    <style>
+
+    </style>
+{% endblock %}
+{% block content %}
+    <hr>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ customer.user.first_name }} {{ customer.user.last_name }}</h3>
+        </div>
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <tr><td>Phone Number</td><td>{{ customer.phone_number }}</td></tr>
+                <tr><td>Email Address</td><td><a href="mailto:{{ customer.user.email }}">{{ customer.user.email }}</a></td></tr>
+                <tr><td>Website</td><td>{{ customer.website }}</td></tr>
+                <tr><td>Fax Number</td><td>{{ customer.fax_number }}</td></tr>
+                <tr><td>Address 1</td><td>{{ customer.address_1 }}</td></tr>
+                <tr><td>Address 2</td><td>{{ customer.address_2 }}</td></tr>
+                <tr><td>City</td><td>{{ customer.city }}</td></tr>
+                <tr><td>State</td><td>{{ customer.state }}</td></tr>
+                <tr><td>ZIP</td><td>{{ customer.zip }}</td></tr>
+                <tr><td>Country</td><td>{{ customer.country }}</td></tr>
+            </table>
+        </div>
+{#        <div class="panel-footer">Panel footer</div>#}
+    </div>
+{% endblock %}
+{% block put_script_tags_here %}
+    <script>
+
+    </script>
+{% endblock %}
