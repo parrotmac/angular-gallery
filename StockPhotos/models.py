@@ -136,10 +136,14 @@ class Configuration(models.Model):
     def __unicode__(self):
         return self.name
 
-    def get_value(self):
-        return json.loads(self.document)['value']
+    @classmethod
+    def set_pref(cls, key, value):
+        cls.objects.filter(name=key).delete()
+        conf = cls(name=key)
+        conf.document=json.dumps({"key": key, "value": value})
+        conf.save()
+        return conf
 
-    def set_value(self, key, value):
-        self.name = key
-        self.document = json.dumps({"key": key, "value": value})
-        self.save()
+    @classmethod
+    def get_pref(cls, key):
+        return str(json.loads(Configuration.objects.get(name=key).document)['value'])

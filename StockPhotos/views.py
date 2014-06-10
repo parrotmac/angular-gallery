@@ -438,7 +438,8 @@ def manage_upload(request):
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_feature_upload(request):
     if request.method == "POST":
-        pass  # Set features based on primary-feature-input and secondary-feature-input
+        if request.POST['primary-feature-image'] is not None:
+            print prim
     else:
         return render_to_response("manage/manage_features.html", {"galleries": Gallery.objects.all()})
 
