@@ -47,7 +47,7 @@
 }
 
 .rc-container {
-    max-width: 1000px;
+    /*max-width: 1000px;*/ /* This totally messes up Safari */
     overflow: hidden;
     display: table;
     padding: 0;
