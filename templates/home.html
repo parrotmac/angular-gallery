@@ -75,7 +75,11 @@
     var incrementAmount = 300;
     var animationSpeed = 200;
     function responsiveCarouselArrow(direction) {
-        var carouselContentWidth = $($(".rc-item-collection")[0]).width();
+        var carouselContentWidth = 0;
+        var numberOfCarouselItems = $(".rc-item-collection a").length;
+        for(var i = 0; i < numberOfCarouselItems; i++) {
+            carouselContentWidth += $(".rc-item-collection a")[i].clientWidth;
+        }
         var currentOffset = parseInt($($(".rc-container")[0]).css("left"));
         var viewWidth = $($(".rc-mask")).width();
         incrementAmount = viewWidth*0.6;

@@ -28,11 +28,13 @@ elif socket.gethostname() == "Masuoka.local":
     print 'on Masuoka'
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'mtsdb',
-            'USER': 'mtsuser',
-            'PASSWORD': 'supersecretpassword',
-            'HOST': 'localhost'
+#            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#            'NAME': 'mtsdb',
+#            'USER': 'mtsuser',
+#            'PASSWORD': 'supersecretpassword',
+#            'HOST': 'localhost'
+             'ENGINE': 'django.db.backends.sqlite3',
+             'NAME': 'mts_django_site.db',
         }
     }
 else:
