@@ -140,10 +140,14 @@ class Configuration(models.Model):
     def set_pref(cls, key, value):
         cls.objects.filter(name=key).delete()
         conf = cls(name=key)
-        conf.document=json.dumps({"key": key, "value": value})
+        conf.document = json.dumps({"value": value})
         conf.save()
         return conf
 
     @classmethod
     def get_pref(cls, key):
-        return str(json.loads(Configuration.objects.get(name=key).document)['value'])
+        try:
+            config = Configuration.objects.get(name=key)
+        except Configuration.DoesNotExist:
+            config = None
+        return str(json.loads(config.document)['value'])

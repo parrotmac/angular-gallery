@@ -438,10 +438,14 @@ def manage_upload(request):
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_feature_upload(request):
     if request.method == "POST":
-        if request.POST['primary-feature-image'] is not None:
-            print prim
+        postData = {}
+        for key, value in request.POST.iteritems():
+            postData[key] = value
+        return HttpResponse(json.dumps(postData))
+        # if request.POST['primary-feature'] is not None:
+        #     print prim
     else:
-        return render_to_response("manage/manage_features.html", {"galleries": Gallery.objects.all()})
+        return render(request, "manage/manage_features.html", {"galleries": Gallery.objects.all()})
 
 
 # @user_passes_test(lambda u:u.is_staff, login_url='/login/')
@@ -460,7 +464,17 @@ def get_tags(request):
 
 
 def user_create_account(request):
+    primary_feature_attributes = ['primary_feature_img', 'primary_feature_heading', 'primary_feature_subheading']
+    secondary_feature_attributes = ['secondary_feature_img', 'secondary_feature_heading', 'secondary_feature_subheading']
     if request.method == "POST":
-        pass
-    return render_to_response('user_create_account.html', context_instance=RequestContext(request))
+        for key, value in request.POST:
+            if key == 'csrfmiddlewaretoken':
+                continue
+
+    request_dictionary = {}
+    for attribute in primary_feature_attributes:
+        request_dictionary[attribute] = Configuration.get_pref(attribute)
+    for attribute in secondary_feature_attributes:
+        request_dictionary[attribute] = Configuration.get_pref(attribute)
+    return render_to_response('user_create_account.html', request_dictionary, context_instance=RequestContext(request))
 
