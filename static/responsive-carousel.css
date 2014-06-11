@@ -73,6 +73,13 @@
     background-color: rgba(50, 50, 50, 0.4);
 }
 
+@media screen and (max-width: 400px) {
+    .rc-item-info {
+        opacity: 1 !important;
+        background-color: rgba(50, 50, 50, 0.4) !important;
+    }
+}
+
 .rc-item-info {
     display: block;
     opacity: 0;

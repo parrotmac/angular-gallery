@@ -128,7 +128,21 @@ html {
 {% endblock %}
 
 {% block page_option_info %}<h3>{{ gallery.name }}</h3>{% endblock %}
-{% block page_option_add_to_lightbox %}{% endblock %}
+{% block page_option_add_to_lightbox %}<div class="pagination">
+        <span class="step-links">
+            {% if photos.has_previous %}
+                <a href="?page={{ photos.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ photos.number }} of {{ photos.paginator.num_pages }}
+            </span>
+
+            {% if photos.has_next %}
+                <a href="?page={{ photos.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>{% endblock %}
 {% block page_option_extra_item %}{% endblock %}
 {% block page_content %}
     <hr>

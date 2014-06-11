@@ -107,8 +107,17 @@ def view_gallery(request, gallery_id):
     lightboxes = None
     if request.user.is_authenticated():
         lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
+    photo_list = Photo.objects.filter(gallery=gallery_id)
+    paginator = Paginator(photo_list, 16)
+    page = request.GET.get('page')
+    try:
+        photos = paginator.page(page)
+    except PageNotAnInteger:
+        photos = paginator.page(1)
+    except EmptyPage:
+        photos = paginator.page(paginator.num_pages)
     return render(request, "gallery.html", {'gallery': Gallery.objects.get(id=gallery_id),
-                                            'photos': Photo.objects.filter(gallery=gallery_id),
+                                            'photos': photos,
                                             'lightboxes': lightboxes}, context_instance=RequestContext(request))
 
 
@@ -203,7 +212,7 @@ def manage_gallery(request, gallery_id):
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_photos(request, page_number=None):
     image_list = Photo.objects.all().order_by('pk')
-    paginator = Paginator(image_list, 24) # Whoohoo for 6x4
+    paginator = Paginator(image_list, 24)  # Whoohoo for 6x4
     try:
         images = paginator.page(page_number)
     except PageNotAnInteger:

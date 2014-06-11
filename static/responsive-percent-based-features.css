@@ -28,6 +28,10 @@
         width: 100%;
         display: block;
     }
+    .feature-hover-text {
+        opacity: 1 !important;
+        background-color: rgba(50, 50, 50, 0.4) !important;
+    }
 }
 @media screen and (min-width: 401px) {
     .primary-feature-link {
