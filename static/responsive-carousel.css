@@ -58,6 +58,7 @@
 .rc-item-collection {
     position: relative;
     display: table-row;
+    background-color: #333;
 }
 .rc-item {
     position: relative;

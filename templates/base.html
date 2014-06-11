@@ -283,7 +283,7 @@
 
     <div class="disclaimer-row">
         <a href="http://matthewturley.com/">Visit MatthewTurley.com</a>
-        <span class="disclaimer-row-right-text">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#">Terms&nbsp;&amp;&nbsp;Conditions</a> | <a href="#">Privacy</a></span>
+        <span class="disclaimer-row-right-text">&copy;&nbsp;2014&nbsp;Matthew&nbsp;Turley Photography, All&nbsp;rights&nbsp;reversed. <a href="#" onclick="event.preventDefault()" data-toggle="modal" data-target="#tcModal">Terms&nbsp;&amp;&nbsp;Conditions</a> | <a href="#" onclick="event.preventDefault()" data-toggle="modal" data-target="#privacyModal">Privacy</a></span>
     </div>
 
 {#        <!-- # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # -->#}
@@ -424,6 +424,45 @@
                 </div>
             </div>
         </div>
+
+
+{#        <!--                           # # # # #  T&C Modal  # # # # #                        -->#}
+        <div class="modal fade" tabindex="-1" role="dialog" id="tcModal" aria-labelledby="tcModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h1 id="tcModalLabel">Terms and Conditions</h1>
+                    </div>
+                    <div class="modal-body">
+                        <p>Terms and conditions of using this site go here</p>
+                    </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{#        <!--                           # # # # #  Privacy Modal  # # # # #                        -->#}
+        <div class="modal fade" tabindex="-1" role="dialog" id="privacyModal" aria-labelledby="privacyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h1 id="privacyModalLabel">Privacy Policy</h1>
+                    </div>
+                    <div class="modal-body">
+                        <p>Privacy Policy goes here</p>
+                    </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 
 
 {#        <!--                           # # # # #  Modal for creating a new lightbox  # # # # #                        -->#}
