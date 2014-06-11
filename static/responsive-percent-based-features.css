@@ -20,17 +20,26 @@
         /*width: 100%;*/
         /*display: block;*/
     }
+    .primary-feature-link {
+        width: 100%;
+        display: block;
+    }
+    .secondary-feature-link {
+        width: 100%;
+        display: block;
+    }
 }
+@media screen and (min-width: 401px) {
+    .primary-feature-link {
+        width: 60%;
+        height: auto;
+    }
 
-.primary-feature-link {
-    width: 60%;
-    height: auto;
+    .secondary-feature-link {
+        width: 40%;
+        height: auto;
+    }
 }
-.secondary-feature-link {
-    width: 40%;
-    height: auto;
-}
-
 .feature-hover-text {
     position: absolute;
     bottom: 0;
