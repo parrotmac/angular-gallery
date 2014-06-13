@@ -29,8 +29,7 @@ class Customer(models.Model):
     state = models.CharField(max_length=30, blank=True, verbose_name='State or Province')
     zip = models.CharField(max_length=30, blank=True, verbose_name='ZIP Code')
     country = models.CharField(max_length=128, blank=True, verbose_name='Country')
-
-    agree_tos = models.BooleanField(default=False, blank=False)  # La la la you're gonna forget about this
+    agree_tos = models.BooleanField(default=False, blank=False)
 
     def __unicode__(self):
         return self.user.username
@@ -75,7 +74,7 @@ class Photo(models.Model):
     image = models.ImageField(upload_to='uploads/')
     preview = models.ImageField(upload_to='uploads/previews/')
     thumbnail = models.FileField(upload_to='uploads/thumbnails/')
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, related_name='photos')
     model_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)
     property_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)
     published = models.BooleanField(default=True)

@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^lightbox/(?P<lightbox_id>\d+)', 'StockPhotos.views.lightbox', name='view_lightbox_id'),
     url(r'^lightbox/', 'StockPhotos.views.lightbox', name='view_lightbox'),
     url(r'^create-account/', 'StockPhotos.views.user_create_account', name='user_create_account'),
+    url(r'^search/', 'StockPhotos.views.search', name='search'),
 
     url(r'^json/tags/', 'StockPhotos.views.get_tags', name="get_all_tags"),
     url(r'^json/lightbox/', 'StockPhotos.views.user_lightbox_ajax', name="user_lightbox_ajax"),

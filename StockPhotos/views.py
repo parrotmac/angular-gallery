@@ -9,6 +9,7 @@ from AngualrGallery import settings
 from django.core.files import File
 from django.template import *
 from iptcinfo import IPTCInfo
+from django.core.mail import send_mail
 import re
 import cStringIO
 from PIL import Image
@@ -508,6 +509,70 @@ def get_tags(request):
 
 def user_create_account(request):
     if request.method == "POST":
-        return  HttpResponse(json.dumps(request.POST), content_type='application/json')
+        param_dict = {}
+        base_user = User.objects.create_user(str(uuid.uuid1())[:30], request.POST['email'], request.POST['password'], first_name=request.POST['first_name'], last_name=request.POST['last_name'])
+        base_customer = Customer.objects.create(user=base_user)
+        for field in Customer._meta.fields:
+            field_name = field.attname
+            if field_name == 'id':
+                continue
+            if field_name == 'user_id':
+                continue
+        #     if field_name in ['id', 'user_id', 'email', 'password', 'password_repeat', 'csrfmiddlewaretoken']:
+            print "CONGRATULATIONS! YOU FOUND " + field_name
+        #         continue
+        #     print field_name
+        #     if request.POST[field_name] is not None:
+            if request.POST[field_name] == 'agree_tos':
+                if request.request.POST[field_name] == 'on':
+                    setattr(base_customer, field_name, True)
+            setattr(base_customer, field_name, request.POST[field_name])
+        base_customer.save()
+        send_mail('Matthew Turley Stock Photography',
+                  base_customer.user.first_name + ',\n\n\tThanks for creating an account at MatthewTurleyStock.com.\n\n-The User Robot',
+                  'stock@matthewturleystock.com',
+                  [base_customer.user.email],
+                  fail_silently=True)
+        active_user = authenticate(email=request.POST['email'], password=request.POST['password'])
+        login(request, active_user)
+        return render_to_response('user_create_success.html', context_instance=RequestContext(request))
+        # return  HttpResponse(json.dumps(request.POST), content_type='application/json')
     return render_to_response('user_create_account.html', context_instance=RequestContext(request))
 
+
+def search(request):
+    if 'q' in request.GET:
+        search_term = request.GET.get('q').strip()
+        if search_term == "":
+            return render_to_response('search.html', context_instance=RequestContext(request))
+        print search_term
+        # tags_query = Tag.objects.filter(tag__icontains=search_term)
+        # print tags_query.__len__()
+        # photo_queries = Photo.objects.filter(tags__in=tags_query)
+        # print photo_queries
+        # return render_to_response('search.html', {'photos': photo_queries}, context_instance=RequestContext(request))
+        matched_tags = []
+        search_results = []
+        for query_tag in Tag.objects.filter(tag__icontains=search_term):
+            if query_tag not in matched_tags:
+                matched_tags.append(query_tag)
+            for query_photo in query_tag.photos.all():
+                if query_photo not in search_results:
+                    search_results.append(query_photo)
+
+        paginator = Paginator(search_results, 16)
+        page = request.GET.get('page')
+        try:
+            photos = paginator.page(page)
+        except PageNotAnInteger:
+            photos = paginator.page(1)
+        except EmptyPage:
+            photos = paginator.page(paginator.num_pages)
+
+        # if search_term.endswith("s"):
+        #     not_plural_search_term = search_term[:-1]
+        #     for query_tag in Tag.objects.filter(tag__icontains=not_plural_search_term):
+        #         if query_tag.photos.all() not in search_results:
+        #             search_results.append(query_tag.photos.all())
+        return render_to_response('search.html', {'matched_photos': photos, 'matched_tags': matched_tags, 'search_term': search_term}, context_instance=RequestContext(request))
+    return render_to_response('search.html', context_instance=RequestContext(request))

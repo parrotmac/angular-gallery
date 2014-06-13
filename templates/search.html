@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{#{% for photo in photos %}#}
+{#    {% for innerPhoto in photo %}#}
+{#        <img src='{{ innerPhoto.image.url }}' alt="{{ innerPhoto }}"><br>#}
+{#     {% endfor %}#}
+{#{% empty %}#}
+{#    <label>Search <input type="text" style="height: 30pt; width: 450px; font-size: 20pt;"></label>#}
+{#{% endfor %}#}
+{% block page_name %}Search: {{ search_term }}{% endblock %}
+{% block head_area %}
+<link rel="stylesheet" href="{% static "gallery.css" %}">
+{#    <style>#}
+{#    .sillysearch-form {#}
+{#        display: block;#}
+{#        position: relative;#}
+{#        margin: 0 auto;#}
+{#        left: 175px;#}
+{#    }#}
+{#    .sillysearch-label {#}
+{#        font-size: 20pt;#}
+{#    }#}
+{#    .sillysearch {#}
+{#        border: 1px;#}
+{#        border-color: #232323;#}
+{#        box-shadow: 0 0 5px #272727;#}
+{#        display: inline;#}
+{#        height: 48px;#}
+{#        font-size: 20pt;#}
+{#        width: 450px;#}
+{#    }#}
+{#    </style>#}
+{% endblock %}
+
+{% block page_option_info %}<h3><small>Results for: </small>{{ search_term }}</h3>{% endblock %}
+{% block page_option_add_to_lightbox %}<div class="pagination">
+        <span class="step-links">
+            {% if matched_photos.has_previous %}
+                <a href="?page={{ matched_photos.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ matched_photos.number }} of {{ matched_photos.paginator.num_pages }}
+            </span>
+
+            {% if matched_photos.has_next %}
+                <a href="?page={{ matched_photos.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>{% endblock %}
+{% block page_option_extra_item %}{% endblock %}
+{% block page_content %}
+    <hr>
+    <div id="fluid-holder">
+    {% for photo in matched_photos %}
+        <a class="photo-square" href="{% url 'view_photo' photo.id %}">
+            <div class="photo-wrapper">
+                <img src="{{ photo.preview.url }}" class="photo-preview pretty-image" />
+{#                <span class="photo-info">{{ photo }}</span>#}
+            </div>
+        </a>
+    {% empty %}
+        <h2>You search for <b><i>{{ search_term }}</i></b> didn't return any results<br><small>Try single keywords, without pluralization</small></h2><br>
+{#        <form action="{% url 'search' %}" method="get" class="sillysearch-form">#}
+{#        <label class="sillysearch-label">Search: <input type="text" name="q" class="searchbox sillysearch form-control"></label>#}
+{#        </form>#}
+    {% endfor %}
+    </div>
+
+{% endblock %}

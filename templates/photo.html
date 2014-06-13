@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block page_name %}Photo {{ photo }}{% endblock %}
 {% block head_area %}
     <style>
@@ -60,47 +61,8 @@
 {% block put_scripts_here %}
     <script>
 
-    function addToLightboxClicked() {
-        if(user_logged_in) {
-            $('#addToLightboxModal').modal('show');
-        } else {
-            $('#loginModal').modal('show');
-        }
-    }
-
     var originalLightboxes = new Array({% for lightbox in lightboxes %}{name: "{{ lightbox.name }}", id: {{ lightbox.id }}}{% if not forloop.last %}, {% endif %}{% endfor %});
 
-            $(document).ready(function() {
-                if(originalLightboxes.length == 0) {
-{#                    Will customize view           #}
-                } else {
-                    for (var i = 0; i < originalLightboxes.length; i++) {
-                        addModalLightboxOption(originalLightboxes[i]);
-                    }
-                }
-            });
-
-    function lightboxDropdownSelected(sender) {
-        var lightboxId = $(sender).attr("data-lightbox-id");
-        var imageId = $("#image-preview").attr("data-image-id");
-        console.log("Add image " + imageId + " to lightbox " + lightboxId);
-        $("#addToLightboxModal").modal('hide');
-{#        var createLightboxLinkSpinner = new Spinner(smallSpinOpts).spin(document.getElementById('userProgressModalBody'));#}
-        var $userProgressModal = $("#userProgressModal");
-        $userProgressModal.modal('show');
-        $.ajax({
-            url: "{% url 'user_lightbox_ajax' %}",
-            type: "POST",
-            data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'add_photo', lightbox_id: lightboxId, image_id: imageId}
-        }).success(function(data) {
-            if(data.success== true) {
-                showUserMessage("Successfully Added Image To Lightbox");
-{#                $userProgressModal.modal('hide');#}
-{#                createLightboxLinkSpinner.stop();#}
-            }
-        }).error(function(data) {
-
-        });
-    }
     </script>
+    <script src="{% static 'photo.js' %}"></script>
 {% endblock %}

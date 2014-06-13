@@ -10,6 +10,7 @@
 {% block page_content %}
     <form class="pure-form pure-form-aligned" action="{% url 'user_create_account' %}" method="POST" id="userRegistrationForm">
         <fieldset>
+            {% csrf_token %}
             <h4>Required</h4>
             <div class="pure-control-group">
                 <label for="first_name">First Name</label>
@@ -36,6 +37,13 @@
                 <input id="password_repeat" name="password_repeat" type="password" placeholder="Repeat Password" required onchange="checkRequiredFields(this)">
             </div>
 
+
+            <div class="pure-controls">
+                <label for="cb" class="pure-checkbox">
+                    I've read the terms and conditions <input id="cb" name="agree_tos" type="checkbox" required>
+                </label>
+            </div>
+
             <h4>Optional</h4>
 
             <div class="pure-control-group">
@@ -45,22 +53,22 @@
 
             <div class="pure-control-group">
                 <label for="phone">Contact Phone</label>
-                <input id="phone" name="phone" type="tel" placeholder="Contact Phone">
+                <input id="phone" name="phone_number" type="tel" placeholder="Contact Phone">
             </div>
 
             <div class="pure-control-group">
                 <label for="fax">Fax Number</label>
-                <input id="fax" name="fax" type="tel" placeholder="Fax Number">
+                <input id="fax" name="fax_number" type="tel" placeholder="Fax Number">
             </div>
 
             <div class="pure-control-group">
                 <label for="address-line-1">Address</label>
-                <input id="address-line-1" name="address-line-1" type="text" placeholder="Address">
+                <input id="address-line-1" name="address_1" type="text" placeholder="Address">
             </div>
 
             <div class="pure-control-group">
                 <label for="address-line-2">Address (cont.)</label>
-                <input id="address-line-2" name="address-line-2" type="text" placeholder="Address (cont.)">
+                <input id="address-line-2" name="address_2" type="text" placeholder="Address (cont.)">
             </div>
 
             <div class="pure-control-group">
@@ -80,7 +88,6 @@
 
             <div class="pure-control-group">
                 <label for="country">Country</label>
-{#                <input id="country" name="country" type="text" placeholder="Country">#}
                 <select id="country" name="country">
                     <option value="AF">Afghanistan</option>
                     <option value="AX">Åland Islands</option>
@@ -329,14 +336,7 @@
                 </select>
             </div>
 
-            {##}
             <div class="pure-controls">
-                <label for="cb" class="pure-checkbox">
-                    I've read the terms and conditions <input id="cb" name="cb" type="checkbox" required>
-                </label>
-
-                {% csrf_token %}
-                <br>
                 <button type="submit" class="pure-button pure-button-primary">Register</button>
             </div>
         </fieldset>

@@ -32,6 +32,9 @@
 {#                <span class="photo-info">{{ photo }}</span>#}
             </div>
         </a>
+
+    {% empty %}
+        <h1>There don't seem to be any photos in this gallery<br><small>Please, check back later</small></h1>
     {% endfor %}
     </div>
 

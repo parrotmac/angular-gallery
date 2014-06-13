@@ -40,9 +40,9 @@
                               <button class="btn btn-default mts-button" data-toggle="modal" data-target="#pricingFaqModal">Pricing/FAQ</button>
                               <button class="btn btn-default mts-button" data-toggle="modal" data-target="#contactModal">Contact</button>
 {#                            <div class="form-group">#}
-                              <form style="display: inline"><input type="text" class="form-control searchbox" placeholder="Search" onfocus="showSearchButton()" onblur="hideSearchButton()">
+                              <form style="display: inline" action="{% url "search" %}"><input type="text" class="form-control searchbox" name="q" placeholder="Search" onfocus="showSearchButton()" onblur="hideSearchButton()">
 {#                            </div>#}
-                            <button type="submit" class="btn btn-default searchbutton mts-button hidden-xs"><span class="glyphicon glyphicon-search" onclick="searchButtonClicked(this)"></span></button></form>
+                            <button type="submit" class="btn btn-default searchbutton mts-button hidden-xs"><span class="glyphicon glyphicon-search"></span></button></form>
                           </div>
                     </nav>
 
@@ -96,7 +96,7 @@
                         <form class="pure-form pure-form-aligned" action="{% url 'login' %}?next={{ request.path }}" method="POST" id="loginForm">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="email_field">Email or Username</label>
+                                    <label for="email_field">Email</label>
                                     <input name="username" id="email_field" type="text" placeholder="Email or Username">
                                 </div>
 
@@ -327,238 +327,24 @@
         </div>
 
 
-
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-        <script src="{% static "spin.min.js" %}"></script>
         <script>
-            //The necessary evil
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie != '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = jQuery.trim(cookies[i]);
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-            var csrftoken = getCookie('csrftoken');
+            var URL_GET_ALL_TAGS = "{% url "get_all_tags" %}";
+            var URL_LOGIN = "{% url 'login' %}";
+            var URL_USER_LIGHTBOX_AJAX = "{% url 'user_lightbox_ajax' %}";
+            var USER_ID = "{{ user.id }}";
 
             var user_logged_in = false;
             {% if user.is_authenticated %}
-                user_logged_in = true;
-            {% endif %}
-
-            var smallSpinOpts = {
-                lines: 9, // The number of lines to draw
-                  length: 0, // The length of each line
-                  width: 4, // The line thickness
-                  radius: 28, // The radius of the inner circle
-                  corners: 0, // Corner roundness (0..1)
-                  rotate: 0, // The rotation offset
-                  direction: 1, // 1: clockwise, -1: counterclockwise
-                  color: '#000', // #rgb or #rrggbb or array of colors
-                  speed: 1, // Rounds per second
-                  trail: 60, // Afterglow percentage
-                  shadow: false, // Whether to render a shadow
-                  hwaccel: false, // Whether to use hardware acceleration
-                  className: 'spinner', // The CSS class to assign to the spinner
-                  zIndex: 2e9, // The z-index (defaults to 2000000000)
-                  top: '50%', // Top position relative to parent
-                  left: '50%' // Left position relative to parent
-            };
-
-            var tags = [];
-            $.ajax({
-                url: "{% url "get_all_tags" %}"
-            }).success(function (data) {
-                tags = data.tags; //It's coming back as JSON, so no need to parse...weird.
-            }).error(function (data) {
-                console.error(data);
-            });
-
-
-            function showSearchButton() {
-                $('.searchbutton').show(200);
-            }
-
-            function hideSearchButton() {
-                $('.searchbutton').delay(250).hide(200);
-            }
-
-            function searchButtonClicked(sender) {
-
-            }
-
-            function handleLoginHover(sender) {
-
-            }
-
-            function loginSubmit(username, password) {
-                var next = window.location.pathname;
-                var loginUrl = "{% url 'login' %}"; // add the 'next' parameter to the 'POST' as a 'GET' parameter
-                var loginForm = document.createElement('form');
-                loginForm.setAttribute("style", "display: none;");
-                loginForm.method = "POST";
-                loginForm.action = loginUrl + "?next=" + next;
-
-                var formUsername = document.createElement('input');
-                formUsername.setAttribute("type", "hidden");
-                formUsername.name = "username";
-                formUsername.value =  username;
-
-                var formPassword = document.createElement('input');
-                formPassword.setAttribute("type", "password");
-                formPassword.name = "password";
-                formPassword.value =  password;
-
-                var formCSRF = document.createElement('input');
-                formCSRF.setAttribute("type", "hidden");
-                formCSRF.name = "csrfmiddlewaretoken";
-                formCSRF.value =  csrftoken;
-
-                document.getElementsByTagName('body')[0].appendChild(loginForm);
-                loginForm.appendChild(formUsername);
-                loginForm.appendChild(formPassword);
-                loginForm.appendChild(formCSRF);
-
-                console.log(username);
-                console.log(formPassword.value);
-
-                loginForm.submit();
-
-
-
-                //This is when we actually create a fake form, fill with username & password data, then submit via post
-            }
-
-            function showUserErrorMessage(message) {
-
-            }
-
-            {% if user != None %}
-
-            var responseData;
-            function createLightboxServerside(lightboxName, successCallback, failureCallback) {
-                $.ajax({
-                    url: "{% url 'user_lightbox_ajax' %}",
-                    type: 'POST',
-                    data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'create', userId: {{ user.id }}, lightboxName: lightboxName}
-                }).success(function(data) {
-                    if (data.success == true) {
-                        successCallback(data);
-                    } else {
-                        failureCallback();
-                    }
-                }).error(function () {
-                    failureCallback();
-                });
-            }
-
-
-            function createNewLightbox(sender, parentModal, nameSource) {
-                var $parentModal = $(parentModal);
-                var $nameSource = $(nameSource);
-                var newLightboxName;
-                if($nameSource.val().trim() != "") {
-                    newLightboxName = $nameSource.val().trim();
-                    createLightboxServerside(newLightboxName, function(serverResponse) {
-                        $parentModal.modal('hide');
-                        $('<a class="btn btn-default mts-button dropdown-button" data-lightbox-button-for="' + serverResponse.id + '" href="/lightbox/' + serverResponse.id + '">' + serverResponse.name + '<span class="lightbox-remove-icon" onclick="$(this).parent().click(function(e) {e.preventDefault();}); deleteLightbox(' + serverResponse.id + ')"><span class="glyphicon glyphicon-remove"></span></span></a>').insertBefore("#create-lightbox-button");
-                        $nameSource.val('');
-                        addModalLightboxOption({name: serverResponse.name, id: serverResponse.id});
-                    }, function() {
-                        //Unable to create lightbox
-                    });
-                }
-            }
-
-            {% endif %}
-
-            function toggleCustomDropdown(sender, target) {
-                var $target = $(target);
-                if($target.is(":visible")) {
-                    $target.hide(200);
-                } else {
-                    $(".dropdown-slider").not(sender).hide(200);
-                    $target.css("left", $(sender).position().left);
-                    $target.show(200);
-                }
-            }
-
-            $(".dropdown-trigger").blur(function() {
-                $("#" + $(this).attr("data-dw-trigger-target")).delay(200).hide(200);
-            });
-
-            function deleteLightbox(id) {
-                if(confirm("Are you sure you want to delete the Lightbox \"" + $("[data-lightbox-button-for=" + id + "]").text() + "\"?")) {
-                    $.ajax({
-                        url: "{% url 'user_lightbox_ajax' %}",
-                        type: 'POST',
-                        data: {csrfmiddlewaretoken: csrftoken, transaction_type: 'delete', id: id}
-                    }).success(function(data) {
-                        console.log(data.success);
-                        $("[data-lightbox-button-for=" + id + "]").remove();
-                        $("[data-lightbox-id=" + id + "]").remove();
-                    }).error(function(data) {
-                    });
-                }
-            }
-
-            function userLogout() {
-
-                var next = window.location.pathname;
-
-                var logoutForm = document.createElement('form');
-                logoutForm.setAttribute("style", "display: none;");
-                logoutForm.action = "{% url 'login' %}" + "?next=" + next;
-                logoutForm.method = "POST";
-
-                var logoutInput = document.createElement("input");
-                logoutInput.name = "logout";
-                logoutInput.value = "";
-                logoutInput.type = "hidden";
-
-                var formCSRF = document.createElement('input');
-                formCSRF.setAttribute("type", "hidden");
-                formCSRF.name = "csrfmiddlewaretoken";
-                formCSRF.value =  csrftoken;
-
-
-                logoutForm.appendChild(logoutInput);
-                logoutForm.appendChild(formCSRF);
-                logoutForm.submit();
-            }
-
-            function addModalLightboxOption(lightbox) {
-                $('<button class="btn btn-default mts-button lightbox-select-item" data-lightbox-id="' + lightbox.id + '" onclick="lightboxDropdownSelected(this)">' + lightbox.name + '</button>').appendTo(".lightbox-modal-select");
-            }
-
-            function showUserMessage(message) {
-                $("#userProgressMessage").text(message);
-                $("#userProgressModal").modal('show');
-            }
-
-            function promptUser(message, confirmCallback, cancelCallback) {
-                $("#promptMessage").text(message);
-                $("#promptUserModal").modal('show');
-                $("#promptConfirmButton").attr("onclick", "(" + confirmCallback + ")()");
-                $("#promptCancelButton").attr("onclick", "(" + cancelCallback + ")()");
-            }
-
-            //Hide dropdown:
-            //("#user-dropdown button").animate({height: 0, padding:0}, 'fast');
-
-            //Show dropdown:
-            //$("#user-dropdown button").animate({height: 32, 'padding-top': 6, 'padding-bottom':6, 'padding-left': 12, 'padding-right':12}, 'fast');
-
+            user_logged_in = true;
         </script>
+        <script src="{% static "lightbox-utils.js" %}"></script>
+        <script>
+            {% endif %}
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="{% static "spin.min.js" %}"></script>
+        <script src="{% static 'utils.js' %}"></script>
     {% block put_scripts_here %}{% endblock %}
     </body>
 </html>
