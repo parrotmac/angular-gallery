@@ -69,7 +69,7 @@ def view_home(request):
     lightboxes = None
     if request.user.is_authenticated():
         lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
-    response_dict = {'thumbnail_galleries': Gallery.objects.filter(active=True), 'lightboxes': lightboxes}
+    response_dict = {'thumbnail_galleries': Gallery.objects.filter(active=True).order_by('pk'), 'lightboxes': lightboxes}
     for primary in primary_feature_attributes:
         response_dict[primary] = Configuration.get_pref(primary)
     for secondary in secondary_feature_attributes:
