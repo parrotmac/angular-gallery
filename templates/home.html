@@ -10,13 +10,13 @@
 {% block page_option_extra_item %}{% endblock %}
 {% block page_content %}
             <div class="feature-area">
-                <a class="feature-link primary-feature-link" href="#">
-                    <img src="http://dummyimage.com/600x400/777/CCC" class="pretty-image img-responsive">
-                    <span class="feature-hover-text">This is where you can put an 600x400px to feature a gallery</span>
+                <a class="feature-link primary-feature-link" href="{% url 'view_gallery' primary_target_gallery %}">
+                    <img src="/media/{{ primary_feature_img }}" class="pretty-image img-responsive">
+                    <span class="feature-hover-text"><span style="font-size: 20pt">{{ primary_feature_heading }}</span><br> {{ primary_feature_subheading }}</span>
                 </a>
-                <a class="feature-link secondary-feature-link" href="#">
-                    <img src="http://dummyimage.com/400x400/CCC/777" class="pretty-image img-responsive">
-                    <span class="feature-hover-text">This is where you can put an 600x400px to feature a (probably) different gallery</span>
+                <a class="feature-link secondary-feature-link" href="{% url 'view_gallery' secondary_target_gallery %}">
+                    <img src="/media/{{ secondary_feature_img }}" class="pretty-image img-responsive">
+                    <span class="feature-hover-text"><span style="font-size: 20pt">{{ secondary_feature_heading }}</span><br> {{ secondary_feature_subheading }}</span>
                 </a>
                 <div class="clear-fix"></div>
             </div>
@@ -153,3 +153,4 @@
     </script>
 
 {% endblock %}
+r

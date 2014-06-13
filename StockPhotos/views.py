@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from AngualrGallery import settings
 from django.core.files import File
-from django.db.models import Q
 from django.template import *
 from iptcinfo import IPTCInfo
 import re
@@ -17,6 +16,16 @@ import uuid
 import os
 import json
 
+
+primary_feature_attributes = ['primary_feature_img',
+                              'primary_feature_heading',
+                              'primary_feature_subheading',
+                              'primary_target_gallery']
+
+secondary_feature_attributes = ['secondary_feature_img',
+                                'secondary_feature_heading',
+                                'secondary_feature_subheading',
+                                'secondary_target_gallery']
 
 def user_login(request):
     notwelcome = {}
@@ -56,51 +65,16 @@ def dump_image_paths(request):
     return render(request, "dump_image_paths.html", {'images': Photo.objects.all()})
 
 
-# def home(request):
-#
-#     primary_feature = GalleryFeature.objects.filter(type='0').first()  # You can call .first() or address [0]
-#     secondary_feature_top = GalleryFeature.objects.filter(type='1').first()
-#     secondary_feature_bottom = GalleryFeature.objects.filter(type='2').first()
-#
-#     not_welcome = {}
-#     is_staff = False
-#     if request.method == 'POST':
-#         if request.POST.has_key('logout'):
-#             logout(request)
-#         else:
-#             #Login
-#             username = request.POST['username']
-#             password = request.POST['password']
-#             active_user = authenticate(username=username, password=password)
-#             if active_user is not None:
-#                 if active_user.is_active:
-#                     login(request, active_user)
-#                     if active_user.is_staff:
-#                         is_staff = True
-#
-#                     # If user was going somewhere, but needs to sign in first,
-#                     # this will send them on their way once authenticated
-#                     if 'next' in request.GET.keys():
-#                         return HttpResponseRedirect(request.GET['next'])
-#                     else:
-#                         return HttpResponseRedirect("/")
-#                 else:
-#                     not_welcome['disabled'] = 'This account has been disabled.'
-#             else:
-#                 not_welcome['invalid'] = "Invalid username or password"
-#     return render(request, "base.html", {'problems': not_welcome,
-#                                          'is_staff': is_staff,
-#                                          'galleries': Gallery.objects.all(),
-#                                          'latest': Photo.objects.all().reverse()[:5],
-#                                          'primary_feature': primary_feature,
-#                                          'secondary_feature_top': secondary_feature_top,
-#                                          'secondary_feature_bottom': secondary_feature_bottom})
-
 def view_home(request):
     lightboxes = None
     if request.user.is_authenticated():
         lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
-    return render_to_response("home.html", {'thumbnail_galleries': Gallery.objects.filter(active=True), 'lightboxes': lightboxes}, context_instance=RequestContext(request))
+    response_dict = {'thumbnail_galleries': Gallery.objects.filter(active=True), 'lightboxes': lightboxes}
+    for primary in primary_feature_attributes:
+        response_dict[primary] = Configuration.get_pref(primary)
+    for secondary in secondary_feature_attributes:
+        response_dict[secondary] = Configuration.get_pref(secondary)
+    return render_to_response("home.html", response_dict, context_instance=RequestContext(request))
 
 
 def view_gallery(request, gallery_id):
@@ -131,13 +105,27 @@ def view_photo(request, photo_id):
 
 def lightbox(request, lightbox_id=None):
     if request.user.is_authenticated():
+        if request.method == 'POST':
+            if "lightbox-delete" in request.POST:
+                LightBox.objects.get(id=request.POST['lightbox-delete']).delete()
+                return HttpResponseRedirect("/")
         lightboxes = LightBox.objects.filter(user=Customer.objects.get(user=request.user))
         if lightbox_id:
             lightbox = LightBox.objects.get(id=lightbox_id)
+            lb_photos = lightbox.images.all()
+            paginator = Paginator(lb_photos, 16)
+            page = request.GET.get('page')
+            try:
+                photos = paginator.page(page)
+            except PageNotAnInteger:
+                photos = paginator.page(1)
+            except EmptyPage:
+                photos = paginator.page(paginator.num_pages)
             if lightbox.user.user == request.user:
-                return render_to_response("lightbox.html", {'lightbox': lightbox, 'lightboxes': lightboxes}, context_instance=RequestContext(request))
+                return render_to_response("lightbox.html", {'lightbox': lightbox, 'photos': photos, 'lightboxes': lightboxes}, context_instance=RequestContext(request))
             else:
-                return HttpResponse("You're not authorized to view this lightbox")
+                # return HttpResponse("You're not authorized to view this lightbox")
+                return HttpResponseRedirect("/")
         else:
             if lightboxes.count() < 1:
                 lightboxes = None
@@ -161,6 +149,14 @@ def user_lightbox_ajax(request):
         if request.POST['transaction_type'] == 'add_photo':
             new_lb_relation = LightBox.objects.get(id=request.POST['lightbox_id']).images.add(Photo.objects.get(id=request.POST['image_id']))
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+        if request.POST['transaction_type'] == 'remove_photo':
+            photo_id = request.POST['photo_id']
+            target_lightbox = LightBox.objects.get(id=request.POST['lightbox_id'])
+            if target_lightbox.user.user == request.user:
+                target_lightbox.images.remove(Photo.objects.get(id=photo_id))
+                return HttpResponse(json.dumps({'success': True, 'photo_id': photo_id}), content_type='application/json')
+            else:
+                return HttpResponse(json.dumps({'success': False, 'reason': 'unauthorized'}))
     return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
 
@@ -447,14 +443,52 @@ def manage_upload(request):
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_feature_upload(request):
     if request.method == "POST":
-        postData = {}
-        for key, value in request.POST.iteritems():
-            postData[key] = value
-        return HttpResponse(json.dumps(postData))
-        # if request.POST['primary-feature'] is not None:
-        #     print prim
-    else:
-        return render(request, "manage/manage_features.html", {"galleries": Gallery.objects.all()})
+
+        if request.POST['transaction_type'] == 'primary_feature':
+            Configuration.set_pref(primary_feature_attributes[1], request.POST[primary_feature_attributes[1]])
+            Configuration.set_pref(primary_feature_attributes[2], request.POST[primary_feature_attributes[2]])
+            Configuration.set_pref(primary_feature_attributes[3], request.POST[primary_feature_attributes[3]])
+            if primary_feature_attributes[0] in request.FILES:
+                feature_file = request.FILES[primary_feature_attributes[0]]
+                file_type = feature_file.content_type.split("/")[1]
+                file_extension = None
+                if file_type == "png":
+                    file_extension = file_type
+                if file_type == "jpeg" or file_type == "jpg":
+                    file_extension = 'jpg'
+                file_name = str(os.path.join("uploads/features", str(uuid.uuid1()) + "." + file_extension))
+                feature_file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+                Configuration.set_pref(primary_feature_attributes[0], file_name)
+                with open(feature_file_path, 'wb+') as destination:
+                    for chunk in feature_file.chunks():
+                        destination.write(chunk)
+
+        if request.POST['transaction_type'] == 'secondary_feature':
+            Configuration.set_pref(secondary_feature_attributes[1], request.POST[secondary_feature_attributes[1]])
+            Configuration.set_pref(secondary_feature_attributes[2], request.POST[secondary_feature_attributes[2]])
+            Configuration.set_pref(secondary_feature_attributes[3], request.POST[secondary_feature_attributes[3]])
+            if secondary_feature_attributes[0] in request.FILES:
+                feature_file = request.FILES[secondary_feature_attributes[0]]
+                file_type = feature_file.content_type.split("/")[1]
+                file_extension = None
+                if file_type == "png":
+                    file_extension = file_type
+                if file_type == "jpeg" or file_type == "jpg":
+                    file_extension = 'jpg'
+                file_name = str(os.path.join("uploads/features", str(uuid.uuid1()) + "." + file_extension))
+                feature_file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+                Configuration.set_pref(secondary_feature_attributes[0], file_name)
+                with open(feature_file_path, 'wb+') as destination:
+                    for chunk in feature_file.chunks():
+                        destination.write(chunk)
+
+    request_dictionary = {}
+    for attribute in primary_feature_attributes:
+        request_dictionary[attribute] = Configuration.get_pref(attribute)
+    for attribute in secondary_feature_attributes:
+        request_dictionary[attribute] = Configuration.get_pref(attribute)
+    request_dictionary['galleries'] = Gallery.objects.all()
+    return render_to_response("manage/manage_features.html", request_dictionary, context_instance=RequestContext(request))
 
 
 # @user_passes_test(lambda u:u.is_staff, login_url='/login/')
@@ -473,17 +507,7 @@ def get_tags(request):
 
 
 def user_create_account(request):
-    primary_feature_attributes = ['primary_feature_img', 'primary_feature_heading', 'primary_feature_subheading']
-    secondary_feature_attributes = ['secondary_feature_img', 'secondary_feature_heading', 'secondary_feature_subheading']
     if request.method == "POST":
-        for key, value in request.POST:
-            if key == 'csrfmiddlewaretoken':
-                continue
-
-    request_dictionary = {}
-    for attribute in primary_feature_attributes:
-        request_dictionary[attribute] = Configuration.get_pref(attribute)
-    for attribute in secondary_feature_attributes:
-        request_dictionary[attribute] = Configuration.get_pref(attribute)
-    return render_to_response('user_create_account.html', request_dictionary, context_instance=RequestContext(request))
+        return  HttpResponse(json.dumps(request.POST), content_type='application/json')
+    return render_to_response('user_create_account.html', context_instance=RequestContext(request))
 

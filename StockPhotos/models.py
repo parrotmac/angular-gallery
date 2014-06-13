@@ -150,4 +150,7 @@ class Configuration(models.Model):
             config = Configuration.objects.get(name=key)
         except Configuration.DoesNotExist:
             config = None
-        return str(json.loads(config.document)['value'])
+        try:
+            return str(json.loads(config.document)['value'])
+        except AttributeError:
+            return None

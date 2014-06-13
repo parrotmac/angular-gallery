@@ -16,12 +16,16 @@
     <hr>
     <div class="row">
         <div class="col-lg-8">
-            <img src="{{ primary_feature_img }}" class="img-responsive">
+            <img src="/media/{{ primary_feature_img }}" class="img-responsive">
         </div>
         <div class="col-lg-4">
-            <form role="form" action="" method="POST">
+            <form role="form" action="{% url 'manage_feature_upload' %}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="transaction_type" value="primary_feature">
                 <div class="form-group">
-                    <label>Primary Feature Heading<input type="text" class="form-control" size="20" name="primary_feature_heading" value="{{ primary_feature_heading }}"></label>
+                    <label>Target Gallery: <select name="primary_target_gallery">{% for gallery in galleries %}<option value="{{ gallery.id }}" {% if gallery.id|add:0 == primary_target_gallery|add:0 %}selected{% endif %}>{{ gallery }}</option>{% endfor %}</select></label>
+                </div>
+                <div class="form-group">
+                    <label>Primary Feature Heading<input type="text" class="form-control" size="40" name="primary_feature_heading" value="{{ primary_feature_heading }}"></label>
                 </div>
                 <div class="form-group">
                     <label>Primary Feature Subheading<input type="text" class="form-control" size="40" name="primary_feature_subheading" value="{{ primary_feature_subheading }}"></label>
@@ -37,12 +41,16 @@
     <hr>
     <div class="row">
         <div class="col-lg-6">
-            <img src="{{ secondary_feature_img }}" class="img-responsive">
+            <img src="/media/{{ secondary_feature_img }}" class="img-responsive">
         </div>
         <div class="col-lg-6">
-            <form role="form" action="" method="POST">
+            <form role="form" action="{% url 'manage_feature_upload' %}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="transaction_type" value="secondary_feature">
                 <div class="form-group">
-                    <label>Secondary Feature Heading<input type="text" class="form-control" size="20" name="secondary_feature_heading" value="{{ secondary_feature_heading }}"></label>
+                    <label>Target Gallery: <select name="secondary_target_gallery">{% for gallery in galleries %}<option value="{{ gallery.id }}" {% if gallery.id|add:0 == secondary_target_gallery|add:0 %}selected{% endif %}>{{ gallery }}</option>{% endfor %}</select></label>
+                </div>
+                <div class="form-group">
+                    <label>Secondary Feature Heading<input type="text" class="form-control" size="40" name="secondary_feature_heading" value="{{ secondary_feature_heading }}"></label>
                 </div>
                 <div class="form-group">
                     <label>Secondary Feature Subheading<input type="text" class="form-control" size="40" name="secondary_feature_subheading" value="{{ secondary_feature_subheading }}"></label>

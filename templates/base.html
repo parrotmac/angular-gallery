@@ -223,7 +223,7 @@
     <div class="container">
         <div class="site-bounds">
             <div class="row">
-                <div class="col-md-4 col-xs-12 logo-container" style="right: -10px;"><a href="/"><img src="http://isaacparker.org/mts/mts-logo-cropped.png" class="logo img-responsive pretty-image"></a></div>
+                <div class="col-md-4 col-xs-12 logo-container" style="right: -10px;"><a href="/"><img src="http://isaacparker.org/mts/mts-logo-cropped.png" alt="Matthew Turley Stock Logo" class="logo img-responsive pretty-image"></a></div>
                 <div class="col-md-8 col-xs-12 nav-container" style="right: 10px;">
                       <nav class="navbar navbar-default" role="navigation">
                           <div class="navbar-form navbar-right">
@@ -303,13 +303,13 @@
                         <form class="pure-form pure-form-aligned" action="{% url 'login' %}?next={{ request.path }}" method="POST" id="loginForm">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="name">Email or Username</label>
-                                    <input name="username" type="text" placeholder="Email or Username">
+                                    <label for="email_field">Email or Username</label>
+                                    <input name="username" id="email_field" type="text" placeholder="Email or Username">
                                 </div>
 
                                 <div class="pure-control-group">
-                                    <label for="password">Password</label>
-                                    <input name="password" type="password" placeholder="Password" onkeydown="if(event.keyCode == 13){$('#loginSubmitButton').click()}">
+                                    <label for="password_field">Password</label>
+                                    <input name="password" id="password_field" type="password" placeholder="Password" onkeydown="if(event.keyCode == 13){$('#loginSubmitButton').click()}">
                                 </div>
 
                                 {% csrf_token %}
@@ -474,7 +474,7 @@
                         <h1 id="createLightboxLabel">Create New Lightbox</h1>
                     </div>
                     <div class="modal-body">
-                        <label>Name: <input type="text" id="newLightboxName" onkeydown="if(event.keyCode == 13){$('#createLightboxSubmit').click()}"></label>
+                        <label>Name: <input type="text" id="newLightboxName" size="38" maxlength="35" onkeydown="if(event.keyCode == 13){$('#createLightboxSubmit').click()}"></label>
                     </div>
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Cancel</button>
@@ -515,19 +515,21 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default mts-button" data-dismiss="modal">Okay</button>
                     </div>
+                </div>
             </div>
         </div>
 
         <div class="modal fade" tabindex="-1" role="dialog" id="promptUserModal">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-body" id="userProgressModalBody" style="min-height: 100px;">
+                    <div class="modal-body" style="min-height: 100px;">
                         <h4 id="promptMessage"></h4>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default mts-button" data-dismiss="modal" id="promptCancelButton">Cancel</button>
                         <button type="button" class="btn btn-default mts-button" data-dismiss="modal" id="promptConfirmButton">Okay</button>
                     </div>
+                </div>
             </div>
         </div>
 
@@ -710,6 +712,7 @@
                     }).success(function(data) {
                         console.log(data.success);
                         $("[data-lightbox-button-for=" + id + "]").remove();
+                        $("[data-lightbox-id=" + id + "]").remove();
                     }).error(function(data) {
                     });
                 }
