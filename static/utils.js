@@ -117,6 +117,8 @@ $(".dropdown-trigger").blur(function() {
 
 function deleteLightbox(id) {
     if(confirm("Are you sure you want to delete the Lightbox \"" + $("[data-lightbox-button-for=" + id + "]").text() + "\"?")) {
+
+
         $.ajax({
             url: URL_USER_LIGHTBOX_AJAX,
             type: 'POST',
@@ -125,6 +127,11 @@ function deleteLightbox(id) {
             console.log(data.success);
             $("[data-lightbox-button-for=" + id + "]").remove();
             $("[data-lightbox-id=" + id + "]").remove();
+            if(typeof(lightbox_page_id) != "undefined") {
+            if (lightbox_page_id == id) {
+                document.location = "/";
+            }
+        }
         }).error(function(data) {
         });
     }

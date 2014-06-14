@@ -62,6 +62,8 @@
 {% block put_scripts_here %}
     <script>
 
+    var lightbox_page_id = {{ lightbox.id }};
+
     function areThereLightboxesLeft() {
         var $fluidHolder = $("#fluid-holder");
         if($fluidHolder.children().length < 1) {
