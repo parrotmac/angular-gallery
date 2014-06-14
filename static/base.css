@@ -170,7 +170,7 @@ body {
 }
 
 .dropdown-button {
-    display: block;
+    display: table;
     position: relative;
     z-index:15;
 
