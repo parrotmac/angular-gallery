@@ -531,11 +531,6 @@ def user_create_account(request):
                     setattr(base_customer, field_name, True)
             setattr(base_customer, field_name, request.POST[field_name])
         base_customer.save()
-        send_mail('Matthew Turley Stock Photography',
-                  base_customer.user.first_name + ',\n\n\tThanks for creating an account at MatthewTurleyStock.com.\n\n-The User Robot',
-                  'stock@matthewturleystock.com',
-                  [base_customer.user.email],
-                  fail_silently=True)
         authenticated_user = authenticate(username=request.POST['email'], password=request.POST['password'])
         login(request, authenticated_user)
         return render_to_response('user_create_success.html', context_instance=RequestContext(request))

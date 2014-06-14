@@ -41,6 +41,12 @@
     right: 10px;
 }
 
+@media screen and (max-width: 400px) {
+    .rc-arrow-absolute {
+        display: none;
+    }
+}
+
 .rc-arrow-absolute {
     width: 0;
 }
