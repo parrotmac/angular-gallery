@@ -353,11 +353,20 @@
             password_repeat : {
                 minlength : 5,
                 equalTo : "#password"
+            },
+            email: {
+                required: true,
+                email: true,
+                remote: "{% url 'username_availability_ajax' %}"
             }
         },
         messages: {
             password: "Password much be at least 5 characters",
-            password_repeat: "Passwords don't match"
+            password_repeat: "Passwords don't match",
+            email: {
+                required: "Please enter a valid email address",
+                remote: "Email is already registered"
+            }
         }
     });
     </script>

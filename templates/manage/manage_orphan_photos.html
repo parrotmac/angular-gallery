@@ -1,0 +1,8 @@
+{% extends "manage/manage_base.html" %}
+{% block page_title %}Orphaned Photos{% endblock %}
+{% block content %}
+    <hr>
+{% for photo in photos %}
+    <a href="{% url 'manage_photo_by_id' photo.id %}"><img src="{{ photo.thumbnail.url }}"></a>
+{% endfor %}
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, render_to_response
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
@@ -16,6 +17,7 @@ from PIL import Image
 import uuid
 import os
 import json
+import hashlib
 
 
 primary_feature_attributes = ['primary_feature_img',
@@ -163,7 +165,7 @@ def user_lightbox_ajax(request):
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage(request):
-    return render(request, "manage/manage_base.html")
+    return render_to_response("manage/manage_base.html", context_instance=RequestContext(request))
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def manage_gallery_cover(request):
@@ -507,10 +509,11 @@ def get_tags(request):
     return HttpResponse(json.dumps({"tags": tag_array}), content_type='application/json')
 
 
+
 def user_create_account(request):
     if request.method == "POST":
         param_dict = {}
-        base_user = User.objects.create_user(str(uuid.uuid1())[:30], request.POST['email'], request.POST['password'], first_name=request.POST['first_name'], last_name=request.POST['last_name'])
+        base_user = User.objects.create_user(request.POST['email'], request.POST['email'], request.POST['password'], first_name=request.POST['first_name'], last_name=request.POST['last_name'])
         base_customer = Customer.objects.create(user=base_user)
         for field in Customer._meta.fields:
             field_name = field.attname
@@ -533,8 +536,8 @@ def user_create_account(request):
                   'stock@matthewturleystock.com',
                   [base_customer.user.email],
                   fail_silently=True)
-        active_user = authenticate(email=request.POST['email'], password=request.POST['password'])
-        login(request, active_user)
+        authenticated_user = authenticate(username=request.POST['email'], password=request.POST['password'])
+        login(request, authenticated_user)
         return render_to_response('user_create_success.html', context_instance=RequestContext(request))
         # return  HttpResponse(json.dumps(request.POST), content_type='application/json')
     return render_to_response('user_create_account.html', context_instance=RequestContext(request))
@@ -576,3 +579,59 @@ def search(request):
         #             search_results.append(query_tag.photos.all())
         return render_to_response('search.html', {'matched_photos': photos, 'matched_tags': matched_tags, 'search_term': search_term}, context_instance=RequestContext(request))
     return render_to_response('search.html', context_instance=RequestContext(request))
+
+
+def manage_prefs(request):
+    return render_to_response('manage/manage_prefs.html')
+
+
+def manage_orphan_photos(request):
+    orphan_photos = Photo.objects.filter(gallery=None)
+    return render_to_response('manage/manage_orphan_photos.html', {'photos': orphan_photos}, context_instance=RequestContext(request))
+
+
+def manage_find_conflicts():
+
+    hash_dict = {}
+    for photo in Photo.objects.all():
+        hasher = hashlib.sha1()
+        with open(photo.thumbnail.path, 'rb') as temp_thumb:
+            buf = temp_thumb.read()
+            hasher.update(buf)
+            hash_dict[photo.id] = hasher.hexdigest()
+
+    just_hash_list = []
+    conflicts = []
+    for key in hash_dict:
+        q_sum = hash_dict[key]
+        for pony in just_hash_list:
+            if pony[1] == q_sum:
+                conflicts.append(pony)
+                conflicts.append((key, q_sum))
+                continue
+        just_hash_list.append((key, q_sum))
+
+    conflict_ids = {}
+    for pair in conflicts:
+        id_array = []
+        for zebra in conflicts:
+            if zebra[1] == pair[1]:
+                if zebra[0] not in id_array:
+                    id_array.append(zebra[0])
+        conflict_ids[pair[1]] = id_array
+
+    print conflict_ids
+
+    # return render_to_response('manage/manage_duplicates.html', {'conflicts': hash_dict} , context_instance=RequestContext(request))
+
+
+def username_availability_ajax(request):
+    username_available = True
+    try:
+        matching_users = User.objects.filter(username=request.GET.get('email'))
+        if matching_users.__len__() > 0:
+            username_available = False
+            print request.GET.get('email') + " is already taken"
+    except ObjectDoesNotExist:
+        pass
+    return HttpResponse(json.dumps(username_available), content_type='application/json')

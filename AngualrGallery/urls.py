@@ -17,6 +17,7 @@ urlpatterns = patterns('',
 
     url(r'^json/tags/', 'StockPhotos.views.get_tags', name="get_all_tags"),
     url(r'^json/lightbox/', 'StockPhotos.views.user_lightbox_ajax', name="user_lightbox_ajax"),
+    url(r'^json/username_available/', 'StockPhotos.views.username_availability_ajax', name="username_availability_ajax"),
 
     url(r'^login/', 'StockPhotos.views.user_login', name="login"),
 
@@ -36,6 +37,8 @@ urlpatterns = patterns('',
     url(r'^manage/gallery/json/$', 'StockPhotos.views.manage_gallery_json', name='manage_gallery_json'),
     url(r'^manage/upload/$', 'StockPhotos.views.manage_upload', name='manage_upload'),
     url(r'^manage/features/$', 'StockPhotos.views.manage_feature_upload', name='manage_feature_upload'),
+    url(r'^manage/preferences/$', 'StockPhotos.views.manage_prefs', name='manage_prefs'),
+    url(r'^manage/orphan-photos/$', 'StockPhotos.views.manage_orphan_photos', name='manage_orphan_photos'),
     # url(r'^manage/gallery/(?P<gallery_slug>[-\w]+)', 'StockPhotos.views.manage_gallery_slug', name='gallery_slug'),
 
     # Just for development

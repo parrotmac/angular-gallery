@@ -70,7 +70,7 @@ class Tag(models.Model):
 class Photo(models.Model):
     title = models.CharField(max_length=64, blank=True)
     description = models.TextField(blank=True, null=True)
-    gallery = models.ManyToManyField(Gallery)
+    gallery = models.ManyToManyField(Gallery, related_name='photos')
     image = models.ImageField(upload_to='uploads/')
     preview = models.ImageField(upload_to='uploads/previews/')
     thumbnail = models.FileField(upload_to='uploads/thumbnails/')
