@@ -1,8 +1,11 @@
 # Django settings for AngualrGallery project.
 import os
+import socket
 PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 DEBUG = True
+if socket.gethostname() == 'rn':
+    DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -11,7 +14,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-import socket
 if socket.gethostname() == "AluminumBeast.local":
     DATABASES = {
         'default': {
@@ -50,7 +52,7 @@ else:
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gallerydev.sianware.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
