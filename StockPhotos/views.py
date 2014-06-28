@@ -61,7 +61,7 @@ def user_login(request):
                     notwelcome['disabled'] = 'This account has been disabled.'
             else:
                 notwelcome['invalid'] = "Invalid username or password"
-    return render_to_response("login.html", {'notwelcome': notwelcome}, context_instance=RequestContext(request))
+    return render(request, "login.html", {'notwelcome': notwelcome})
 
 
 def dump_image_paths(request):

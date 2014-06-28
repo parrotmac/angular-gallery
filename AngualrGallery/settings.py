@@ -26,33 +26,16 @@ if socket.gethostname() == "AluminumBeast.local":
             'PORT': '',                        # Set to empty string for default.
         }
     }
-elif socket.gethostname() == "Masuoka.local":
-    print 'on Masuoka'
-    DATABASES = {
-        'default': {
-#            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#            'NAME': 'mtsdb',
-#            'USER': 'mtsuser',
-#            'PASSWORD': 'supersecretpassword',
-#            'HOST': 'localhost'
-             'ENGINE': 'django.db.backends.sqlite3',
-             'NAME': 'mts_django_site.db',
-        }
-    }
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'django_stock_gallery',
-            'USER': 'django_gallery',
-            'PASSWORD': 'as22ni37LIB',
-            'HOST': 'localhost'
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'database.db',
         }
     }
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['gallerydev.sianware.com']
+ALLOWED_HOSTS = ['secure.sianware.com', 'gallerydev.sianware.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
