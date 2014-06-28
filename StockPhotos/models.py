@@ -153,3 +153,24 @@ class Configuration(models.Model):
             return str(json.loads(config.document)['value'])
         except AttributeError:
             return None
+
+
+class SearchLog(models.Model):
+    term = models.CharField(max_length=40, blank=False)
+    count = models.IntegerField(max_length=10, blank=True, null=True)  # sure, sounds like a reasonable limit...
+    customer = models.ForeignKey(Customer, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.term
+
+    @staticmethod
+    def log_search(search_term, customer=None):
+        new_search_log = SearchLog.objects.get_or_create(term=search_term)
+        if customer is not None:
+            new_search_log[0].customer = customer
+        if new_search_log[1]:  # The search is new
+            new_search_log[0].count = 1
+            new_search_log[0].save()
+        else:
+            new_search_log[0].count += 1
+            new_search_log[0].save()

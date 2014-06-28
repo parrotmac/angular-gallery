@@ -541,14 +541,12 @@ def user_create_account(request):
 def search(request):
     if 'q' in request.GET:
         search_term = request.GET.get('q').strip()
+        if request.user.is_authenticated():
+            SearchLog.log_search(search_term, request.user.customer)
+        else:
+            SearchLog.log_search(search_term)
         if search_term == "":
             return render_to_response('search.html', context_instance=RequestContext(request))
-        print search_term
-        # tags_query = Tag.objects.filter(tag__icontains=search_term)
-        # print tags_query.__len__()
-        # photo_queries = Photo.objects.filter(tags__in=tags_query)
-        # print photo_queries
-        # return render_to_response('search.html', {'photos': photo_queries}, context_instance=RequestContext(request))
         matched_tags = []
         search_results = []
         for query_tag in Tag.objects.filter(tag__icontains=search_term):
