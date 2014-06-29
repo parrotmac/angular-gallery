@@ -15,6 +15,16 @@ IMAGE_RELEASE = (
     (2, 'N/A'),
 )
 
+COLOR_BLACK_WHITE = (
+    (0, 'Color'),
+    (1, 'Black & White')
+)
+
+ORIENTATION_CHOICES = (
+    (0, 'Horizontal'),
+    (1, 'Vertical')
+)
+
 
 class Customer(models.Model):
     user = models.OneToOneField(User)
@@ -78,11 +88,8 @@ class Photo(models.Model):
     model_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)
     property_release = models.SmallIntegerField(choices=IMAGE_RELEASE, default=2)
     published = models.BooleanField(default=True)
-
-    attr_color = models.BooleanField(blank=True, default=False, verbose_name='Color')
-    attr_black_white = models.BooleanField(blank=True, default=False, verbose_name='Black & White')
-    attr_vertical = models.BooleanField(blank=True, default=False, verbose_name='Vertical')
-    attr_horizontal = models.BooleanField(blank=True, default=False, verbose_name='Horizontal')
+    attr_color_bw = models.SmallIntegerField(choices=COLOR_BLACK_WHITE, default=0)
+    attr_orientation = models.SmallIntegerField(choices=ORIENTATION_CHOICES, default=0)
     attr_panoramic = models.BooleanField(blank=True, default=False, verbose_name='Panoramic')
 
     def __unicode__(self):
@@ -157,7 +164,6 @@ class Configuration(models.Model):
 
 class SearchLog(models.Model):
     term = models.CharField(max_length=40, blank=False)
-    count = models.IntegerField(max_length=10, blank=True, null=True)  # sure, sounds like a reasonable limit...
     customer = models.ForeignKey(Customer, blank=True, null=True)
 
     def __unicode__(self):
@@ -165,12 +171,14 @@ class SearchLog(models.Model):
 
     @staticmethod
     def log_search(search_term, customer=None):
-        new_search_log = SearchLog.objects.get_or_create(term=search_term)
+        new_search_log = SearchLog(term=search_term)
         if customer is not None:
-            new_search_log[0].customer = customer
-        if new_search_log[1]:  # The search is new
-            new_search_log[0].count = 1
-            new_search_log[0].save()
-        else:
-            new_search_log[0].count += 1
-            new_search_log[0].save()
+            new_search_log.customer = customer
+        new_search_log.save()
+
+    @staticmethod
+    def get_search_stats():
+        distinct_search_terms = SearchLog.objects.all().distinct('term')
+        for d_search_term in distinct_search_terms:
+            setattr(d_search_term, 'search_count', SearchLog.objects.filter(term=d_search_term.term).count())
+        return distinct_search_terms

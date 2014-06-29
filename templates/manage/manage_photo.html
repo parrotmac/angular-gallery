@@ -4,26 +4,10 @@
 {% block head_area %}
     <link href="{% static 'bootstrap-tagsinput.css' %}" rel="stylesheet">
     <style>
-    .main-table {
-{#        display: table;#}
-        padding: 20px;
-        width: 100%;
-        background-color: #e6e8e9;
-    }
-    .main-table div:first-child {
-        border-top: 0;
-    }
-    .table-row {
-        border-top: 1px dotted #525253;
-        margin: 20px 0;
-{#        display: table-row;#}
-{#        border-bottom: solid white 30px;#}
-    }
     .image-thumbnail {
         max-height: 400px;
         max-width: 400px;
     }
-
 
     .image-release ul {
         display: table;
@@ -48,76 +32,119 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>Edit Photo</h1>
-    <div class="main-table">
-        <div class="table-row"><h4>Photo ID: <strong>{{ image.pk }}</strong></h4></div>
-        <div class="table-row">
-            <label><h4>Title: </h4><input type="text" value="{{ image.title }}" size="40" onkeyup="if(event.keyCode == 13) {updateImageName({{ image.id }}, this)}"></label>
+    <h1>Edit Photo <small>Stock no. {{ image.pk }}</small></h1>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Published:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} />
+                </div>
+            </div>
         </div>
-        <div class="table-row">
-            <h4>Image:</h4>
-            <a href="{{ image.image.url }}" target="_blank"><img class="image-thumbnail" src="{{ image.thumbnail.url }}"></a>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Title: </h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <label><input type="text" value="{{ image.title }}" style="width: 100%" onkeyup="if(event.keyCode == 13) {updateImageName({{ image.id }}, this)}"></label>
+                </div>
+            </div>
         </div>
-{#        <div class="table-row">#}
-{#           data-toggle="collapse" data-target="#description-box"#}
-{#            <h4>Description:</h4>#}
-{#            <div id="description-box" class="collapse">#}
-{#                <span style="font-style: italic" >For ID purposes only, not displayed on website.</span><br />#}
-{#                <textarea class="text-area" rows="5" placeholder="Nothing defined...">{{ image.description }}</textarea>#}
-{#            </div>#}
-{#        </div>#}
-        <div class="table-row">
-            <h4>Tags:</h4>
-            <input type="text" id="tagsinput" class="typeahead" value="{% for tag in image.tags.all %}{{ tag }}{% if not forloop.last %},{% endif %}{% endfor %}">
-{#                <button class="btn btn-xs btn-success" data-toggle="modal" data-target="#newTabModal"><span class="glyphicon glyphicon-plus"></span></button></h4>#}
-{#            <textarea class="text-area">{% for tag in image.tags.all %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}</textarea>#}
-{#            <select name="tags-selector" style="height: 300px" multiple>#}
-{#                {% for tag in tags %}#}
-{#                    <option value="{{ tag.pk }}"#}
-{#                            {% for image_tag in image.tags.all %}#}
-{#                                {% if image_tag.pk ==  tag.pk %} selected{% endif %}#}
-{#                            {% endfor %}>{{ tag }}</option>>#}
-{#                {% endfor %}#}
-{#            </select>#}
-
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Image:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <a href="{{ image.image.url }}" target="_blank"><img class="image-thumbnail" src="{{ image.thumbnail.url }}"></a>
+                </div>
+            </div>
         </div>
-        <div class="table-row">
-            <h4>Published:</h4>
-            <input type="checkbox" class="published-checkbox" value="{{ image.pk }}" {% if image.published %}checked{% endif %} />
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Galleries:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul style="list-style: none; margin: 0; padding: 0">{% for gallery in galleries %}
+                        <li><label><input type="checkbox" value="{{ gallery.pk }}" onclick="updateImageGalleries(this)" {% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} checked="" {% endif %}{% endfor %}>&nbsp;{{ gallery.name }}</label></li>{% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="table-row"><h4>Galleries:</h4>
-            <ul style="list-style: none; margin: 0; padding: 0">{% for gallery in galleries %}
-                    <li><label><input type="checkbox" value="{{ gallery.pk }}" onclick="updateImageGalleries(this)" {% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} checked="" {% endif %}{% endfor %}>&nbsp;{{ gallery.name }}</label></li>{% endfor %}
-            </ul>
-{#            <select name="in_galleries" multiple>{% for gallery in galleries %}#}
-{#                    <option value="{{ gallery.pk }}"{% for image_gallery in image.gallery.all %}{% if image_gallery.pk ==  gallery.pk %} selected{% endif %}{% endfor %}>{{ gallery.name }}</option>>{% endfor %}#}
-{#            </select>#}
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Attributes:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <label>Color <input type="radio" name="attr_color" value="{{ image.id }}" {% if image.attr_color_bw == 0 %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+                    <label>Black & White <input type="radio" name="attr_color" data-false="true" value="{{ image.id }}" {% if image.attr_color_bw == 1 %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+                    <label>Vertical <input type="radio" name="attr_orientation" data-false="true" value="{{ image.id }}" {% if image.attr_orientation == 1 %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+                    <label>Horizontal <input type="radio" name="attr_orientation" value="{{ image.id }}" {% if image.attr_orientation == 0 %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
+                    <label>Panoramic <input type="checkbox" id="panoramic_check" name="attr_panoramic" value="{{ image.id }}" {% if image.attr_panoramic %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label>
+                </div>
+            </div>
         </div>
-        <div class="image-release table-row">
-            <h4>Model Release:</h4>
-            <ul>
-            <li><label>Yes <input onclick="updateImageRelease(this)" name="model_release" value="0" type="radio" {% if image.model_release == 0 %}checked{% endif %} /></label></li>
-            <li><label>No <input onclick="updateImageRelease(this)"  name="model_release" value="1" type="radio" {% if image.model_release == 1 %}checked{% endif %} /></label></li>
-            <li><label>N/A <input onclick="updateImageRelease(this)"  name="model_release" value="2" type="radio" {% if image.model_release == 2 %}checked{% endif %} /></label></li>
-            </ul>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Tags:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <input type="text" id="tagsinput" class="typeahead" value="{% for tag in image.tags.all %}{{ tag }}{% if not forloop.last %},{% endif %}{% endfor %}">
+                </div>
+            </div>
         </div>
-        <div class="image-release table-row">
-            <h4>Property Release:</h4>
-            <ul>
-            <li><label>Yes <input onclick="updateImageRelease(this)"  name="property_release" value="0" type="radio" {% if image.property_release == 0 %}checked{% endif %} /></label></li>
-            <li><label>No <input onclick="updateImageRelease(this)"  name="property_release" value="1" type="radio" {% if image.property_release == 1 %}checked{% endif %} /></label></li>
-            <li><label>N/A <input onclick="updateImageRelease(this)"  name="property_release" value="2" type="radio" {% if image.property_release == 2 %}checked{% endif %} /></label></li>
-            </ul>
+        <div class="image-release col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Model Release:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        <li><label>Yes <input onclick="updateImageRelease(this)" name="model_release" value="0" type="radio" {% if image.model_release == 0 %}checked{% endif %} /></label></li>
+                        <li><label>No <input onclick="updateImageRelease(this)"  name="model_release" value="1" type="radio" {% if image.model_release == 1 %}checked{% endif %} /></label></li>
+                        <li><label>N/A <input onclick="updateImageRelease(this)"  name="model_release" value="2" type="radio" {% if image.model_release == 2 %}checked{% endif %} /></label></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="table-row">
-            <h4>Attributes:</h4>
-            <label>Color <input type="checkbox" name="attr_color" value="{{ image.id }}" {% if image.attr_color %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
-            <label>Black & White <input type="checkbox" name="attr_black_white" value="{{ image.id }}" {% if image.attr_black_white %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
-            <label>Horizontal <input type="checkbox" name="attr_horizontal" value="{{ image.id }}" {% if image.attr_horizontal %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
-            <label>Vertical <input type="checkbox" name="attr_vertical" value="{{ image.id }}" {% if image.attr_vertical %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label><br>
-            <label>Panoramic <input type="checkbox" name="attr_panoramic" value="{{ image.id }}" {% if image.attr_panoramic %}checked="true"{% endif %} onclick="setImageAttributes(this)"></label>
+        <div class="image-release col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4>Property Release:</h4>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        <li><label>Yes <input onclick="updateImageRelease(this)"  name="property_release" value="0" type="radio" {% if image.property_release == 0 %}checked{% endif %} /></label></li>
+                        <li><label>No <input onclick="updateImageRelease(this)"  name="property_release" value="1" type="radio" {% if image.property_release == 1 %}checked{% endif %} /></label></li>
+                        <li><label>N/A <input onclick="updateImageRelease(this)"  name="property_release" value="2" type="radio" {% if image.property_release == 2 %}checked{% endif %} /></label></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div  class="table-row">
+        <div  class="col-sm-6">
             <br>
             <div class="panel panel-danger">
                 <div class="panel-heading">
@@ -178,11 +205,7 @@
             console.log("Updated Publish Status")
         }, function(){
             showUserErrorMessage("Unable to " + (sender.checked?"":"un") + "publish photo " + id);
-            if(sender.checked) {
-                sender.checked = false;
-            } else {
-                sender.checked = true;
-            }
+            sender.checked = !sender.checked;
         });
     }
 
@@ -198,7 +221,14 @@
     }
 
     function setImageAttributes(sender) {
-        updateImageAttribute(sender.value, sender.name, sender.checked, function(data) {
+        var isChecked = false;
+        if(sender.name == "attr_color"||sender.name == "attr_orientation") {
+            isChecked = !($(sender).attr("data-false")=="true");
+        } else {
+            isChecked = sender.checked;
+        }
+
+        updateImageAttribute(sender.value, sender.name, isChecked, function(data) {
             if(JSON.parse(data).success == true) {
                 //Awesome
             } else {

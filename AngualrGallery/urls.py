@@ -39,6 +39,7 @@ urlpatterns = patterns('',
     url(r'^manage/features/$', 'StockPhotos.views.manage_feature_upload', name='manage_feature_upload'),
     url(r'^manage/preferences/$', 'StockPhotos.views.manage_prefs', name='manage_prefs'),
     url(r'^manage/orphan-photos/$', 'StockPhotos.views.manage_orphan_photos', name='manage_orphan_photos'),
+    url(r'^manage/statistics/searches/$', 'StockPhotos.views.manage_search_statistics', name='manage_search_statistics'),
     # url(r'^manage/gallery/(?P<gallery_slug>[-\w]+)', 'StockPhotos.views.manage_gallery_slug', name='gallery_slug'),
 
     # Just for development

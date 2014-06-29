@@ -49,6 +49,7 @@ body{
 {% endblock %}
 {% block content %}
 {#    <h3>Showing page {{ photos.number }} of {{ photos.paginator.num_pages }}</h3>#}
+    <hr>
     <div class="rigidish-container">
         {% for photo in photos %}
             <div class="image-thumbnail-container"><a href="{% url "manage_photo_by_id" photo.pk %}"><img class="image-thumbnail" src="{{ photo.image.url }}" alt="{{ image.title }}" /></a></div>

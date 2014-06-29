@@ -181,13 +181,6 @@
     doneText.hide();
     progressWrapper.hide();
 
-    var imageAttributes = new Array({name: "Color", "model_name": "attr_color"},
-                           {name: "Black & White", "model_name": "attr_black_white"},
-                           {name: "Horizontal", "model_name": "attr_horizontal"},
-                           {name: "Vertical", "model_name": "attr_vertical"},
-                           {name: "Panoramic", "model_name": "attr_panoramic"});
-    var imageAttributesLength = imageAttributes.length;
-
     var fileListLength = 0;
     var numberDone = 0;
     function anotherFileDone(responseObject) {
@@ -220,23 +213,39 @@
             imageAttributeWell.classList.add('attribute-well');
         panelBody.appendChild(imageAttributeWell);
 
-        for(var imageAttributeCounter = 0; imageAttributeCounter < imageAttributesLength; imageAttributeCounter++) {
-            var imageAttributeLabel = document.createElement('label');
-                imageAttributeLabel.innerHTML = imageAttributes[imageAttributeCounter].name + "&nbsp;";
-            imageAttributeWell.appendChild(imageAttributeLabel);
+        var imageAttrColorRadio = $('<label>Color <input type="radio" data-modify="attr_color" name="attr_color-' + responseObject.siteId + '" checked value="' + responseObject.siteId + '" onclick="setImageAttributes(this)"></label>');
+        imageAttrColorRadio.appendTo(imageAttributeWell);
 
-            var imageAttributeCheck = document.createElement('input');
-                imageAttributeCheck.type = "checkbox";
-                imageAttributeCheck.value = responseObject.siteId;
-                imageAttributeCheck.name = imageAttributes[imageAttributeCounter].model_name;
-                imageAttributeCheck.setAttribute("onclick", "setImageAttributes(this)");
-            if (responseObject.orientation != null) {
-                if (responseObject.orientation == imageAttributes[imageAttributeCounter].model_name) {
-                    imageAttributeCheck.setAttribute("checked", "true");
-                }
-            }
-            imageAttributeLabel.appendChild(imageAttributeCheck);
-        }
+        var imageAttrBlackWhiteRadio = $('<label>Black & White <input type="radio" data-modify="attr_color" name="attr_color-' + responseObject.siteId + '" data-false="true" value="' + responseObject.siteId + '" onclick="setImageAttributes(this)"></label>');
+        imageAttrBlackWhiteRadio.appendTo(imageAttributeWell);
+
+        var imageAttrVerticalRadio = $('<label>Vertical <input type="radio" data-modify="attr_orientation" name="attr_orientation-' + responseObject.siteId + '" ' + (responseObject.orientation?"checked":0) +' data-false="true" value="' + responseObject.siteId + '" onclick="setImageAttributes(this)"></label>');
+        imageAttrVerticalRadio.appendTo(imageAttributeWell);
+
+        var imageAttrHorizontalRadio = $('<label>Horizontal <input type="radio" data-modify="attr_orientation" name="attr_orientation-' + responseObject.siteId + '" ' + (responseObject.orientation?0:"checked") +' value="' + responseObject.siteId + '" onclick="setImageAttributes(this)"></label>');
+        imageAttrHorizontalRadio.appendTo(imageAttributeWell);
+
+        var imageAttrPanoramicCheckBox = $('<label>Panoramic <input type="checkbox" data-modify="attr_panoramic" name="attr_panoramic-' + responseObject.siteId + '" value="' + responseObject.siteId + '" onclick="setImageAttributes(this)"></label>');
+        imageAttrPanoramicCheckBox.appendTo(imageAttributeWell);
+
+        //This code can go in a minute
+{#        for(var imageAttributeCounter = 0; imageAttributeCounter < imageAttributesLength; imageAttributeCounter++) {#}
+{#            var imageAttributeLabel = document.createElement('label');#}
+{#                imageAttributeLabel.innerHTML = imageAttributes[imageAttributeCounter].name + "&nbsp;";#}
+{#            imageAttributeWell.appendChild(imageAttributeLabel);#}
+{##}
+{#            var imageAttributeCheck = document.createElement('input');#}
+{#                imageAttributeCheck.type = "checkbox";#}
+{#                imageAttributeCheck.value = responseObject.siteId;#}
+{#                imageAttributeCheck.name = imageAttributes[imageAttributeCounter].model_name;#}
+{#                imageAttributeCheck.setAttribute("onclick", "setImageAttributes(this)");#}
+{#            if (responseObject.orientation != null) {#}
+{#                if (responseObject.orientation == imageAttributes[imageAttributeCounter].model_name) {#}
+{#                    imageAttributeCheck.setAttribute("checked", "true");#}
+{#                }#}
+{#            }#}
+{#            imageAttributeLabel.appendChild(imageAttributeCheck);#}
+{#        }#}
 
 {#        var tagTextArea = document.createElement("textarea");#}
 {#            tagTextArea.classList.add("tag-text-area");#}
@@ -417,7 +426,14 @@
         }).done(successCallback).error(failureCallback);
     }
     function setImageAttributes(sender) {
-        updateImageAttribute(sender.value, sender.name, sender.checked, function(data) {
+        var isChecked = false;
+        if(sender.name == "attr_color"||sender.name == "attr_orientation") {
+            isChecked = !($(sender).attr("data-false")=="true");
+        } else {
+            isChecked = sender.checked;
+        }
+
+        updateImageAttribute(sender.value, $(sender).attr("data-modify"), isChecked, function(data) {
             if(JSON.parse(data).success == true) {
                 //Awesome
             } else {

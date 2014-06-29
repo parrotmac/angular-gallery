@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, render_to_response
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
+import operator
 from StockPhotos.models import *
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
@@ -10,7 +11,6 @@ from AngualrGallery import settings
 from django.core.files import File
 from django.template import *
 from iptcinfo import IPTCInfo
-from django.core.mail import send_mail
 import re
 import cStringIO
 from PIL import Image
@@ -241,7 +241,17 @@ def manage_photo_json(request):
             photo_to_change.obliterate_object()  # This deletes the records, as well as the file
             return HttpResponse(json.dumps({'success': True}))
         if request.POST['transaction_type'].startswith('attr_'):
-            setattr(photo_to_change, request.POST['transaction_type'], request.POST['value'])
+            if request.POST['transaction_type'] == 'attr_color':
+                setattr(photo_to_change, 'attr_color_bw', (0 if json.loads(request.POST['value']) else 1))
+                photo_to_change.save()
+            elif request.POST['transaction_type'] == 'attr_orientation':
+                setattr(photo_to_change, 'attr_orientation', (0 if json.loads(request.POST['value']) else 1))
+                photo_to_change.save()
+            else:
+                print request.POST['transaction_type']
+                print json.loads(request.POST['value'])
+                setattr(photo_to_change, request.POST['transaction_type'], json.loads(request.POST['value']))
+                photo_to_change.save()
             return HttpResponse(json.dumps({'success': True}))
         if request.POST['transaction_type'].endswith('_release'):
             setattr(photo_to_change, request.POST['transaction_type'], request.POST['value'])
@@ -395,11 +405,13 @@ def manage_upload(request):
             preview_image.save(preview_file_path, "JPEG")
             img_image.save(image_file_path, "JPEG")
 
-            orientation = None
-            if thumbnail_image.size[0] > thumbnail_image.size[1]:
-                orientation = 'attr_horizontal'
-            elif thumbnail_image.size[0] < thumbnail_image.size[1]:
-                orientation = 'attr_vertical'
+            orientation = 0
+            if thumbnail_image.size[0] < thumbnail_image.size[1]:
+                orientation = 1
+            # if thumbnail_image.size[0] > thumbnail_image.size[1]:
+            #     orientation = 0
+            # elif thumbnail_image.size[0] < thumbnail_image.size[1]:
+            #     orientation = 1
 
             image_tags = []
             try:
@@ -412,7 +424,8 @@ def manage_upload(request):
                                              thumbnail=File(open(thumbnail_file_path)),
                                              preview=File(open(preview_file_path)))
 
-            setattr(new_image, orientation, True)
+            setattr(new_image, 'attr_orientation', orientation)
+            setattr(new_image, 'attr_color_bw', 0)
 
             os.remove(thumbnail_file_path)
             os.remove(preview_file_path)
@@ -422,7 +435,7 @@ def manage_upload(request):
 
             for tag in image_tags:
                 possibly_new_tag = Tag.objects.get_or_create(tag=tag)
-                json_tags_response.append({'value': possibly_new_tag[0].id, 'text': possibly_new_tag[0].tag })
+                json_tags_response.append({'value': possibly_new_tag[0].id, 'text': possibly_new_tag[0].tag})
                 new_image.tags.add(possibly_new_tag[0].id)
 
             new_image.save()
@@ -628,3 +641,27 @@ def username_availability_ajax(request):
     except ObjectDoesNotExist:
         pass
     return HttpResponse(json.dumps(username_available), content_type='application/json')
+
+
+def manage_search_statistics(request):
+    unordered_search_logs = SearchLog.get_search_stats()
+
+    search_logs = sorted(unordered_search_logs, key=operator.attrgetter('search_count'), reverse=True)
+
+    terms_per_page = 50
+    if request.GET.get('perPage') is not None:
+        try:
+            terms_per_page = request.GET.get('perPage')
+        except Exception:
+            pass
+
+    paginator = Paginator(search_logs, terms_per_page)
+    page = request.GET.get('page')
+    try:
+        search_log_page = paginator.page(page)
+    except PageNotAnInteger:
+        search_log_page = paginator.page(1)
+    except EmptyPage:
+        search_log_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'manage/manage_search_statistics.html', {'search_logs': search_log_page})

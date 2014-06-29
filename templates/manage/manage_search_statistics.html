@@ -1,0 +1,21 @@
+{% extends "manage/manage_base.html" %}
+{% block page_title %}Search Statistics{% endblock %}
+{% block head_area %}{% endblock %}
+{% block content %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Search Term</th>
+                <th>Number Of Searches</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for search_log in search_logs %}
+            <tr><td>{{ search_log.term }}</td><td>{{ search_log.search_count }}</td></tr>
+            {% empty %}
+            <tr><td colspan="2"><small>There haven't been any searches preformed</small></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+{% block put_script_tags_here %}{% endblock %}

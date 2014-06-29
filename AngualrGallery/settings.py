@@ -14,25 +14,25 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-if socket.gethostname() == "AluminumBeast.local":
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'mts_django_site',                      # Or path to database file if using sqlite3.
-            # The following settings are not used with sqlite3:
-            'USER': 'mts_dev_testing',
-            'PASSWORD': 'squigglyLines!eatCars',
-            'HOST': '127.0.0.1',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': '',                        # Set to empty string for default.
-        }
+# if socket.gethostname() == "AluminumBeast.local":
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#             'NAME': 'mts_django_site',                      # Or path to database file if using sqlite3.
+#             # The following settings are not used with sqlite3:
+#             'USER': 'mts_dev_testing',
+#             'PASSWORD': 'squigglyLines!eatCars',
+#             'HOST': '127.0.0.1',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+#             'PORT': '',                        # Set to empty string for default.
+#         }
+#     }
+# else:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'database.db',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'database.db',
-        }
-    }
+}
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['secure.sianware.com', 'gallerydev.sianware.com']
