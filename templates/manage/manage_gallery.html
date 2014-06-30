@@ -41,7 +41,7 @@
 {% block content %}
     <span style="font-size: 24pt">Gallery: <strong>{{ gallery.name }}</strong></span>
     <br>
-    <span style="font-size: 12pt; font-weight: bold"><span style="font-style: italic; font-size: 16pt">Contains {{ images.count }} image{{ images.count|pluralize }}</span>&nbsp;&nbsp;<a href="{% url 'manage_upload' %}?target={{ gallery.pk }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a><label style="float: right;">Active <input type="checkbox" value="{{ gallery.id }}" onclick="galleryActiveToggle(this)"></label></span>
+    <span style="font-size: 12pt; font-weight: bold"><span style="font-style: italic; font-size: 16pt">Contains {{ images.count }} image{{ images.count|pluralize }}</span>&nbsp;&nbsp;<a href="{% url 'manage_upload' %}?target={{ gallery.pk }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a><label style="float: right;">Active <input type="checkbox" value="{{ gallery.id }}" {% if gallery.active %}checked{% endif %} onclick="galleryActiveToggle(this)"></label></span>
     <hr />
     {% for image in images %}
         <div class="panel panel-default">
