@@ -627,8 +627,8 @@ def manage_find_conflicts():
         conflict_ids[pair[1]] = id_array
 
     print conflict_ids
-
-    # return render_to_response('manage/manage_duplicates.html', {'conflicts': hash_dict} , context_instance=RequestContext(request))
+    # return render_to_response('manage/manage_duplicates.html',
+    # {'conflicts': hash_dict} , context_instance=RequestContext(request))
 
 
 def username_availability_ajax(request):
