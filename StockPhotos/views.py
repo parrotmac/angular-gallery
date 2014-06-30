@@ -644,24 +644,9 @@ def username_availability_ajax(request):
 
 
 def manage_search_statistics(request):
-    unordered_search_logs = SearchLog.get_search_stats()
-
-    search_logs = sorted(unordered_search_logs, key=operator.attrgetter('search_count'), reverse=True)
-
-    terms_per_page = 50
-    if request.GET.get('perPage') is not None:
-        try:
-            terms_per_page = request.GET.get('perPage')
-        except Exception:
-            pass
-
-    paginator = Paginator(search_logs, terms_per_page)
-    page = request.GET.get('page')
-    try:
-        search_log_page = paginator.page(page)
-    except PageNotAnInteger:
-        search_log_page = paginator.page(1)
-    except EmptyPage:
-        search_log_page = paginator.page(paginator.num_pages)
-
-    return render(request, 'manage/manage_search_statistics.html', {'search_logs': search_log_page})
+    distinct_logs = SearchLog.objects.values_list('term', flat=True).distinct()
+    unordered_search_logs = []
+    for distinct_log in distinct_logs:
+        unordered_search_logs.append({"term": distinct_log, "search_count": SearchLog.objects.filter(term=distinct_log).count()})
+    search_logs = sorted(unordered_search_logs, key=lambda log: log['search_count'], reverse=True)
+    return render(request, 'manage/manage_search_statistics.html', {'search_logs': search_logs})

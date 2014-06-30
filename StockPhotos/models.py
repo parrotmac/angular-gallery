@@ -175,10 +175,3 @@ class SearchLog(models.Model):
         if customer is not None:
             new_search_log.customer = customer
         new_search_log.save()
-
-    @staticmethod
-    def get_search_stats():
-        distinct_search_terms = SearchLog.objects.all().distinct('term')
-        for d_search_term in distinct_search_terms:
-            setattr(d_search_term, 'search_count', SearchLog.objects.filter(term=d_search_term.term).count())
-        return distinct_search_terms
