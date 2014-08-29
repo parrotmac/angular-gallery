@@ -12,25 +12,17 @@ STAGING = False
 if socket.gethostname() == 'murray':
     STAGING = True
 
+PRODUCTION = False
+if socket.gethostname() == 'ip-50-63-147-106.ip.secureserver.net':
+    PRODUCTION = True
+    DEBUG = False
+
 ADMINS = (
     ('Isaac Parker', 'isaac@sianware.com'),
 )
 
 MANAGERS = ADMINS
 
-# if socket.gethostname() == "AluminumBeast.local":
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#             'NAME': 'mts_django_site',                      # Or path to database file if using sqlite3.
-#             # The following settings are not used with sqlite3:
-#             'USER': 'mts_dev_testing',
-#             'PASSWORD': 'squigglyLines!eatCars',
-#             'HOST': '127.0.0.1',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-#             'PORT': '',                        # Set to empty string for default.
-#         }
-#     }
-# else:
 if STAGING:
     DATABASES = {
         'default': {
@@ -38,6 +30,17 @@ if STAGING:
             'NAME': 'django',
             'USER': 'django',
             'PASSWORD': 'password',
+            'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': '',  # Set to empty string for default.
+        }
+    }
+elif PRODUCTION:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'mtsadmin_django_stock_site',
+            'USER': 'mtsadmin_newsite',
+            'PASSWORD': '3abEQ[Hc6+ZTJ^T,L%',
             'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
             'PORT': '',  # Set to empty string for default.
         }
@@ -51,7 +54,7 @@ else:
     }
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['panda.gnoek.com', 'secure.sianware.com', 'gallerydev.sianware.com']
+ALLOWED_HOSTS = ['panda.gnoek.com', 'localhost', 'secure.sianware.com', 'gallerydev.sianware.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -112,7 +115,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'jbg*l$&u)8sz@i97u53*5k*vsklwrr9-1gtjt6ijjx!h1f*7wb'
+SECRET_KEY = 'jbg*l$&u)8sz@i97u53*5k*vsklwvg8-1gtjt6ijjx!h1f*7wb'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
